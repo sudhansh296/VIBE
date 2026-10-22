@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Video calling</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<script src="assets/demo-data.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="stylesheet" href="assets/call.css">
+<style>
+  .self { background: radial-gradient(ellipse at 50% 35%, #34324a, #0b0b12 75%); transition: transform .3s; }
+  .self .face { background: radial-gradient(circle at 50% 40%, #59577a, #2a2940 70%); }
+  .self .body { background: radial-gradient(circle at 50% 0, #393853, #121219 70%); }
+</style>
+</head>
+<body>
+<main class="phone call">
+  <!-- your own front camera, full screen, while it rings (WebRTC local preview in the real app) -->
+  <div class="c-cam self" id="self"><div class="face"></div><div class="body"></div></div>
+  <div id="camOff" class="hidden absolute inset-0 bg-cyberDark flex-col items-center justify-center text-[11px] tracking-[.14em] uppercase text-gray-500">Camera off</div>
+  <div class="c-shade"></div>
+
+  <div class="c-top">
+    <button class="c-icon-btn" onclick="hangUp()" aria-label="Back"></button>
+    <span class="c-enc" id="enc"></span>
+    <span class="c-pill"><span class="coin"></span><span id="bal"></span></span>
+  </div>
+
+  <section class="c-who pt-8">
+    <div class="c-ring ringing"><div class="c-av w-[84px] h-[84px] text-3xl" id="av"></div></div>
+    <h1 class="c-name text-[26px] mt-5" id="name"></h1>
+    <p class="c-status mt-2" id="state"></p>
+    <p class="c-meta mt-3" id="meta"></p>
+  </section>
+
+  <div class="flex-1"></div>
+
+  <footer class="c-ctrls">
+    <div class="c-row px-4" id="row"></div>
+    <div class="flex justify-center mt-6"><button class="c-btn c-end" onclick="hangUp()" aria-label="Cancel"><span class="ic"></span><span class="lb">Cancel</span></button></div>
+  </footer>
+</main>
+
+<script src="assets/call.js"></script>
+<script>
+  const D = window.DEMO, $ = s => document.getElementById(s);
+  const h = D.hosts.find(x => x.id === +(new URLSearchParams(location.search).get('id') || 1)) || D.hosts[0];
+  const dots = '<span class="dots"><span>.</span><span>.</span><span>.</span></span>';
+  document.querySelector('.c-icon-btn').innerHTML = CI.chev;
+  document.querySelector('.c-end .ic').innerHTML = CI.end;
+  $('enc').innerHTML = `${CI.lock} Encrypted`;
+  $('bal').textContent = D.balance.toLocaleString('en-IN');
+  $('av').textContent = h.n[0];
+  $('name').textContent = h.n;
+  $('meta').innerHTML = `<span class="coin"></span><b>${h.r}</b> coins / min · after pick-up`;
+  $('row').innerHTML = cbtn('flip', 'Flip') + cbtn('cam', 'Camera') + cbtn('mic', 'Mute');
+
+  $('row').onclick = e => {
+    const b = e.target.closest('.c-btn'); if (!b) return;
+    if (b.dataset.k === 'flip') { $('self').style.transform = $('self').style.transform ? '' : 'scaleX(-1)'; return; }
+    const on = b.classList.toggle('on');
+    if (b.dataset.k === 'cam') { $('camOff').classList.toggle('hidden', !on); $('camOff').classList.toggle('flex', on); }
+  };
+
+  // calling -> ringing -> connecting (demo); the real app waits for the server's "accepted" event
+  $('state').innerHTML = `Video calling${dots}`;
+  const t1 = setTimeout(() => ($('state').innerHTML = `Ringing${dots}`), 1500);
+  const t2 = setTimeout(() => ($('state').innerHTML = '<span class="live"></span>Connecting'), 3500);
+  const stay = new URLSearchParams(location.search).get('stay') === '1'; // compare page: keep ringing
+  const t3 = stay ? 0 : setTimeout(() => vibe.go(`10-video-call.html?id=${h.id}`), 4200);
+  if (stay) setTimeout(() => { clearTimeout(t2); $('state').innerHTML = `Ringing${dots}`; }, 1600);
+  function hangUp() { [t1, t2, t3].forEach(clearTimeout); vibe.toast('Call cancelled · no coins charged'); setTimeout(() => history.length > 1 ? history.back() : vibe.go('05-home.html'), 900); }
+</script>
+</body>
+</html>

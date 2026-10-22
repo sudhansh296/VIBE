@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIBE · Choose Home card and footer</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<script src="assets/icons.js"></script>
+<script src="assets/data.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="stylesheet" href="assets/callme.css">
+<style>
+  body { display: block; padding: 24px 16px 90px; background: #07070c; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  .grid4 { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 22px; }
+  .opt { position: relative; border-radius: 28px; padding: 14px; background: #0d0d16; border: 2px solid #1f1f2d; cursor: pointer; transition: all .18s; }
+  .opt:hover { border-color: #3a3a52; }
+  .opt.sel { border-color: #ff2a85; box-shadow: 0 0 0 4px rgba(255,42,133,.18), 0 20px 50px -20px rgba(255,42,133,.5); }
+  .opt .tag { position: absolute; top: -12px; left: 18px; padding: 3px 12px; border-radius: 99px; background: #1b1b2b; border: 1px solid #2c2c40; font-size: 12px; font-weight: 800; letter-spacing: .06em; }
+  .opt.sel .tag { background: #ff2a85; border-color: #ff2a85; }
+  .opt .tick { position: absolute; top: 12px; right: 14px; width: 26px; height: 26px; border-radius: 99px; background: #ff2a85; display: none; align-items: center; justify-content: center; z-index: 5; }
+  .opt.sel .tick { display: flex; }
+  .mock { background: #07070c; border-radius: 20px; padding: 14px 12px; position: relative; overflow: hidden; }
+  .mock::before { content: ''; position: absolute; width: 220px; height: 220px; left: -60px; top: -80px; background: #ff2a85; opacity: .12; filter: blur(60px); }
+  .stack > * + * { margin-top: 12px; }
+  .name { font-weight: 800; }
+  /* card A: poster */
+  .cA { position: relative; height: 132px; border-radius: 26px; overflow: hidden; }
+  .cA .wm { position: absolute; right: -10px; top: -6px; font-size: 150px; font-weight: 900; color: rgba(255,255,255,.16); line-height: 1; }
+  /* card B: glass row */
+  .cB { display: flex; align-items: center; gap: 12px; padding: 11px; border-radius: 22px; background: #12121c; border: 1px solid #1f1f2d; }
+  .cB .av { width: 62px; height: 62px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 900; position: relative; flex-shrink: 0; }
+  /* card C: tall */
+  .cC { position: relative; height: 188px; border-radius: 24px; overflow: hidden; }
+  .cC .wm { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 110px; font-weight: 900; color: rgba(255,255,255,.2); padding-bottom: 36px; }
+  .cC .bar { position: absolute; left: 8px; right: 8px; bottom: 8px; border-radius: 18px; padding: 8px 8px 8px 12px; display: flex; align-items: center; gap: 8px; background: rgba(10,10,18,.62); backdrop-filter: blur(14px); }
+  /* card D: ring avatar */
+  .cD { display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 10px; border-radius: 999px 26px 26px 999px; background: linear-gradient(90deg, rgba(255,255,255,.05), #12121c 40%); border: 1px solid #1f1f2d; }
+  .ringA { padding: 3px; border-radius: 99px; flex-shrink: 0; }
+  .ringA.on { background: conic-gradient(from 200deg, #3ee08f, #00f2fe, #ff2a85, #3ee08f); } .ringA.off { background: #2a2a3a; }
+  .ringA .in { width: 58px; height: 58px; border-radius: 99px; border: 3px solid #12121c; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 24px; }
+  .callD { height: 44px; padding: 0 16px; border-radius: 99px; display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 14px; background: linear-gradient(135deg, #ff2a85, #7a1fd1); box-shadow: 0 8px 20px -8px #ff2a85; }
+  .pr { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 9px; border-radius: 99px; font-size: 12px; font-weight: 800; color: #f6dc9b; background: rgba(246,220,155,.1); border: 1px solid rgba(246,220,155,.3); }
+  .pill-dark { background: rgba(0,0,0,.42); border-radius: 99px; padding: 3px 9px; font-size: 10px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; letter-spacing: .05em; }
+  /* footers */
+  .fbox { position: relative; height: 116px; background: #07070c; border-radius: 20px; overflow: hidden; }
+  .fbox::before { content: ''; position: absolute; width: 200px; height: 200px; left: 20%; top: -120px; background: #ff2a85; opacity: .10; filter: blur(50px); }
+  .f1 { position: absolute; left: 14px; right: 14px; bottom: 16px; height: 68px; border-radius: 32px; background: rgba(18,18,32,.95); border: 1px solid rgba(255,255,255,.1); display: flex; justify-content: space-around; align-items: center; padding: 0 8px; }
+  .f1 .it { height: 46px; padding: 0 18px; border-radius: 24px; display: flex; align-items: center; gap: 8px; color: #8a8aa0; font-weight: 700; font-size: 14px; }
+  .f1 .it.on { color: #fff; background: linear-gradient(90deg, #ff2a85, #b4179c); } .f1 .it svg { width: 26px; height: 26px; } .f1 .it.on svg { width: 23px; height: 23px; }
+  .f2 { position: absolute; left: 0; right: 0; bottom: 0; height: 74px; background: rgba(16,16,28,.96); border-top: 1px solid rgba(255,255,255,.08); display: flex; }
+  .f2 .it { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #6f6f86; font-size: 10.5px; font-weight: 700; position: relative; }
+  .f2 .it svg { width: 24px; height: 24px; } .f2 .it.on { color: #fff; } .f2 .it.on svg { color: #ff4a95; filter: drop-shadow(0 0 8px #ff2a85); }
+  .f2 .it.on::before { content: ''; position: absolute; top: 0; left: 28%; right: 28%; height: 3px; border-radius: 0 0 6px 6px; background: linear-gradient(90deg, #ff2a85, #00f2fe); box-shadow: 0 0 12px #ff2a85; }
+  .f3 { position: absolute; left: 12px; right: 12px; bottom: 14px; height: 64px; border-radius: 26px; background: rgba(18,18,32,.95); border: 1px solid rgba(255,255,255,.1); display: flex; align-items: center; justify-content: space-between; padding: 0 6px; }
+  .f3 .it { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #7a7a90; font-size: 9.5px; font-weight: 700; } .f3 .it svg { width: 22px; height: 22px; } .f3 .it.on { color: #ff6aa8; }
+  .f3 .mid { flex: 0 0 66px; position: relative; height: 100%; } .f3 .mid i { position: absolute; left: 50%; top: -24px; transform: translateX(-50%); width: 60px; height: 60px; border-radius: 99px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ff2a85, #7a1fd1); box-shadow: 0 12px 28px -6px #ff2a85, 0 0 0 6px #07070c; } .f3 .mid svg { width: 28px; height: 28px; }
+  .f4 { position: absolute; left: 50%; transform: translateX(-50%); bottom: 18px; height: 60px; border-radius: 99px; background: rgba(18,18,32,.95); border: 1px solid rgba(255,255,255,.1); display: flex; align-items: center; gap: 6px; padding: 0 8px; }
+  .f4 .it { width: 48px; height: 48px; border-radius: 99px; display: flex; align-items: center; justify-content: center; color: #7a7a90; position: relative; } .f4 .it svg { width: 25px; height: 25px; }
+  .f4 .it.on { color: #fff; background: radial-gradient(circle at 30% 25%, #ff6aa8, #ff2a85 55%, #b4179c); box-shadow: 0 0 0 4px rgba(255,42,133,.18), 0 8px 20px -6px #ff2a85; }
+  .f5 { position: absolute; left: 14px; right: 14px; bottom: 16px; height: 62px; border-radius: 22px; background: rgba(18,18,32,.95); border: 1px solid rgba(255,255,255,.1); display: grid; grid-template-columns: repeat(4, 1fr); padding: 5px; }
+  .f5 .it { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #7a7a90; font-size: 10px; font-weight: 700; } .f5 .it svg { width: 22px; height: 22px; } .f5 .it.on { color: #fff; }
+  .f5 .slide { position: absolute; top: 5px; bottom: 5px; left: 5px; width: calc(25% - 2.5px); border-radius: 17px; background: linear-gradient(135deg, rgba(255,42,133,.5), rgba(122,31,209,.45)); border: 1px solid rgba(255,42,133,.7); }
+  #summary { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: rgba(10,10,18,.95); backdrop-filter: blur(14px); border-top: 1px solid #262636; padding: 12px 16px; display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="text-3xl font-black grad-text">VIBE · call-me edition</h1>
+  <p class="text-gray-400 mt-1">Home card aur footer ke options. Jo pasand aaye us par click karo. Neeche aap ka choice dikhega.</p>
+
+  <h2 class="text-xl font-bold mt-8 mb-5">1. Home card <span class="text-sm text-gray-500 font-normal">(video call only, ek hi price)</span></h2>
+  <div class="grid4" id="cards"></div>
+
+  <h2 class="text-xl font-bold mt-12 mb-5">2. Footer (tab bar) <span class="text-sm text-gray-500 font-normal">3 tabs: Home, Chats, Me</span></h2>
+  <div class="grid4" id="foots"></div>
+
+  <p class="text-xs text-gray-600 mt-10">Koi image, icon-image ya video use nahi hua. Sab kuch CSS aur SVG se bana hai.</p>
+</div>
+
+<div id="summary"><span class="text-sm text-gray-400">Aap ka choice:</span><b id="sc" class="text-neonPink">Card: not selected</b><span class="text-gray-600">·</span><b id="sf" class="text-neonPink">Footer: not selected</b>
+  <span class="text-xs text-gray-500">Mujhe bas ye bata do, jaise "Card C + Footer 3".</span></div>
+
+<script>
+  const D = window.DEMO, H = D.hosts.filter(h => h.s !== 'BUSY').slice(0, 3);
+  const g = h => `linear-gradient(150deg,${h.grad[0]},${h.grad[1]})`;
+  const dot = h => `<i class="live-dot" style="background:${D.status[h.s].dot};width:7px;height:7px"></i>`;
+  const coin = '<span class="coin" style="font-size:15px"></span>';
+  const vid = (c, s = 'w-6 h-6') => IC('video', s);
+
+  // ---- cards
+  const CARDS = {
+    A: ['Poster (jaisa abhi hai)', H => H.map(h => `<div class="cA" style="background:${g(h)}"><span class="wm">${h.n[0]}</span><div class="absolute inset-0" style="background:linear-gradient(transparent 35%,rgba(0,0,0,.62))"></div>
+      <div class="absolute top-3 left-3 right-3 flex items-center gap-1.5"><span class="pill-dark">${dot(h)}${h.s}</span>${h.vip ? '<span class="pill-dark" style="background:#f6dc9b;color:#000">VIP</span>' : ''}<span class="flex-1"></span><span class="pill-dark">${IC('star', 'w-3 h-3 text-cyberGold')}${h.rt}</span></div>
+      <div class="absolute left-4 bottom-3"><div class="name text-xl">${h.n}, ${h.a}</div><div class="text-xs text-white/80 flex items-center gap-1">${IC('pin', 'w-3 h-3')}${h.c}</div></div>
+      <div class="absolute right-3 bottom-3 flex items-center gap-2"><span class="pr" style="background:rgba(0,0,0,.45)">${coin}${h.r}/min</span><span class="w-[52px] h-[52px] rounded-full bg-white flex items-center justify-center text-neonPink">${vid()}</span></div></div>`).join('')],
+    B: ['Glass row (chhota avatar)', H => H.map(h => `<div class="cB"><div class="av" style="background:${g(h)}">${h.n[0]}<i class="absolute right-1 bottom-1 w-3 h-3 rounded-full border-2 border-black/40" style="background:${D.status[h.s].dot}"></i></div>
+      <div class="flex-1 min-w-0"><div class="name flex items-center gap-1.5">${h.n}, ${h.a}${h.v ? `<span class="text-neonCyan">${IC('check', 'w-3.5 h-3.5')}</span>` : ''}</div><div class="text-[11px] text-gray-500 mt-0.5">${h.c} · <span style="color:${D.status[h.s].text}">${h.s.toLowerCase()}</span></div>
+      <div class="flex items-center gap-2 mt-1.5"><span class="pr">${coin}${h.r}/min</span><span class="text-[11px] text-gray-400 flex items-center gap-1">${IC('star', 'w-3 h-3 text-cyberGold')}${h.rt}</span></div></div>
+      <span class="w-12 h-12 rounded-2xl flex items-center justify-center" style="background:linear-gradient(135deg,#ff2a85,#7a1fd1);box-shadow:0 8px 20px -6px #ff2a85">${vid()}</span></div>`).join('')],
+    C: ['Tall card (2 column grid)', H => `<div class="grid grid-cols-2 gap-3">${H.slice(0, 2).map(h => `<div class="cC" style="background:${g(h)}"><span class="wm">${h.n[0]}</span>
+      <div class="absolute top-2.5 left-2.5"><span class="pill-dark">${dot(h)}${h.s}</span></div>
+      <div class="bar"><div class="flex-1 min-w-0"><div class="name text-[13px] truncate">${h.n}, ${h.a}</div><div class="text-[10px] flex items-center gap-1 text-cyberGold font-bold">${coin}${h.r}/min</div></div>
+      <span class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-neonPink">${vid('', 'w-5 h-5')}</span></div></div>`).join('')}</div>`],
+    D: ['Ring avatar + Call button', H => H.map(h => `<div class="cD"><div class="ringA ${h.s === 'ONLINE' ? 'on' : 'off'}"><div class="in" style="background:${g(h)}">${h.n[0]}</div></div>
+      <div class="flex-1 min-w-0"><div class="name flex items-center gap-1.5">${h.n}, ${h.a}${h.vip ? '<span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded-md bg-cyberGold text-black">VIP</span>' : ''}</div><div class="text-[11px] text-gray-500">${h.c} · ${IC('star', 'w-3 h-3 text-cyberGold')} ${h.rt}</div></div>
+      <div class="callD">${vid('', 'w-5 h-5')}${h.r}<span class="coin" style="font-size:14px"></span></div></div>`).join('')],
+  };
+  const FOOT = {
+    1: ['Capsule (jaisa abhi hai)', `<div class="f1"><div class="it">${IC('home')}</div><div class="it on">${IC('chat')}Chats</div><div class="it">${IC('user')}</div></div>`],
+    2: ['Classic strip + top glow line', `<div class="f2"><div class="it on">${IC('home')}Home</div><div class="it">${IC('chat')}Chats</div><div class="it">${IC('user')}Me</div></div>`],
+    3: ['Raised centre (Chats beech mein)', `<div class="f3"><div class="it on" style="flex:1">${IC('home')}Home</div><div class="mid"><i>${IC('chat')}</i></div><div class="it" style="flex:1">${IC('user')}Me</div></div>`],
+  };
+  let pc = null, pf = null;
+  const upd = () => { document.getElementById('sc').textContent = pc ? `Card ${pc}` : 'Card: not selected'; document.getElementById('sf').textContent = pf ? `Footer ${pf}` : 'Footer: not selected'; };
+  document.getElementById('cards').innerHTML = Object.entries(CARDS).map(([k, [t, f]]) => `<div class="opt" data-c="${k}"><span class="tag">CARD ${k}</span><span class="tick">${IC('check', 'w-4 h-4')}</span><div class="text-sm font-semibold mt-3 mb-3 text-gray-300">${t}</div><div class="mock stack">${f(H)}</div></div>`).join('');
+  document.getElementById('foots').innerHTML = Object.entries(FOOT).map(([k, [t, h]]) => `<div class="opt" data-f="${k}"><span class="tag">FOOTER ${k}</span><span class="tick">${IC('check', 'w-4 h-4')}</span><div class="text-sm font-semibold mt-3 mb-3 text-gray-300">${t}</div><div class="fbox">${h}</div></div>`).join('');
+  document.addEventListener('click', e => {
+    const c = e.target.closest('[data-c]'), f = e.target.closest('[data-f]');
+    if (c) { pc = c.dataset.c; document.querySelectorAll('[data-c]').forEach(x => x.classList.toggle('sel', x === c)); }
+    if (f) { pf = f.dataset.f; document.querySelectorAll('[data-f]').forEach(x => x.classList.toggle('sel', x === f)); }
+    upd();
+  });
+</script>
+</body>
+</html>

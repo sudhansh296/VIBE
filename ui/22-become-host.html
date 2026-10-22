@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Become a host</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .step { position: relative; display: flex; gap: 14px; padding-bottom: 20px; }
+  .step:not(:last-child)::before { content: ''; position: absolute; left: 17px; top: 38px; bottom: 2px; width: 2px; background: linear-gradient(#ff2a85, #262636); border-radius: 2px; }
+  .num { width: 36px; height: 36px; border-radius: 99px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; border: 1.5px solid #ff2a85; background: rgba(255,42,133,.12); color: #ff2a85; }
+  .perk { border: 1px solid #262636; background: #12121c; border-radius: 18px; padding: 14px; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-80 h-80 bg-neonPink/20 -top-28 -left-20"></div>
+  <div class="blob w-64 h-64 bg-neonCyan/10 top-60 -right-24"></div>
+
+  <header class="relative flex items-center px-4 pt-5">
+    <button onclick="history.length > 1 ? history.back() : vibe.go('17-me.html')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Back">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+  </header>
+
+  <section class="relative flex-1 overflow-y-auto px-5 pb-6">
+    <div class="text-center mt-1">
+      <img src="assets/icons/ghost-profile.webp" onerror="this.src='assets/icons/profile.webp'" class="w-32 h-32 object-contain mx-auto float" alt="">
+      <h1 class="text-3xl font-light mt-1">Earn by <span class="grad-text font-semibold">talking</span></h1>
+      <p class="text-sm text-gray-400 mt-2 px-4">Become a VIBE host. Open for everyone 18+, whether you are a girl or a guy.</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 mt-6">
+      <div class="perk"><div class="text-neonPink text-sm font-semibold">Your rates</div><div class="text-xs text-gray-400 mt-1">Set separate voice and video rates per minute</div></div>
+      <div class="perk"><div class="text-neonCyan text-sm font-semibold">Paid chat</div><div class="text-xs text-gray-400 mt-1">Earn from messages after the free ones</div></div>
+      <div class="perk"><div class="text-cyberGold text-sm font-semibold">Gifts</div><div class="text-xs text-gray-400 mt-1">Fans send you gifts during calls</div></div>
+      <div class="perk"><div class="text-onlineGreen text-sm font-semibold">Withdraw</div><div class="text-xs text-gray-400 mt-1">Cash out to your UPI or bank account</div></div>
+    </div>
+
+    <h3 class="text-[10px] tracking-[.16em] uppercase text-gray-500 mt-7 mb-4">How it works</h3>
+    <div>
+      <div class="step"><span class="num">1</span><div><b class="text-sm font-medium">Fill the application</b><div class="text-xs text-gray-500 mt-0.5">Photos, a short bio and the languages you speak</div></div></div>
+      <div class="step"><span class="num">2</span><div><b class="text-sm font-medium">Verify yourself</b><div class="text-xs text-gray-500 mt-0.5">A selfie and an ID so users know you are real</div></div></div>
+      <div class="step"><span class="num">3</span><div><b class="text-sm font-medium">Get approved</b><div class="text-xs text-gray-500 mt-0.5">The VIBE team reviews it, usually within 24 hours</div></div></div>
+      <div class="step"><span class="num">4</span><div><b class="text-sm font-medium">Go online and earn</b><div class="text-xs text-gray-500 mt-0.5">Switch your status on and answer calls</div></div></div>
+    </div>
+
+    <div class="mt-2 rounded-2xl border border-cyberGold/30 bg-cyberGold/5 p-4 flex gap-3 items-start">
+      <svg class="w-6 h-6 text-cyberGold shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 11a3 3 0 1 0 0-6M22 21a6 6 0 0 0-4-5.6"/></svg>
+      <div><b class="text-sm font-medium">Have an agency code?</b><div class="text-xs text-gray-400 mt-0.5 leading-relaxed">If an agency invited you, add its code in the application. You can also join or leave an agency later from your host dashboard.</div></div>
+    </div>
+    <p class="text-[11px] text-gray-500 text-center mt-4">Rate limits and your earning share are set by VIBE.</p>
+  </section>
+
+  <footer class="relative p-5 pt-3 glass border-t border-cyberLine/60">
+    <button onclick="vibe.go('23-host-application.html')" class="btn-neon w-full h-14 rounded-2xl font-bold">Apply to be a host</button>
+  </footer>
+</main>
+</body>
+</html>

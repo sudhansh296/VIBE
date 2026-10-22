@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Language</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .opt { width: 100%; display: flex; align-items: center; gap: 14px; padding: 15px 16px; text-align: left; border: 1.5px solid #262636; background: #12121c; border-radius: 18px; transition: all .15s; }
+  .opt + .opt { margin-top: 10px; } .opt.on { border-color: #ff2a85; background: linear-gradient(135deg, rgba(255,42,133,.16), #12121c); }
+  .rad { width: 20px; height: 20px; border-radius: 99px; border: 2px solid #3a3a4a; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .opt.on .rad { border-color: #ff2a85; } .opt.on .rad::after { content: ''; width: 10px; height: 10px; border-radius: 99px; background: #ff2a85; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-neonCyan/10 -top-24 -right-24"></div>
+  <header class="relative flex items-center gap-3 px-4 pt-5 pb-2">
+    <button onclick="history.length > 1 ? history.back() : vibe.go('28-settings.html')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Back"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 class="text-xl font-semibold">Language</h1>
+  </header>
+  <section class="relative flex-1 overflow-y-auto px-5 pb-6">
+    <p class="text-xs text-gray-500 mt-1 mb-4">Choose the language of the app. This does not change the languages you speak on your profile.</p>
+    <div id="opts"></div>
+    <p class="text-[11px] text-gray-600 mt-5 leading-relaxed">More languages are added over time. Some text such as host bios stays in the language the host wrote it.</p>
+  </section>
+  <footer class="relative p-5 pt-3 glass border-t border-cyberLine/60"><button id="save" class="btn-neon w-full h-14 rounded-2xl font-bold">Save</button></footer>
+</main>
+<script>
+  // DEMO. The app keeps its own text in each language; only the chosen language code is saved on the server.
+  const L = [['en', 'English', 'English'], ['hi', 'हिंदी', 'Hindi'], ['pa', 'ਪੰਜਾਬੀ', 'Punjabi'], ['bn', 'বাংলা', 'Bengali'], ['ta', 'தமிழ்', 'Tamil'], ['te', 'తెలుగు', 'Telugu'], ['mr', 'मराठी', 'Marathi']];
+  let pick = 'en';
+  const $ = i => document.getElementById(i);
+  function paint() { $('opts').innerHTML = L.map(([k, n, e]) => `<button data-k="${k}" class="opt ${k === pick ? 'on' : ''}"><span class="rad"></span><span class="flex-1"><span class="block text-[16px]">${n}</span><span class="text-[11px] text-gray-500">${e}</span></span></button>`).join(''); }
+  $('opts').onclick = e => { const b = e.target.closest('[data-k]'); if (b) { pick = b.dataset.k; paint(); } };
+  $('save').onclick = () => { vibe.toast('Language saved'); setTimeout(() => history.length > 1 ? history.back() : vibe.go('28-settings.html'), 700); };
+  paint();
+</script>
+</body>
+</html>

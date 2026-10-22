@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tab bar · 3 Sliding glow</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="../assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/theme.css">
+<style>
+  /* Option 3: flat glass bar; a neon light beam slides on top and shines down onto the active ghost */
+  .nav { position: absolute; left: 0; right: 0; bottom: 0; height: 84px; z-index: 30; display: flex;
+    background: linear-gradient(180deg, rgba(18,18,28,.85), rgba(7,7,12,.98)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,.06); }
+  .beam { position: absolute; top: 0; width: 33.333%; height: 100%; pointer-events: none; transition: transform .45s cubic-bezier(.2,1,.3,1); }
+  .beam::before { content: ''; position: absolute; top: -1px; left: 50%; width: 56px; height: 3px; transform: translateX(-50%); border-radius: 0 0 4px 4px;
+    background: linear-gradient(90deg, #ff2a85, #00f2fe); box-shadow: 0 0 14px #ff2a85, 0 0 28px #00f2fe; }
+  .beam::after { content: ''; position: absolute; top: 2px; left: 50%; width: 90px; height: 70px; transform: translateX(-50%);
+    background: radial-gradient(ellipse at top, rgba(255,42,133,.28), rgba(0,242,254,.08) 50%, transparent 72%); }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+  .tab img { width: 46px; height: 46px; object-fit: contain; opacity: .45; transform: scale(.9); transition: all .35s; }
+  .tab span { font-size: 11px; color: #777786; transition: all .3s; }
+  .tab.active img { opacity: 1; transform: scale(1.05); filter: drop-shadow(0 4px 12px rgba(255,42,133,.55)); }
+  .tab.active span { color: #fff; font-weight: 600; letter-spacing: .3px; }
+  .badge { position: absolute; top: 8px; left: calc(50% + 10px); min-width: 20px; height: 20px; padding: 0 5px; border-radius: 99px; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ff2a85, #c3157a); border: 2px solid #0d0d16; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <section id="content" class="flex-1 overflow-y-auto pb-28"></section>
+  <nav class="nav">
+    <span class="beam" id="beam"></span>
+    <button class="tab active" data-tab><img src="../assets/icons/home.webp" alt=""><span>Home</span></button>
+    <button class="tab" data-tab><img src="../assets/icons/chat.webp" alt=""><span>Chats</span><b class="badge">3</b></button>
+    <button class="tab" data-tab><img src="../assets/icons/profile.webp" alt=""><span>Me</span></button>
+  </nav>
+</main>
+<script src="shell.js"></script>
+<script>window.onTab = i => (document.getElementById('beam').style.transform = `translateX(${i * 100}%)`);</script>
+</body>
+</html>

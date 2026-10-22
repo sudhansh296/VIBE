@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Incoming call</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<script src="assets/demo-data.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="stylesheet" href="assets/call.css">
+</head>
+<body>
+<main class="phone call">
+  <div class="wash"></div>
+
+  <div class="c-top">
+    <span class="c-pill green"><span class="live" style="width:6px;height:6px;border-radius:99px;background:#3ee08f;display:inline-block"></span>Online as host</span>
+    <span class="c-enc" id="enc"></span>
+    <span class="c-pill !text-gray-300 !font-normal" id="countdown">30s</span>
+  </div>
+
+  <section class="c-who flex-1 pt-12">
+    <p class="c-status !text-[11px] !text-gray-400" id="kind"></p>
+    <div class="c-ring ringing mt-8"><div class="c-av w-[124px] h-[124px] text-5xl" id="av"></div></div>
+    <h1 class="c-name text-[30px] mt-8" id="name"></h1>
+    <div class="flex flex-wrap justify-center gap-2 mt-4" id="tags"></div>
+    <p class="c-meta mt-6" id="earn"></p>
+  </section>
+
+  <footer class="c-ctrls">
+    <div class="flex flex-wrap justify-center gap-2 mb-7" id="quick"></div>
+    <div class="flex items-start justify-between px-6">
+      <button class="c-btn c-end" onclick="decline()"><span class="ic"></span><span class="lb">Decline</span></button>
+      <button class="c-btn c-accept" onclick="accept()"><span class="ic" id="acceptIc"></span><span class="lb">Accept</span></button>
+    </div>
+  </footer>
+</main>
+
+<script src="assets/call.js"></script>
+<script>
+  const D = window.DEMO, $ = s => document.getElementById(s), q = new URLSearchParams(location.search);
+  const h = D.hosts.find(x => x.id === +(q.get('id') || 2)) || D.hosts[1];
+  const type = q.get('type') === 'audio' ? 'audio' : 'video';
+  const myRate = type === 'audio' ? 30 : 60; // the host's own rates, set in host settings and enforced by the server
+  $('enc').innerHTML = `${CI.lock} Encrypted`;
+  $('kind').textContent = type === 'audio' ? 'Incoming voice call' : 'Incoming video call';
+  $('av').textContent = h.n[0];
+  $('name').textContent = `${h.n}, ${h.a}`;
+  $('tags').innerHTML = [h.c, `Lv.${h.lv}`, 'Good caller', h.langs[0]].map(t => `<span class="c-chip">${t}</span>`).join('');
+  $('earn').innerHTML = `<span class="coin"></span>You earn <b>${myRate}</b> / min · keep 60%`;
+  document.querySelector('.c-end .ic').innerHTML = CI.end;
+  $('acceptIc').innerHTML = type === 'audio' ? CI.phone : CI.video;
+  $('acceptIc').querySelector('svg').style.cssText = 'width:26px;height:26px';
+  $('quick').innerHTML = ['Busy, call later 🙏', 'Give me 5 min', 'Text me instead'].map(t => `<button class="c-chip" onclick="reply('${t}')">${t}</button>`).join('');
+
+  let left = 30;
+  const stay = q.get('stay') === '1'; // compare page: don't time out
+  const t = stay ? 0 : setInterval(() => { left--; $('countdown').textContent = `${left}s`; if (left <= 0) { clearInterval(t); vibe.toast('Missed call'); setTimeout(() => vibe.go('05-home.html'), 900); } }, 1000);
+  function accept() { clearInterval(t); setTimeout(() => vibe.go(type === 'audio' ? `13-audio-call.html?id=${h.id}&connected=1` : `10-video-call.html?id=${h.id}`), 300); }
+  function decline() { clearInterval(t); vibe.toast('Call declined'); setTimeout(() => vibe.go('05-home.html'), 800); }
+  function reply(msg) { clearInterval(t); vibe.toast(`Declined · sent "${msg}"`); setTimeout(() => vibe.go('05-home.html'), 1100); }
+</script>
+</body>
+</html>

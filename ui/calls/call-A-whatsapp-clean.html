@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calls · A WhatsApp Clean</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+  /* A · WhatsApp Clean: calm charcoal, one solid control sheet, no neon */
+  .ph { background: #0e1013; }
+  .voice .bg { background: linear-gradient(180deg, rgba(255,42,133,.10), transparent 45%), #0e1013; }
+  .who { margin-top: 70px; }
+  .who .av { width: 128px; height: 128px; font-size: 48px; background: #2a2f36; color: #e9edef; }
+  .who .nm { font-size: 26px; font-weight: 500; margin-top: 22px; color: #e9edef; }
+  .who .st { font-size: 15px; color: #aeb4ba; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .who .meta { color: #7d858c; margin-top: 10px; }
+  .ctrls { background: #1c1f24; border-radius: 26px 26px 0 0; padding: 20px 22px 30px; }
+  .cb .ic { width: 54px; height: 54px; border-radius: 99px; background: #2c3036; color: #e9edef; }
+  .cb.on .ic { background: #e9edef; color: #111; }
+  .cb .lb { color: #aeb4ba; }
+  .endrow { margin-top: 20px; }
+  .endb .ic { width: 62px; height: 62px; background: #f15c6d; color: #fff; }
+  .endb .lb { display: none; }
+  /* ringing: own camera behind, quiet */
+  .ring .selfcam { background: radial-gradient(ellipse at 50% 35%, #3c4452, #15181d 75%); }
+  .ring .face, .incall .face { background: radial-gradient(circle at 50% 40%, #5d6676, #2e343e 70%); opacity: .6; }
+  .ring .body, .incall .body { background: radial-gradient(circle at 50% 0, #3b424e, #15181d 70%); opacity: .7; }
+  .shade { background: linear-gradient(180deg, rgba(0,0,0,.6), transparent 35%, transparent 60%, rgba(0,0,0,.6)); }
+  .who.small { margin-top: 40px; }
+  .who.small .av { width: 76px; height: 76px; font-size: 28px; }
+  .who.small .nm { font-size: 22px; margin-top: 14px; }
+  .ring .ctrls, .incall .ctrls { background: rgba(28,31,36,.94); }
+  /* video call: one rounded bar */
+  .incall .remote { background: radial-gradient(ellipse at 50% 35%, #50435a, #1a161f 75%); }
+  .incall .ctrls { margin: auto 12px 22px; border-radius: 26px; padding: 12px 14px; }
+  .incall .cb .lb { display: none; }
+  .incall .cb .ic { width: 44px; height: 44px; }
+  .incall .cb .ic svg { width: 21px; height: 21px; }
+  .incall .endb .ic { width: 44px; height: 44px; }
+  .topbar .av.mini { background: #2a2f36; }
+  .topbar .chip, .coins { background: rgba(0,0,0,.45); padding: 6px 10px 6px 6px; border-radius: 99px; }
+  .coins { padding: 6px 10px; color: #f6dc9b; }
+  .pip { background: radial-gradient(ellipse at 50% 30%, #4a5260, #1c2026); border: 1.5px solid rgba(255,255,255,.25); color: #cfd5da; }
+</style>
+</head>
+<body>
+<header class="top"><h1>Call design · A · WhatsApp Clean</h1><p class="sub">Calm charcoal, one solid control sheet, grey round buttons, only End is red.</p></header>
+<nav class="opts"><a class="cur" href="call-A-whatsapp-clean.html">A · WhatsApp Clean</a><a href="call-B-midnight-glass.html">B · Midnight Glass</a><a href="call-C-luxe-gold.html">C · Luxe Gold</a><a href="call-D-vibe-minimal.html">D · VIBE Minimal</a><a href="index.html">Compare all</a></nav>
+<div class="row3" id="r"></div>
+<script src="calls.js"></script><script>renderCalls(document.getElementById('r'));</script>
+</body>
+</html>

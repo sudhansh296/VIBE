@@ -1,0 +1,33 @@
+# secrets: never in git
+.env
+.env.*
+!.env.example
+*service-account*.json
+google-services.json
+local.properties
+*.jks
+*.keystore
+*.pem
+*.p12
+
+# installed / built / generated
+node_modules/
+build/
+.gradle/
+.idea/
+.kotlin/
+*.apk
+*.aab
+*.log
+__pycache__/
+*.pyc
+
+# user uploads (photos, videos, ID images)
+uploads/
+
+# local tools (big binaries, Python env)
+tools/platform-tools/
+tools/imgenv/
+
+# research on other apps: kept local only
+research/

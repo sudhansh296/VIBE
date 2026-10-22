@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Following</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<script src="assets/demo-data.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .seg { display: flex; padding: 4px; border-radius: 18px; background: #12121c; border: 1px solid #262636; }
+  .seg button { flex: 1; height: 46px; border-radius: 14px; color: #8b8b9a; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; transition: all .2s; }
+  .seg button b { font-size: 17px; font-weight: 800; } .seg button span { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
+  .seg button.on { background: linear-gradient(135deg, rgba(255,42,133,.25), rgba(0,242,254,.12)); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,42,133,.5); }
+  .row { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 20px; background: #12121c; border: 1px solid #1f1f2d; }
+  .row + .row { margin-top: 10px; }
+  .ring { padding: 2.5px; border-radius: 99px; flex-shrink: 0; }
+  .ring.on { background: conic-gradient(from 200deg, #3ee08f, #00f2fe, #3ee08f); } .ring.off { background: #2a2a3a; }
+  .circ { width: 40px; height: 40px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .chipf { height: 26px; padding: 0 11px; border-radius: 99px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+  .sort { height: 30px; padding: 0 12px; border-radius: 99px; font-size: 11px; border: 1px solid #262636; background: #12121c; color: #c7c7d1; }
+  .sort.on { border-color: #ff2a85; color: #fff; background: rgba(255,42,133,.15); }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-neonPink/10 -top-24 -left-24"></div>
+  <div class="blob w-60 h-60 bg-neonCyan/10 top-60 -right-24"></div>
+
+  <header class="relative flex items-center gap-3 px-4 pt-5 pb-3">
+    <button onclick="history.length > 1 ? history.back() : vibe.go('17-me.html')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Back"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 class="text-xl font-semibold flex-1">My people</h1>
+  </header>
+
+  <div class="relative px-5"><div class="seg" id="tabs">
+    <button data-t="following" class="on"><b id="c1">5</b><span>Following</span></button>
+    <button data-t="followers"><b id="c2">3</b><span>Followers</span></button></div></div>
+
+  <div class="relative px-5 mt-3">
+    <div class="neon-field rounded-2xl flex items-center gap-3 px-4 h-12"><svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" class="flex-1 bg-transparent outline-none text-sm" placeholder="Search name or city"></div>
+    <div class="flex items-center gap-2 mt-3"><button class="sort on" data-s="online">Online first</button><button class="sort" data-s="name">A to Z</button><span class="flex-1"></span><span id="onl" class="text-[11px] text-onlineGreen"></span></div>
+  </div>
+
+  <section id="list" class="relative flex-1 overflow-y-auto px-5 pt-3 pb-8"></section>
+  <div id="empty" class="hidden relative flex-1 flex-col items-center justify-center text-center px-8">
+    <img src="assets/icons/ghost-empty.webp" class="w-40 h-40 object-contain float" alt="" onerror="this.src='assets/icons/home.webp'">
+    <h3 id="et" class="text-lg font-bold mt-3"></h3><p id="es" class="text-sm text-gray-400 mt-1 max-w-[260px]"></p>
+    <button onclick="vibe.go('05-home.html')" class="mt-6 px-6 h-11 rounded-full btn-neon font-semibold text-sm">Discover people</button>
+  </div>
+</main>
+<script>
+  // DEMO. The server returns the real lists with "since" times (a blocked person never appears here).
+  const $ = i => document.getElementById(i), D = window.DEMO;
+  let tab = new URLSearchParams(location.search).get('t') === 'followers' ? 'followers' : 'following', sort = 'online';
+  const data = { following: [1, 3, 6, 2, 7], followers: [5, 8, 4] }, back = { 5: true, 2: true };
+  const since = { 1: 'Since 2 Oct', 3: 'Since 28 Sep', 6: 'Since 15 Sep', 2: 'Since 3 Sep', 7: 'Since 20 Aug', 5: 'Followed you 2h ago', 8: 'Followed you yesterday', 4: 'Followed you 3 days ago' };
+  const fresh = { 5: true };
+  const stt = h => h.s === 'OFFLINE' ? 'Offline' : h.s === 'BUSY' ? 'Busy' : 'Online';
+  const ic = d => `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">${d}</svg>`;
+  const CHAT = ic('<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z"/>'), VID = ic('<path d="M5.5 6h7.5a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H5.5a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3z"/><path d="m16 11 5-3v8l-5-3"/>');
+  function paint() {
+    $('c1').textContent = data.following.length; $('c2').textContent = data.followers.length;
+    document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.t === tab));
+    const q = $('q').value.trim().toLowerCase();
+    let hs = data[tab].map(id => D.hosts.find(x => x.id === id)).filter(h => h && (!q || (h.n + ' ' + h.c).toLowerCase().includes(q)));
+    hs.sort((a, b) => sort === 'name' ? a.n.localeCompare(b.n) : (a.s === 'OFFLINE') - (b.s === 'OFFLINE'));
+    $('onl').textContent = `${data[tab].map(id => D.hosts.find(x => x.id === id)).filter(h => h.s === 'ONLINE').length} online now`;
+    const none = data[tab].length === 0;
+    $('list').classList.toggle('hidden', none); $('empty').classList.toggle('hidden', !none); $('empty').classList.toggle('flex', none);
+    $('et').textContent = tab === 'following' ? 'You are not following anyone' : 'No followers yet'; $('es').textContent = tab === 'following' ? 'Follow people you like and they show up here when they are online.' : 'When people follow you, you will see them here.';
+    $('list').innerHTML = hs.length ? hs.map(h => { const live = h.s === 'ONLINE', isF = tab === 'following' || back[h.id], can = h.s === 'ONLINE';
+      const chip = isF ? `<button data-u="${h.id}" class="chipf border border-white/20 text-gray-300">✓ Following</button>` : `<button data-f="${h.id}" class="chipf btn-neon text-white">+ Follow back</button>`;
+      return `<div class="row"><button onclick="vibe.go('07-host-profile.html?id=${h.id}')" class="ring ${live ? 'on' : 'off'} relative"><span class="block w-[52px] h-[52px] rounded-full border-2 border-cyberDark flex items-center justify-center font-bold text-lg" style="background:linear-gradient(135deg,${h.grad[0]},${h.grad[1]})">${h.n[0]}</span><span class="absolute right-0 bottom-0 w-3.5 h-3.5 rounded-full border-2 border-cyberDark" style="background:${D.status[h.s].dot}"></span></button>
+        <div class="flex-1 min-w-0"><div class="flex items-center gap-2"><b class="truncate">${h.n}, ${h.a}</b>${fresh[h.id] && tab === 'followers' ? '<span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-neonPink text-white">NEW</span>' : ''}</div>
+          <div class="text-[11px] ${live ? 'text-onlineGreen' : 'text-gray-500'} mt-0.5">${stt(h)} · ${h.c}</div><div class="text-[10px] text-gray-600 mt-0.5 mb-1.5">${since[h.id]}</div>${chip}</div>
+        <div class="flex flex-col gap-2"><button onclick="vibe.go('15-chat.html?id=${h.id}')" class="circ bg-cyberDark border border-cyberLine text-gray-300" aria-label="Chat">${CHAT}</button>
+          <button ${can ? `onclick="vibe.go('09-outgoing-call.html')"` : `onclick="vibe.toast('${h.n} is ${stt(h).toLowerCase()} now')"`} class="circ ${can ? 'btn-neon' : 'bg-cyberDark border border-cyberLine text-gray-600'}" aria-label="Video call">${VID}</button></div></div>`; }).join('')
+      : '<div class="text-center text-sm text-gray-500 py-12">No one matches your search</div>';
+  }
+  $('tabs').onclick = e => { const b = e.target.closest('[data-t]'); if (b) { tab = b.dataset.t; paint(); } };
+  document.querySelectorAll('.sort').forEach(b => b.onclick = () => { sort = b.dataset.s; document.querySelectorAll('.sort').forEach(x => x.classList.toggle('on', x === b)); paint(); });
+  $('q').oninput = paint;
+  $('list').onclick = e => {
+    const u = e.target.closest('[data-u]'), f = e.target.closest('[data-f]');
+    if (u) { const id = +u.dataset.u; if (tab === 'following') data.following = data.following.filter(x => x !== id); else delete back[id]; vibe.toast('Unfollowed'); paint(); }
+    if (f) { const id = +f.dataset.f; back[id] = true; if (!data.following.includes(id)) data.following.push(id); vibe.toast('Following'); paint(); }
+  };
+  paint();
+</script>
+</body>
+</html>

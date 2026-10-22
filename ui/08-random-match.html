@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Random match</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<script src="assets/demo-data.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .seg { border: 1.5px solid #262636; background: #12121c; color: #c7c7d1; transition: all .18s; }
+  .seg.on { border-color: #ff2a85; color: #fff; background: linear-gradient(135deg, rgba(255,42,133,.22), rgba(0,242,254,.12)); }
+  .orbit { position: absolute; inset: 0; border-radius: 9999px; animation: spin360 6s linear infinite; }
+  .orbit.rev { animation-direction: reverse; animation-duration: 9s; }
+  .orbit > div { position: absolute; width: 44px; height: 44px; border-radius: 9999px; border: 2px solid #07070c; }
+  .radar { background: conic-gradient(from 0deg, rgba(255,42,133,.35), transparent 30%); animation: spin360 2.2s linear infinite; }
+  .pop { animation: pop .5s cubic-bezier(.2,1.5,.4,1) both; }
+  @keyframes pop { from { opacity: 0; transform: scale(.7) } to { opacity: 1; transform: none } }
+  .view { display: none; } .view.on { display: flex; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-80 h-80 bg-neonPink/20 -top-24 -left-24"></div>
+  <div class="blob w-80 h-80 bg-neonCyan/15 bottom-0 -right-28"></div>
+
+  <header class="relative flex items-center justify-between px-5 pt-5">
+    <button onclick="leave()" class="w-10 h-10 rounded-xl btn-ghost flex items-center justify-center" aria-label="Close">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <h1 class="text-lg font-bold">Random Match</h1>
+    <div class="flex items-center gap-1.5 px-3 h-9 rounded-full bg-cyberCard border border-cyberGold/30"><span class="coin w-4 h-4"></span><span id="bal" class="text-cyberGold text-sm font-semibold"></span></div>
+  </header>
+
+  <!-- 1. choose -->
+  <section id="v-choose" class="view on relative flex-1 flex-col px-6">
+    <div class="flex-1 flex flex-col items-center justify-center">
+      <div class="relative w-60 h-60 flex items-center justify-center">
+        <span class="absolute w-44 h-44 rounded-full border-2 border-neonPink/40 ring-wave"></span>
+        <span class="absolute w-44 h-44 rounded-full border-2 border-neonCyan/40 ring-wave" style="animation-delay:1s"></span>
+        <img src="assets/icons/ghost-search.webp" class="relative w-44 h-44 object-contain float glow" alt="" onerror="this.src='assets/icons/home.webp'">
+      </div>
+      <h2 class="text-2xl font-extrabold text-center mt-2">Meet someone new</h2>
+      <p class="text-sm text-gray-400 text-center mt-2 max-w-[280px]">We connect you with a real person who is online and accepting calls right now.</p>
+    </div>
+    <div class="pb-2">
+      <h3 class="text-xs font-medium text-gray-400 mb-2">Match me with</h3>
+      <div class="grid grid-cols-3 gap-2" id="who">
+        <button class="seg on h-12 rounded-2xl text-sm font-semibold" data-v="all">✨ Anyone</button>
+        <button class="seg h-12 rounded-2xl text-sm font-semibold" data-v="F">♀ Girls</button>
+        <button class="seg h-12 rounded-2xl text-sm font-semibold" data-v="M">♂ Boys</button>
+      </div>
+      <h3 class="text-xs font-medium text-gray-400 mt-5 mb-2">Language</h3>
+      <div class="flex gap-2 overflow-x-auto" id="lang">
+        <button class="chip on px-4 h-9 rounded-full text-sm shrink-0" data-v="any">Any</button>
+        <button class="chip px-4 h-9 rounded-full text-sm shrink-0" data-v="Hindi">Hindi</button>
+        <button class="chip px-4 h-9 rounded-full text-sm shrink-0" data-v="English">English</button>
+        <button class="chip px-4 h-9 rounded-full text-sm shrink-0" data-v="Tamil">Tamil</button>
+        <button class="chip px-4 h-9 rounded-full text-sm shrink-0" data-v="Bengali">Bengali</button>
+      </div>
+      <div class="mt-5 rounded-2xl bg-cyberCard border border-cyberLine p-3 flex items-center gap-3 text-xs text-gray-400">
+        <span class="text-lg">💡</span><span>You only pay after the other person picks up. Price is shown before connecting.</span>
+      </div>
+    </div>
+    <div class="py-5"><button onclick="startSearch()" class="btn-neon w-full h-14 rounded-2xl font-bold">Start matching</button></div>
+  </section>
+
+  <!-- 2. searching -->
+  <section id="v-search" class="view relative flex-1 flex-col items-center justify-center px-6">
+    <div class="relative w-72 h-72 flex items-center justify-center">
+      <div class="absolute inset-0 rounded-full border border-white/5"></div>
+      <div class="absolute inset-8 rounded-full border border-white/5"></div>
+      <div class="absolute inset-16 rounded-full border border-white/10"></div>
+      <div class="absolute inset-0 rounded-full radar"></div>
+      <div class="orbit" id="orbit1"></div>
+      <div class="orbit rev" id="orbit2"></div>
+      <img src="assets/icons/ghost-search.webp" class="relative w-32 h-32 object-contain float" alt="" onerror="this.src='assets/icons/home.webp'">
+    </div>
+    <h2 class="text-2xl font-extrabold mt-8">Finding someone…</h2>
+    <p class="text-sm text-gray-400 mt-2"><span id="searchingCount">8</span> people online · <span id="timer">0:00</span></p>
+    <button onclick="cancelSearch()" class="mt-10 px-8 h-12 rounded-full btn-ghost font-semibold text-gray-300">Cancel</button>
+  </section>
+
+  <!-- 3. found -->
+  <section id="v-found" class="view relative flex-1 flex-col items-center px-6">
+    <div class="flex-1 flex flex-col items-center justify-center w-full">
+      <p class="text-neonCyan text-sm font-semibold pop">✨ It's a match!</p>
+      <div id="foundAv" class="pop mt-4 avatar-ring" style="animation-delay:.1s"></div>
+      <h2 id="foundName" class="text-3xl font-extrabold mt-5 pop" style="animation-delay:.2s"></h2>
+      <p id="foundMeta" class="text-sm text-gray-400 mt-1 pop" style="animation-delay:.25s"></p>
+      <div id="foundTags" class="flex flex-wrap justify-center gap-2 mt-4 pop" style="animation-delay:.3s"></div>
+      <div class="mt-6 px-4 py-2 rounded-full bg-cyberCard border border-cyberGold/30 text-sm text-cyberGold flex items-center gap-2 pop" style="animation-delay:.35s">
+        <span class="coin w-4 h-4"></span><span id="foundRate"></span></div>
+    </div>
+    <div class="w-full pb-6">
+      <p class="text-center text-xs text-gray-500 mb-3">Connecting in <b id="count" class="text-white">5</b>…</p>
+      <div class="flex gap-3">
+        <button onclick="skip()" class="flex-1 h-14 rounded-2xl btn-ghost font-semibold">Skip</button>
+        <button onclick="connect()" class="flex-[2] h-14 rounded-2xl btn-neon font-bold">Connect now</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  const D = window.DEMO;
+  document.getElementById('bal').textContent = D.balance.toLocaleString('en-IN');
+  let who = 'all', lang = 'any', searchT, tickT, countT, found = null, seen = [];
+
+  function bindSeg(box, setter, cls) {
+    document.querySelectorAll(`#${box} .${cls}`).forEach(b => b.onclick = () => {
+      document.querySelectorAll(`#${box} .${cls}`).forEach(x => x.classList.toggle('on', x === b));
+      setter(b.dataset.v);
+    });
+  }
+  bindSeg('who', v => (who = v), 'seg');
+  bindSeg('lang', v => (lang = v), 'chip');
+
+  function show(v) { document.querySelectorAll('.view').forEach(s => s.classList.toggle('on', s.id === 'v-' + v)); }
+
+  function pool() {
+    return D.hosts.filter(h => (h.s === 'LIVE' || h.s === 'ONLINE')
+      && (who === 'all' || h.g === who) && (lang === 'any' || h.langs.includes(lang)));
+  }
+
+  function startSearch() {
+    const p = pool();
+    // avatars orbiting the radar
+    const ring = (id, list, r) => document.getElementById(id).innerHTML = list.map((h, i) => {
+      const a = (i / list.length) * Math.PI * 2;
+      return `<div style="left:calc(50% + ${Math.cos(a) * r}px - 22px);top:calc(50% + ${Math.sin(a) * r}px - 22px)">${D.avatar(h, 'w-full h-full rounded-full text-base')}</div>`;
+    }).join('');
+    const online = D.hosts.filter(h => h.s !== 'OFFLINE');
+    ring('orbit1', online.slice(0, 4), 128);
+    ring('orbit2', online.slice(4), 84);
+    document.getElementById('searchingCount').textContent = online.length;
+    show('search');
+    let s = 0;
+    tickT = setInterval(() => { s++; document.getElementById('timer').textContent = `0:${String(s).padStart(2, '0')}`; }, 1000);
+    searchT = setTimeout(() => {
+      clearInterval(tickT);
+      const fresh = p.filter(h => !seen.includes(h.id));
+      if (!fresh.length) { show('choose'); seen = []; vibe.toast(p.length ? 'You have seen everyone · starting over' : 'No one matches right now · try "Anyone"'); return; }
+      found = fresh[Math.floor(Math.random() * fresh.length)];
+      seen.push(found.id);
+      showFound();
+    }, 2600);
+  }
+
+  function showFound() {
+    const h = found;
+    document.getElementById('foundAv').innerHTML = D.avatar(h, 'w-36 h-36 rounded-full border-4 border-cyberDark text-6xl');
+    document.getElementById('foundName').textContent = `${h.n}, ${h.a}`;
+    document.getElementById('foundMeta').textContent = `📍 ${h.c} · ⭐ ${h.rt} · Lv.${h.lv}`;
+    document.getElementById('foundTags').innerHTML = h.langs.map(l => `<span class="px-3 py-1 rounded-full bg-cyberCard border border-cyberLine text-xs">${l}</span>`).join('');
+    document.getElementById('foundRate').textContent = `${h.r} coins/min · charged after pick-up`;
+    show('found');
+    let c = 5;
+    document.getElementById('count').textContent = c;
+    countT = setInterval(() => { c--; document.getElementById('count').textContent = c; if (c <= 0) connect(); }, 1000);
+  }
+
+  function stopAll() { clearTimeout(searchT); clearInterval(tickT); clearInterval(countT); }
+  function cancelSearch() { stopAll(); show('choose'); }
+  function skip() { stopAll(); startSearch(); }
+  function connect() { stopAll(); vibe.go(`10-video-call.html?id=${found.id}`); }
+  function leave() { stopAll(); vibe.go('05-home.html'); }
+</script>
+</body>
+</html>

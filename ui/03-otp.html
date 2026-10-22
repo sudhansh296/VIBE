@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Verify OTP</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .otp { width: 100%; aspect-ratio: 5/6; text-align: center; font-size: 26px; font-weight: 800; border-radius: 16px; outline: none; caret-color: #ff2a85; }
+  .otp.filled { border-color: rgba(0,242,254,.6); background: linear-gradient(180deg, rgba(0,242,254,.08), rgba(18,18,28,1)); }
+  .otp.bad { border-color: #ff4d5e !important; box-shadow: 0 0 0 4px rgba(255,77,94,.15) !important; }
+  .otp.good { border-color: #3ee08f !important; box-shadow: 0 0 0 4px rgba(62,224,143,.15) !important; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-neonCyan/15 -top-24 -left-20"></div>
+  <div class="blob w-72 h-72 bg-neonPink/20 bottom-0 -right-24"></div>
+
+  <header class="relative flex items-center px-5 pt-6">
+    <button onclick="vibe.go('02-login.html')" class="w-10 h-10 rounded-xl btn-ghost flex items-center justify-center" aria-label="Back">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+    <div class="flex-1 flex justify-center gap-1.5 pr-10">
+      <span class="w-6 h-1.5 rounded-full bg-neonPink"></span><span class="w-6 h-1.5 rounded-full bg-neonPink"></span><span class="w-6 h-1.5 rounded-full bg-cyberLine"></span>
+    </div>
+  </header>
+
+  <section class="relative flex-1 overflow-y-auto px-6 pt-8">
+    <div class="flex justify-center -mt-4">
+      <img src="assets/icons/otp-ghost.webp" alt="" class="w-40 h-40 object-contain float"
+           onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'w-16 h-16 rounded-2xl neon-border flex items-center justify-center text-3xl',textContent:'🔐'}))">
+    </div>
+    <h1 class="text-[28px] font-extrabold mt-2">Verify your number</h1>
+    <p class="text-gray-400 text-sm mt-2">Enter the 6-digit code sent to
+      <span class="text-white font-semibold" id="num">+91 98765 43210</span>
+      <button onclick="vibe.go('02-login.html')" class="text-neonCyan font-semibold ml-1">Change</button></p>
+
+    <div id="boxes" class="grid grid-cols-6 gap-2.5 mt-9">
+      <input class="otp neon-field" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Digit 1">
+      <input class="otp neon-field" inputmode="numeric" maxlength="1" aria-label="Digit 2">
+      <input class="otp neon-field" inputmode="numeric" maxlength="1" aria-label="Digit 3">
+      <input class="otp neon-field" inputmode="numeric" maxlength="1" aria-label="Digit 4">
+      <input class="otp neon-field" inputmode="numeric" maxlength="1" aria-label="Digit 5">
+      <input class="otp neon-field" inputmode="numeric" maxlength="1" aria-label="Digit 6">
+    </div>
+    <p id="msg" class="text-xs mt-3 h-4"></p>
+
+    <div class="flex items-center justify-between mt-5 text-sm">
+      <span class="text-gray-400">Didn't get the code?</span>
+      <button id="resend" disabled class="font-semibold text-gray-500 disabled:cursor-default">Resend in <span id="timer">00:30</span></button>
+    </div>
+    <button id="viaCall" class="w-full mt-4 h-12 rounded-2xl btn-ghost text-sm text-gray-300 flex items-center justify-center gap-2 opacity-40" disabled>📞 Get code via call</button>
+
+    <div class="mt-8 rounded-2xl bg-cyberCard border border-cyberLine p-4 flex gap-3 text-xs text-gray-400">
+      <span class="text-lg">🛡️</span>
+      <span>VIBE will never ask for your OTP on chat or call. Don't share it with anyone.</span>
+    </div>
+    <p class="text-[11px] text-gray-600 text-center mt-4">Demo: type any 6 digits · <b>000000</b> shows the wrong-code state</p>
+  </section>
+
+  <footer class="relative p-6">
+    <button id="verify" disabled class="btn-neon w-full h-14 rounded-2xl font-bold text-[15px]">Verify & continue</button>
+  </footer>
+</main>
+
+<script>
+  const p = sessionStorage.getItem('vibe-phone');
+  if (p) document.getElementById('num').textContent = `+91 ${p.slice(0, 5)} ${p.slice(5)}`;
+
+  const boxes = [...document.querySelectorAll('.otp')];
+  const verify = document.getElementById('verify');
+  const msg = document.getElementById('msg');
+  const code = () => boxes.map(b => b.value).join('');
+
+  function update() {
+    boxes.forEach(b => { b.classList.toggle('filled', !!b.value); b.classList.remove('bad'); });
+    msg.textContent = '';
+    verify.disabled = code().length !== 6;
+    if (code().length === 6) check();
+  }
+  boxes.forEach((b, i) => {
+    b.addEventListener('input', () => {
+      b.value = b.value.replace(/\D/g, '').slice(-1);
+      if (b.value && i < 5) boxes[i + 1].focus();
+      update();
+    });
+    b.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !b.value && i > 0) { boxes[i - 1].value = ''; boxes[i - 1].focus(); update(); }
+      if (e.key === 'ArrowLeft' && i > 0) boxes[i - 1].focus();
+      if (e.key === 'ArrowRight' && i < 5) boxes[i + 1].focus();
+    });
+    b.addEventListener('paste', e => {
+      const d = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6);
+      if (!d) return;
+      e.preventDefault();
+      d.split('').forEach((c, j) => (boxes[j].value = c));
+      boxes[Math.min(d.length, 5)].focus();
+      update();
+    });
+  });
+  boxes[0].focus();
+
+  let checking = false;
+  function check() {
+    if (checking) return;
+    checking = true;
+    verify.innerHTML = '<span class="inline-block w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin align-middle"></span>';
+    setTimeout(() => {
+      checking = false;
+      if (code() === '000000') {
+        boxes.forEach(b => b.classList.add('bad'));
+        document.getElementById('boxes').classList.add('shake');
+        setTimeout(() => document.getElementById('boxes').classList.remove('shake'), 400);
+        msg.className = 'text-xs mt-3 h-4 text-dangerRed';
+        msg.textContent = 'Wrong code. 2 attempts left.';
+        verify.textContent = 'Verify & continue';
+        verify.disabled = true;
+        return;
+      }
+      boxes.forEach(b => b.classList.add('good'));
+      msg.className = 'text-xs mt-3 h-4 text-onlineGreen';
+      msg.textContent = '✓ Verified';
+      verify.textContent = 'Verified ✓';
+      setTimeout(() => vibe.go('04-profile-setup.html'), 600);
+    }, 800);
+  }
+  verify.addEventListener('click', check);
+
+  // resend countdown
+  let left = 30;
+  const resend = document.getElementById('resend');
+  const viaCall = document.getElementById('viaCall');
+  function tick() {
+    if (left <= 0) {
+      resend.disabled = false; resend.className = 'font-semibold text-neonPink';
+      resend.textContent = 'Resend code';
+      viaCall.disabled = false; viaCall.classList.remove('opacity-40');
+      return;
+    }
+    document.getElementById('timer').textContent = `00:${String(left).padStart(2, '0')}`;
+    left--; setTimeout(tick, 1000);
+  }
+  tick();
+  resend.addEventListener('click', () => {
+    vibe.toast('New code sent');
+    left = 30; resend.disabled = true; resend.className = 'font-semibold text-gray-500';
+    resend.innerHTML = 'Resend in <span id="timer">00:30</span>'; tick();
+  });
+  viaCall.addEventListener('click', () => vibe.toast('You will get a call in a few seconds'));
+</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+/* VIBE (call-me edition): same dark neon theme as theme.css, new components. No bitmap images: coin, avatars and art are drawn with CSS/SVG. */
+.coin { display: inline-block; width: 1em; height: 1em; border-radius: 99px; flex-shrink: 0; position: relative; vertical-align: middle; font-size: 0 !important; color: transparent !important; background: none !important; filter: none !important;
+  background: radial-gradient(circle at 32% 28%, #fff3c4 0%, #f6dc9b 35%, #e0a82e 75%, #a66f10 100%) !important; box-shadow: 0 0 8px rgba(246,220,155,.45), inset 0 0 0 .12em rgba(120,75,5,.55); }
+.coin::after { content: 'V'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: .56em; font-weight: 900; color: #7a4a05; line-height: 1; }
+
+/* floating tab bar: pill with a raised centre "Match" button */
+.dock { position: absolute; left: 14px; right: 14px; bottom: 14px; z-index: 30; height: 66px; border-radius: 26px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px;
+  background: rgba(20,20,32,.82); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); border: 1px solid rgba(255,255,255,.09); box-shadow: 0 16px 40px -12px rgba(0,0,0,.8), 0 0 0 1px rgba(255,42,133,.06); }
+.dock .it { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: #6f6f82; font-size: 10px; font-weight: 600; letter-spacing: .04em; position: relative; transition: color .2s; }
+.dock .it svg { width: 23px; height: 23px; transition: transform .2s; }
+.dock .it.on { color: #fff; } .dock .it.on svg { transform: translateY(-1px) scale(1.08); filter: drop-shadow(0 0 8px rgba(255,42,133,.8)); color: #ff6aa8; }
+.dock .it.on::after { content: ''; position: absolute; bottom: 7px; width: 4px; height: 4px; border-radius: 9px; background: #ff2a85; box-shadow: 0 0 8px #ff2a85; }
+.dock .mid { width: 62px; flex: 0 0 62px; position: relative; height: 100%; }
+.dock .mid button { position: absolute; left: 50%; top: -22px; transform: translateX(-50%); width: 62px; height: 62px; border-radius: 99px; display: flex; align-items: center; justify-content: center; color: #fff;
+  background: linear-gradient(135deg, #ff2a85, #c3157a 55%, #7a1fd1); box-shadow: 0 12px 30px -6px rgba(255,42,133,.8), 0 0 0 6px #07070c; }
+.dock .mid svg { width: 28px; height: 28px; }
+.badge { position: absolute; top: 10px; left: 55%; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 99px; background: #ff2a85; color: #fff; font-size: 9px; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid #12121c; }
+
+/* shared bits */
+.chip2 { height: 36px; padding: 0 14px; border-radius: 12px; font-size: 13px; font-weight: 600; color: #a7a7b8; background: #12121c; border: 1px solid #262636; white-space: nowrap; transition: all .15s; }
+.chip2.on { color: #fff; background: linear-gradient(135deg, rgba(255,42,133,.28), rgba(122,31,209,.22)); border-color: rgba(255,42,133,.7); }
+.glass2 { background: rgba(18,18,28,.62); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,.1); }
+.live-dot { width: 8px; height: 8px; border-radius: 99px; background: #3ee08f; box-shadow: 0 0 0 0 rgba(62,224,143,.6); animation: lp 1.6s infinite; }
+@keyframes lp { 70% { box-shadow: 0 0 0 7px rgba(62,224,143,0); } 100% { box-shadow: 0 0 0 0 rgba(62,224,143,0); } }
+.ico { width: 20px; height: 20px; display: inline-block; vertical-align: middle; }

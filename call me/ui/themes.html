@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIBE · Theme options</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/icons.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Inter', sans-serif; background: #050508; color: #fff; margin: 0; padding: 24px 16px 100px; }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 26px; margin-top: 26px; }
+  .opt { border-radius: 30px; padding: 14px; background: #0c0c12; border: 2px solid #1b1b26; cursor: pointer; position: relative; transition: all .18s; }
+  .opt:hover { border-color: #33334a; }
+  .opt.sel { border-color: var(--p1); box-shadow: 0 0 0 4px color-mix(in srgb, var(--p1) 22%, transparent), 0 24px 60px -24px var(--p1); }
+  .tag { position: absolute; top: -13px; left: 20px; padding: 3px 13px; border-radius: 99px; background: #1a1a27; border: 1px solid #2c2c40; font-size: 12px; font-weight: 800; letter-spacing: .05em; }
+  .opt.sel .tag { background: var(--p1); border-color: var(--p1); color: var(--onp); }
+  .tick { position: absolute; top: 14px; right: 16px; width: 26px; height: 26px; border-radius: 99px; background: var(--p1); color: var(--onp); display: none; align-items: center; justify-content: center; z-index: 5; }
+  .opt.sel .tick { display: flex; }
+  .sw { display: flex; gap: 6px; margin: 10px 0 12px; }
+  .sw i { width: 26px; height: 26px; border-radius: 9px; border: 1px solid rgba(255,255,255,.14); }
+  /* the mini phone */
+  .ph { position: relative; height: 560px; border-radius: 26px; overflow: hidden; background: var(--bg); border: 1px solid var(--line); }
+  .ph .glow { position: absolute; width: 260px; height: 260px; left: -70px; top: -90px; background: var(--p1); opacity: .16; filter: blur(70px); }
+  .ph .glow2 { position: absolute; width: 220px; height: 220px; right: -90px; top: 160px; background: var(--p2); opacity: .10; filter: blur(70px); }
+  .hd { position: relative; display: flex; align-items: center; padding: 14px 14px 8px; gap: 8px; }
+  .logo { font-size: 24px; font-weight: 900; flex: 1; background: linear-gradient(90deg, var(--p1), var(--p2), var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .coinchip { height: 32px; padding: 0 11px 0 4px; border-radius: 99px; display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 12px; color: var(--gold); border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent); background: color-mix(in srgb, var(--gold) 12%, transparent); }
+  .coin { width: 22px; height: 22px; border-radius: 99px; background: radial-gradient(circle at 32% 28%, #fff, var(--gold) 45%, color-mix(in srgb, var(--gold) 55%, #000)); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #3a2400; }
+  .bell { width: 32px; height: 32px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: var(--card); border: 1px solid var(--line); color: var(--sub); }
+  .tabs { position: relative; display: flex; gap: 16px; padding: 4px 14px 8px; font-weight: 700; font-size: 15px; color: var(--mute); }
+  .tabs b { color: #fff; position: relative; } .tabs b::after { content: ''; position: absolute; left: 0; right: 0; bottom: -6px; height: 3px; border-radius: 3px; background: linear-gradient(90deg, var(--p1), var(--p2)); }
+  .chips { position: relative; display: flex; gap: 6px; padding: 8px 14px; }
+  .chip { height: 28px; padding: 0 12px; border-radius: 99px; font-size: 11.5px; font-weight: 700; display: flex; align-items: center; color: var(--sub); background: var(--card); border: 1px solid var(--line); }
+  .chip.on { color: #fff; background: color-mix(in srgb, var(--p1) 22%, transparent); border-color: var(--p1); }
+  .story { position: relative; display: flex; gap: 12px; padding: 4px 14px 10px; }
+  .story div { width: 46px; height: 46px; border-radius: 99px; padding: 2px; background: conic-gradient(from 200deg, var(--p1), var(--p2), var(--p1)); } .story div span { display: flex; width: 100%; height: 100%; border-radius: 99px; align-items: center; justify-content: center; font-weight: 800; background: var(--bg); border: 2px solid var(--bg); }
+  .cards { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 4px 14px; }
+  .c { position: relative; aspect-ratio: .74; border-radius: 22px; overflow: hidden; }
+  .c .wm { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 96px; font-weight: 900; color: rgba(255,255,255,.2); padding-bottom: 14px; }
+  .c .sh { position: absolute; inset: 0; background: linear-gradient(transparent 45%, rgba(0,0,0,.66)); }
+  .c .st { position: absolute; top: 8px; left: 8px; display: flex; align-items: center; gap: 5px; font-size: 9.5px; font-weight: 800; padding: 3px 8px; border-radius: 99px; background: rgba(0,0,0,.42); }
+  .c .st i { width: 6px; height: 6px; border-radius: 99px; background: #3ee08f; }
+  .c .pr { position: absolute; top: 8px; right: 8px; display: flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 800; padding: 2px 7px 2px 3px; border-radius: 99px; background: rgba(0,0,0,.42); color: var(--gold); }
+  .c .pr .coin { width: 15px; height: 15px; font-size: 8px; }
+  .c .nm { position: absolute; left: 10px; bottom: 9px; font-weight: 800; font-size: 13.5px; line-height: 1.15; } .c .nm small { display: block; font-weight: 500; opacity: .8; font-size: 10.5px; }
+  .c .bt { position: absolute; right: 8px; bottom: 8px; width: 36px; height: 36px; border-radius: 13px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--p1), var(--p2)); color: var(--onp); }
+  .match { position: absolute; left: 50%; transform: translateX(-50%); bottom: 96px; display: flex; align-items: center; gap: 9px; padding: 6px 16px 6px 6px; border-radius: 99px; background: linear-gradient(90deg, var(--p1), var(--p2)); color: var(--onp); font-weight: 800; font-size: 12.5px; box-shadow: 0 10px 26px -8px var(--p1); white-space: nowrap; z-index: 3; }
+  .match .b { width: 30px; height: 30px; border-radius: 99px; background: #fff; color: var(--p1); display: flex; align-items: center; justify-content: center; }
+  .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 118px; background: linear-gradient(transparent, var(--bg) 35%); z-index: 2; }
+  .bar { position: absolute; left: 12px; right: 12px; bottom: 12px; height: 56px; border-radius: 24px; background: var(--bar); border: 1px solid var(--line); display: flex; align-items: center; z-index: 3; }
+  .bar .it { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 9.5px; font-weight: 700; color: var(--mute); } .bar .it svg { width: 22px; height: 22px; } .bar .it.on { color: var(--p1); }
+  .bar .mid { width: 76px; position: relative; height: 100%; } .bar .mid i { position: absolute; left: 50%; top: -22px; transform: translateX(-50%); width: 58px; height: 58px; border-radius: 99px; background: linear-gradient(135deg, var(--p1), var(--p2)); color: var(--onp); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 5px var(--bg), 0 10px 24px -6px var(--p1); } .bar .mid svg { width: 26px; height: 26px; }
+  #summary { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: rgba(8,8,12,.96); border-top: 1px solid #262636; padding: 12px 16px; display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 style="font-size:30px;font-weight:900;background:linear-gradient(90deg,#ff2a85,#00f2fe,#f6dc9b);-webkit-background-clip:text;background-clip:text;color:transparent">VIBE · Theme options</h1>
+  <p style="color:#9a9ab0;margin-top:6px">Har theme mein wahi Home screen (cards, Random Match, footer C) alag colors mein. Dekh lo, jo pasand aaye us par click karo.</p>
+  <div class="grid" id="grid"></div>
+  <p style="font-size:12px;color:#55556a;margin-top:30px">Koi image ya video use nahi hua. Sab kuch CSS aur SVG se bana hai.</p>
+</div>
+<div id="summary"><span style="font-size:14px;color:#9a9ab0">Aap ka choice:</span><b id="sel" style="color:#ff2a85">not selected</b><span style="font-size:12px;color:#6a6a80">Mujhe bas naam bata do, jaise "Theme 3".</span></div>
+
+<script>
+  // bg, card, line, bar, p1 (main), p2 (second), gold (coins), onp (text on main), sub/mute greys, 4 card gradients
+  const T = [
+    { n: 'Neon Pink (abhi wala)', bg: '#07070c', card: '#12121c', line: '#262636', bar: '#14141f', p1: '#ff2a85', p2: '#00f2fe', gold: '#f6dc9b', onp: '#fff', sub: '#c7c7d1', mute: '#7a7a90',
+      g: [['#ff2a85', '#7a1fd1'], ['#00f2fe', '#1e3a8a'], ['#a855f7', '#581c87'], ['#10b981', '#065f46']], d: 'Jaisa abhi hai. Tez, youthful.' },
+    { n: 'Rose Gold Noir', bg: '#0b0709', card: '#171013', line: '#2e2024', bar: '#1a1215', p1: '#e8a597', p2: '#c9748b', gold: '#f3d9a4', onp: '#2a120d', sub: '#d9c3c0', mute: '#8a7274',
+      g: [['#e8a597', '#8a3b4d'], ['#c9748b', '#4a1b33'], ['#d9a27a', '#6b3022'], ['#b98aa3', '#3d2142']], d: 'Premium, warm, luxury brand jaisa.' },
+    { n: 'Royal Violet Gold', bg: '#0a0713', card: '#150f26', line: '#2a1f48', bar: '#170f2b', p1: '#a78bfa', p2: '#f0abfc', gold: '#f6d27a', onp: '#14082e', sub: '#cfc6ea', mute: '#7d72a3',
+      g: [['#8b5cf6', '#3b1d8f'], ['#d946ef', '#5b1a73'], ['#6366f1', '#1e1b6b'], ['#c084fc', '#4a1d7a']], d: 'Shahi, deep purple aur sone jaisa gold.' },
+    { n: 'Emerald Noir', bg: '#050b09', card: '#0d1714', line: '#1c2e28', bar: '#0e1a16', p1: '#34d399', p2: '#fbbf24', gold: '#fde68a', onp: '#03150d', sub: '#bfe3d3', mute: '#6b8a7e',
+      g: [['#10b981', '#064e3b'], ['#14b8a6', '#134e4a'], ['#84cc16', '#365314'], ['#f59e0b', '#78350f']], d: 'Dark green + gold. Calm aur rich.' },
+    { n: 'Sunset Ember', bg: '#0b0706', card: '#181010', line: '#30201c', bar: '#1a1111', p1: '#ff6a3d', p2: '#ff2e6e', gold: '#ffd27a', onp: '#fff', sub: '#e0c9c1', mute: '#8c726b',
+      g: [['#ff6a3d', '#9f1d3a'], ['#ff2e6e', '#6b1055'], ['#f59e0b', '#9a3412'], ['#ec4899', '#831843']], d: 'Garam, energetic, sunset jaisa.' },
+    { n: 'Ocean Aurora', bg: '#050a14', card: '#0c1626', line: '#1a2c47', bar: '#0d192c', p1: '#38bdf8', p2: '#a78bfa', gold: '#fcd9a0', onp: '#04111f', sub: '#bcd0ea', mute: '#64809f',
+      g: [['#0ea5e9', '#1e3a8a'], ['#8b5cf6', '#312e81'], ['#14b8a6', '#0f3d52'], ['#6366f1', '#1e1b4b']], d: 'Midnight blue, cool aur modern.' },
+  ];
+  const HOSTS = [['Priya', 24, 'Mumbai', 60, 'Online'], ['Arjun', 26, 'Delhi', 50, 'Online']];
+  const HL = ['P', 'A', 'K', 'D'];
+  document.getElementById('grid').innerHTML = T.map((t, i) => {
+    const vars = `--bg:${t.bg};--card:${t.card};--line:${t.line};--bar:${t.bar};--p1:${t.p1};--p2:${t.p2};--gold:${t.gold};--onp:${t.onp};--sub:${t.sub};--mute:${t.mute}`;
+    return `<div class="opt" data-i="${i}" style="${vars}"><span class="tag">THEME ${i + 1}</span><span class="tick">${IC('check', 'w-4 h-4')}</span>
+      <div style="font-weight:800;font-size:16px;margin-top:8px">${t.n}</div><div style="font-size:12px;color:#8a8aa2;margin-top:2px">${t.d}</div>
+      <div class="sw">${[t.bg, t.card, t.p1, t.p2, t.gold].map(c => `<i style="background:${c}"></i>`).join('')}</div>
+      <div class="ph"><div class="glow"></div><div class="glow2"></div>
+        <div class="hd"><span class="logo">VIBE</span><span class="coinchip"><span class="coin">V</span>2,850</span><span class="bell">${IC('bell', 'w-4 h-4')}</span></div>
+        <div class="tabs"><b>Discover</b><span>Following</span><span>New</span></div>
+        <div class="chips"><span class="chip on">All</span><span class="chip">Girls</span><span class="chip">Boys</span><span class="chip">Online now</span></div>
+        <div class="story">${HL.map(l => `<div><span>${l}</span></div>`).join('')}</div>
+        <div class="cards">${HOSTS.map((h, k) => `<div class="c" style="background:linear-gradient(150deg,${t.g[k][0]},${t.g[k][1]})"><span class="wm">${h[0][0]}</span><span class="sh"></span>
+          <span class="st"><i></i>${h[4]}</span><span class="pr"><span class="coin">V</span>${h[3]}</span>
+          <span class="nm">${h[0]}, ${h[1]}<small>${h[2]}</small></span><span class="bt">${IC('video', 'w-5 h-5')}</span></div>`).join('')}</div>
+        <div class="match"><span class="b">${IC('bolt', 'w-4 h-4')}</span>Random match</div>
+        <div class="fade"></div>
+        <div class="bar"><div class="it on">${IC('home')}Home</div><div class="mid"><i>${IC('chat')}</i></div><div class="it">${IC('user')}Me</div></div>
+      </div></div>`;
+  }).join('');
+  document.addEventListener('click', e => {
+    const o = e.target.closest('.opt'); if (!o) return;
+    document.querySelectorAll('.opt').forEach(x => x.classList.toggle('sel', x === o));
+    const t = T[+o.dataset.i]; const s = document.getElementById('sel'); s.textContent = `Theme ${+o.dataset.i + 1} · ${t.n}`; s.style.color = t.p1;
+  });
+</script>
+</body>
+</html>

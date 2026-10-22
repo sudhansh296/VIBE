@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Safety center</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .tool { border: 1px solid #262636; border-radius: 20px; padding: 14px; text-align: left; background: linear-gradient(160deg, var(--c1), #12121c 70%); transition: transform .12s; }
+  .tool:active { transform: scale(.97); }
+  .tool .ic { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--c2); background: rgba(0,0,0,.25); color: var(--c2); margin-bottom: 10px; }
+  .tool .ic svg { width: 20px; height: 20px; }
+  .tip { display: flex; gap: 12px; align-items: flex-start; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .tip:last-child { border: 0; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-80 h-80 bg-neonCyan/10 -top-28 -left-24"></div>
+
+  <header class="relative flex items-center gap-3 px-4 pt-5 pb-2">
+    <button onclick="history.length > 1 ? history.back() : vibe.go('28-settings.html')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Back">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 class="text-xl font-semibold">Safety center</h1>
+  </header>
+
+  <section class="relative flex-1 overflow-y-auto px-5 pb-10">
+    <div class="flex items-center gap-4 mt-3">
+      <span class="w-16 h-16 rounded-2xl border border-neonCyan/40 bg-neonCyan/10 text-neonCyan flex items-center justify-center shrink-0"><svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6Z"/><path d="m9 12 2 2 4-4"/></svg></span>
+      <p class="text-sm text-gray-400 leading-relaxed">Your safety comes first. Here are the tools and tips to stay safe on VIBE.</p>
+    </div>
+
+    <h3 class="text-[10px] tracking-[.16em] uppercase text-gray-500 mt-7 mb-3">Your tools</h3>
+    <div class="grid grid-cols-2 gap-3">
+      <button class="tool" style="--c1:rgba(255,77,94,.14);--c2:#ff4d5e" onclick="vibe.go('36-report-user.html')"><span class="ic"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg></span><b class="text-sm font-medium block">Report</b><span class="text-[11px] text-gray-400">Tell our team what went wrong</span></button>
+      <button class="tool" style="--c1:rgba(255,42,133,.14);--c2:#ff2a85" onclick="vibe.go('37-blocked-users.html')"><span class="ic"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></svg></span><b class="text-sm font-medium block">Blocked users</b><span class="text-[11px] text-gray-400">See or undo your blocks</span></button>
+      <button class="tool" style="--c1:rgba(246,220,155,.14);--c2:#f6dc9b" onclick="vibe.go('40-guidelines.html')"><span class="ic"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg></span><b class="text-sm font-medium block">Guidelines</b><span class="text-[11px] text-gray-400">What is and isn't allowed</span></button>
+      <button class="tool" style="--c1:rgba(62,224,143,.14);--c2:#3ee08f" onclick="vibe.go('28-settings.html')"><span class="ic"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14.5 12a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"/><path d="M7.5 7.5a6.4 6.4 0 0 0 0 9M16.5 7.5a6.4 6.4 0 0 1 0 9"/></svg></span><b class="text-sm font-medium block">Privacy settings</b><span class="text-[11px] text-gray-400">Hide online status and visits</span></button>
+    </div>
+
+    <h3 class="text-[10px] tracking-[.16em] uppercase text-gray-500 mt-7 mb-1">Stay safe</h3>
+    <div class="rounded-2xl bg-cyberCard border border-cyberLine px-4">
+      <div class="tip"><span class="w-9 h-9 rounded-xl bg-dangerRed/10 border border-dangerRed/40 text-dangerRed flex items-center justify-center shrink-0"><svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l3 3"/></svg></span><div><b class="text-sm font-medium">Never share your OTP or UPI PIN</b><div class="text-xs text-gray-500 mt-0.5">VIBE staff will never ask for them.</div></div></div>
+      <div class="tip"><span class="w-9 h-9 rounded-xl bg-cyberGold/10 border border-cyberGold/40 text-cyberGold flex items-center justify-center shrink-0"><svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4"/></svg></span><div><b class="text-sm font-medium">Don't pay outside VIBE</b><div class="text-xs text-gray-500 mt-0.5">If someone asks for money on UPI or another app, it is a scam. Report them.</div></div></div>
+      <div class="tip"><span class="w-9 h-9 rounded-xl bg-neonCyan/10 border border-neonCyan/40 text-neonCyan flex items-center justify-center shrink-0"><svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg></span><div><b class="text-sm font-medium">Keep your number private</b><div class="text-xs text-gray-500 mt-0.5">Stay on VIBE calls. Do not give phone numbers or social ids to people you just met.</div></div></div>
+      <div class="tip"><span class="w-9 h-9 rounded-xl bg-neonPink/10 border border-neonPink/40 text-neonPink flex items-center justify-center shrink-0"><svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span><div><b class="text-sm font-medium">Be careful meeting anyone</b><div class="text-xs text-gray-500 mt-0.5">We do not recommend meeting people from the app. If you do, tell a friend and choose a public place.</div></div></div>
+      <div class="tip"><span class="w-9 h-9 rounded-xl bg-onlineGreen/10 border border-onlineGreen/40 text-onlineGreen flex items-center justify-center shrink-0"><svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg></span><div><b class="text-sm font-medium">Report anything that feels wrong</b><div class="text-xs text-gray-500 mt-0.5">Reports are private and reviewed by our team, usually within 24 hours.</div></div></div>
+    </div>
+
+    <div class="rounded-2xl border border-dangerRed/30 bg-dangerRed/5 p-4 mt-5 text-xs text-gray-300 leading-relaxed"><b class="text-dangerRed">In danger?</b> Call your local emergency number first. For women's helpline in India dial 181.</div>
+
+    <div class="grid grid-cols-2 gap-3 mt-4">
+      <button onclick="vibe.go('38-terms.html')" class="h-12 rounded-2xl btn-ghost text-sm font-semibold">Terms</button>
+      <button onclick="vibe.go('39-privacy.html')" class="h-12 rounded-2xl btn-ghost text-sm font-semibold">Privacy Policy</button>
+    </div>
+    <button onclick="vibe.go('29-help.html')" class="w-full h-12 rounded-2xl btn-neon font-bold mt-3">Contact support</button>
+  </section>
+</main>
+</body>
+</html>

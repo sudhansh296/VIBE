@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · My photos & videos</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .tabn { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #6b6b7b; padding-bottom: 12px; position: relative; line-height: 1; }
+  .tabn.on { color: #fff; }
+  .tabn.on::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, #ff2a85, #00f2fe); }
+  .tile { position: relative; aspect-ratio: 3/4; border-radius: 18px; overflow: hidden; border: 1.5px solid #262636; }
+  .tile.add { border: 1.5px dashed #3a3a4c; background: #12121c; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #ff2a85; font-size: 12px; font-weight: 600; }
+  .bd { position: absolute; left: 6px; top: 6px; font-size: 9px; font-weight: 800; letter-spacing: .06em; padding: 3px 8px; border-radius: 99px; display: flex; align-items: center; gap: 4px; }
+  .bd.free { background: rgba(62,224,143,.9); color: #04180d; }
+  .bd.lock { background: linear-gradient(90deg, #f6dc9b, #eab308); color: #000; }
+  .more { position: absolute; right: 6px; top: 6px; width: 28px; height: 28px; border-radius: 99px; background: rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center; }
+  .ov { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 8px 8px; font-size: 10px; font-weight: 600; text-align: center; background: linear-gradient(transparent, rgba(0,0,0,.85)); }
+  .row { display: flex; align-items: center; gap: 14px; width: 100%; padding: 15px 4px; text-align: left; }
+  .row + .row { border-top: 1px solid rgba(255,255,255,.06); }
+  .ico { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid; flex-shrink: 0; }
+  .ico svg { width: 19px; height: 19px; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-neonPink/10 -top-24 -left-24"></div>
+
+  <header class="relative flex items-center gap-3 px-4 pt-5 pb-3">
+    <button onclick="history.length > 1 ? history.back() : vibe.go('27-edit-profile.html')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Back">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 class="text-xl font-semibold flex-1">Photos & videos</h1>
+    <button onclick="vibe.go('07-host-profile.html?id=1')" class="h-9 px-3 rounded-full btn-ghost text-xs flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>Preview</button>
+  </header>
+
+  <section class="relative flex-1 overflow-y-auto px-5 pb-8">
+    <!-- how it works + earnings -->
+    <div class="rounded-2xl border border-cyberGold/30 p-4" style="background:linear-gradient(135deg,rgba(120,80,10,.3),#12121c 70%)">
+      <div class="flex items-start gap-3">
+        <svg class="w-6 h-6 text-cyberGold shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        <p class="text-xs text-gray-300 leading-relaxed">Your <b class="text-white">first 3 photos</b> and <b class="text-white">intro video</b> are free for everyone. You can lock the rest. Users pay coins to unlock them and <b class="text-cyberGold">you earn <span id="share"></span> of every unlock</b>.</p>
+      </div>
+      <div class="flex items-center justify-between mt-3 pt-3 border-t border-white/10 text-xs"><span class="text-gray-400">Unlock earnings this week</span><span class="flex items-center gap-1 font-bold text-cyberGold"><span class="coin w-4 h-4"></span>1,240</span></div>
+    </div>
+
+    <div class="flex gap-6 mt-5 border-b border-white/10" id="tabs"><button class="tabn on" data-t="photo">Photos <span id="pc"></span></button><button class="tabn" data-t="video">Videos <span id="vc"></span></button></div>
+
+    <div id="grid" class="grid grid-cols-3 gap-3 mt-4"></div>
+    <p id="rule" class="text-[11px] text-gray-500 mt-3 leading-relaxed"></p>
+    <p class="text-[11px] text-gray-600 text-center mt-5">Every new photo or video is checked by the VIBE team before it goes live. Limits, unlock prices and your share are set by VIBE.</p>
+  </section>
+
+  <!-- add sheet -->
+  <div id="addS" class="sheet-wrap" onclick="if(event.target===this)closeS()">
+    <div class="sheet glass rounded-t-3xl px-6 pt-4 pb-6 border-t border-cyberLine" id="addBody"></div>
+  </div>
+  <!-- item sheet -->
+  <div id="itemS" class="sheet-wrap" onclick="if(event.target===this)closeS()">
+    <div class="sheet glass rounded-t-3xl px-6 pt-4 pb-6 border-t border-cyberLine" id="itemBody"></div>
+  </div>
+</main>
+<script>
+  // DEMO. Items, limits, review status, unlock price and share % come from the SERVER (admin panel); files are uploaded to storage and
+  // locked files are only sent to users after they pay. The first FREE_PHOTOS photos and the intro video are always free.
+  const CFG = { maxPhoto: 6, maxVideo: 6, minPhoto: 3, freePhotos: 3, pricePhoto: 200, priceVideo: 500, share: '60%', introSec: 15, videoSec: 30 };
+  const G = [['#ff2a85', '#7a1fd1'], ['#00f2fe', '#1e3a8a'], ['#f59e0b', '#9a3412'], ['#a855f7', '#581c87'], ['#10b981', '#065f46'], ['#f43f5e', '#86198f'], ['#38bdf8', '#1e40af']];
+  let photos = [ { g: 0, st: 'ok' }, { g: 1, st: 'ok' }, { g: 2, st: 'ok' }, { g: 3, st: 'ok', locked: true }, { g: 4, st: 'review' } ];
+  let videos = [ { g: 1, len: 15, st: 'ok', intro: true }, { g: 3, len: 24, st: 'ok', locked: true }, { g: 4, len: 18, st: 'review' } ];
+  let tab = 'photo', sel = null;
+  const $ = id => document.getElementById(id);
+  const I = {
+    plus: '<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+    dots: '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+    lock: '<svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+    play: '<svg class="w-8 h-8 text-white/90" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',
+    user: '<svg class="w-9 h-9 text-white/70" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+  };
+  const ic = (path, tone) => `<span class="ico" style="${tone}"><svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">${path}</svg></span>`;
+  const TN = { pink: 'border-color:rgba(255,42,133,.4);background:rgba(255,42,133,.1);color:#ff2a85', cyan: 'border-color:rgba(0,242,254,.4);background:rgba(0,242,254,.1);color:#00f2fe', gold: 'border-color:rgba(246,220,155,.4);background:rgba(246,220,155,.1);color:#f6dc9b', green: 'border-color:rgba(62,224,143,.4);background:rgba(62,224,143,.1);color:#3ee08f', red: 'border-color:rgba(255,77,94,.4);background:rgba(255,77,94,.1);color:#ff4d5e', grey: 'border-color:rgba(255,255,255,.15);color:#d1d5db' };
+  const P = { cam: '<path d="M20 8h-3l-2-3H9L7 8H4a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1Z"/><circle cx="12" cy="13.5" r="3"/>', img: '<path d="M6 3h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3Z"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>', vid: '<path d="M5.5 6h7.5a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H5.5a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3z"/><path d="m16 11 5-3v8l-5-3"/>', film: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/>', star: '<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3Z"/>', lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>', unlock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/>', swap: '<path d="M17 3l4 4-4 4M21 7H8M7 21l-4-4 4-4M3 17h13"/>', trash: '<path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1L5 6"/>' };
+
+  function paint() {
+    $('share').textContent = CFG.share;
+    $('pc').textContent = `${photos.length}/${CFG.maxPhoto}`; $('vc').textContent = `${videos.length}/${CFG.maxVideo}`;
+    document.querySelectorAll('.tabn').forEach(b => b.classList.toggle('on', b.dataset.t === tab));
+    const list = tab === 'photo' ? photos : videos, max = tab === 'photo' ? CFG.maxPhoto : CFG.maxVideo;
+    const tiles = list.map((it, i) => {
+      const g = G[it.g % G.length], free = tab === 'photo' ? i < CFG.freePhotos : !!it.intro, price = tab === 'photo' ? CFG.pricePhoto : CFG.priceVideo;
+      const badge = it.st !== 'ok' ? '' : (free || !it.locked) ? '<span class="bd free">FREE</span>' : `<span class="bd lock">${I.lock}${price}</span>`;
+      const main = tab === 'photo' && i === 0 ? '<span class="bd" style="left:auto;right:40px;background:rgba(0,0,0,.55)">MAIN</span>' : '';
+      const ov = it.st === 'review' ? '<div class="ov text-cyberGold">In review</div>' : it.st === 'bad' ? `<div class="ov text-dangerRed">Rejected<br><span class="font-normal text-white/70">${it.why}</span></div>` : tab === 'video' ? `<div class="ov text-white/80">0:${String(it.len).padStart(2, '0')}${it.intro ? ' · Intro' : ''}</div>` : '';
+      return `<button data-i="${i}" class="tile" style="background:linear-gradient(160deg,${g[0]},${g[1]})">
+        <span class="absolute inset-0 flex items-center justify-center ${it.st === 'bad' ? 'opacity-40' : ''}">${tab === 'video' ? I.play : I.user}</span>${badge}${main}<span class="more">${I.dots}</span>${ov}</button>`;
+    }).join('');
+    $('grid').innerHTML = (list.length < max ? `<button id="addTile" class="tile add">${I.plus}Add ${tab}</button>` : '') + tiles;
+    $('rule').textContent = tab === 'photo'
+      ? `At least ${CFG.minPhoto} photos. Photos 1 to ${CFG.freePhotos} are always free. Others can be locked at ${CFG.pricePhoto} coins each.`
+      : `Intro video is free (${CFG.introSec} sec). Other videos are up to ${CFG.videoSec} sec and can be locked at ${CFG.priceVideo} coins each.`;
+  }
+  const sheet = (id, html) => { $(id).querySelector('.sheet').innerHTML = '<div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-3"></div>' + html; $(id).classList.add('open'); };
+  function closeS() { document.querySelectorAll('.sheet-wrap.open').forEach(s => s.classList.remove('open')); }
+  const row = (key, icon, tone, title, sub, danger) => `<button class="row" data-k="${key}">${ic(P[icon], TN[tone])}<span class="flex-1"><span class="block text-[15px] ${danger ? 'text-dangerRed' : ''}">${title}</span>${sub ? `<span class="text-[11px] text-gray-500">${sub}</span>` : ''}</span><span class="text-gray-600">›</span></button>`;
+
+  document.addEventListener('click', e => {
+    const t = e.target.closest('.tabn'); if (t) { tab = t.dataset.t; return paint(); }
+    if (e.target.closest('#addTile')) {
+      sheet('addS', `<h3 class="text-base font-semibold mb-1">Add ${tab}</h3>` + (tab === 'photo'
+        ? row('shot', 'cam', 'pink', 'Take a photo', 'Front or back camera') + row('pick', 'img', 'cyan', 'Choose from gallery', 'Clear photos of yourself only')
+        : row('rec', 'vid', 'pink', 'Record a video', `Up to ${CFG.videoSec} seconds`) + row('vpick', 'film', 'cyan', 'Video from gallery', `Up to ${CFG.videoSec} seconds`)));
+      return;
+    }
+    const k = e.target.closest('[data-k]');
+    if (k) return act(k.dataset.k);
+    const it = e.target.closest('.tile[data-i]'); if (it) openItem(+it.dataset.i);
+  });
+  function openItem(i) {
+    sel = i; const list = tab === 'photo' ? photos : videos, x = list[i], free = tab === 'photo' ? i < CFG.freePhotos : !!x.intro, ok = x.st === 'ok';
+    let h = `<h3 class="text-base font-semibold mb-1">${tab === 'photo' ? 'Photo' : 'Video'} ${i + 1}${x.st === 'review' ? ' · In review' : x.st === 'bad' ? ' · Rejected' : ''}</h3>`;
+    if (x.st === 'bad') h += `<div class="rounded-xl border border-dangerRed/30 bg-dangerRed/5 p-3 text-xs text-gray-300 my-2"><b class="text-dangerRed">Reason:</b> ${x.why}. Replace it with a new one.</div>`;
+    if (tab === 'photo' && i !== 0 && ok) h += row('main', 'star', 'gold', 'Set as main photo', 'Shown first on your profile');
+    if (ok && !free) h += x.locked ? row('free', 'unlock', 'green', 'Make it free', 'Everyone can see it') : row('lock', 'lock', 'gold', `Lock it · ${tab === 'photo' ? CFG.pricePhoto : CFG.priceVideo} coins`, 'Users pay to see it and you earn');
+    if (ok && free) h += `<div class="text-[11px] text-gray-500 py-2">${tab === 'photo' ? 'The first ' + CFG.freePhotos + ' photos are always free.' : 'The intro video is always free.'}</div>`;
+    h += row('replace', 'swap', 'cyan', 'Replace', 'Pick a new one (needs review)');
+    h += row('del', 'trash', 'red', 'Delete', '', true);
+    sheet('itemS', h);
+  }
+  function act(k) {
+    const list = tab === 'photo' ? photos : videos;
+    if (k === 'shot' || k === 'pick' || k === 'rec' || k === 'vpick') {
+      if (k === 'rec') vibe.toast('Camera opens · ' + CFG.videoSec + ' sec max'); else vibe.toast(k === 'shot' ? 'Camera opens here' : 'Gallery opens here');
+      list.push({ g: list.length + 2, st: 'review', len: 12, locked: false }); closeS(); return paint();
+    }
+    const x = list[sel];
+    if (k === 'main') { list.splice(sel, 1); list.unshift(x); vibe.toast('Main photo updated'); }
+    else if (k === 'lock') { x.locked = true; vibe.toast('Locked · users pay to unlock'); }
+    else if (k === 'free') { x.locked = false; vibe.toast('Now free for everyone'); }
+    else if (k === 'replace') { x.st = 'review'; vibe.toast('Sent for review'); }
+    else if (k === 'del') {
+      if (tab === 'photo' && photos.length <= CFG.minPhoto) return vibe.toast(`Keep at least ${CFG.minPhoto} photos`);
+      if (tab === 'video' && x.intro) return vibe.toast('Replace the intro video instead of deleting it');
+      list.splice(sel, 1); vibe.toast('Deleted');
+    }
+    closeS(); paint();
+  }
+  paint();
+</script>
+</body>
+</html>

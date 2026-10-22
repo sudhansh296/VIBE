@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>VIBE UI Prototype</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="https://unpkg.com/lucide@0.454.0/dist/umd/lucide.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: { sans: ['Inter', 'sans-serif'] },
+  colors: {
+    cyberDark: '#07070c', cyberCard: '#12121c', cyberSurface: '#1e0f17', cyberLine: '#262636',
+    neonPink: '#ff2a85', neonCyan: '#00f2fe', cyberGold: '#f6dc9b', onlineGreen: '#3ee08f', dangerRed: '#ff4d5e'
+  }
+}}};
+</script>
+<style>
+  ::-webkit-scrollbar { display: none; }
+  * { -ms-overflow-style: none; scrollbar-width: none; -webkit-tap-highlight-color: transparent; }
+  body { background: radial-gradient(circle at 20% 10%, #1b0b18 0%, #07070c 45%), #07070c; }
+  .neon-border { border: 1px solid transparent;
+    background: linear-gradient(135deg, rgba(18,18,28,.92), rgba(30,15,23,.85)) padding-box,
+                linear-gradient(135deg, #ff2a85, #00f2fe) border-box; }
+  .neon-border-soft { border: 1px solid transparent;
+    background: linear-gradient(135deg, rgba(18,18,28,.95), rgba(18,18,28,.95)) padding-box,
+                linear-gradient(135deg, rgba(255,42,133,.55), rgba(0,242,254,.45)) border-box; }
+  .glass { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(18,18,28,.82); }
+  .glass-light { backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); background: rgba(0,0,0,.38); }
+  .grad-text { background: linear-gradient(90deg, #00f2fe, #ff2a85, #f6dc9b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .btn-neon { background: linear-gradient(135deg, #ff2a85 0%, #c3157a 55%, #7a1fd1 100%); box-shadow: 0 8px 28px -6px rgba(255,42,133,.6); }
+  .btn-cyan { background: linear-gradient(135deg, #00f2fe 0%, #0aa6d6 100%); box-shadow: 0 8px 28px -6px rgba(0,242,254,.45); }
+  .coin { background: radial-gradient(circle at 30% 30%, #fff6d8, #f6dc9b 40%, #c9952b 100%); box-shadow: 0 0 14px rgba(246,220,155,.45); }
+  .avatar-ring { background: conic-gradient(from 200deg, #f6dc9b, #ff2a85, #00f2fe, #f6dc9b); padding: 2.5px; }
+  .online-pulse { animation: pulse-glow 2s ease-in-out infinite; }
+  @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 6px rgba(62,224,143,.6); } 50% { box-shadow: 0 0 16px rgba(62,224,143,1); } }
+  .float-icon { animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-4px) } }
+  .heartbeat { animation: heartbeat 1.4s ease-in-out infinite; }
+  @keyframes heartbeat { 0%,100% { transform: scale(1); filter: drop-shadow(0 0 8px #ff2a85) } 50% { transform: scale(1.08); filter: drop-shadow(0 0 20px #ff2a85) } }
+  .glow-active { filter: drop-shadow(0 0 12px #00f2fe) drop-shadow(0 0 22px rgba(255,42,133,.45)); }
+  .spin-border { position: relative; isolation: isolate; overflow: hidden; }
+  .spin-border::before { content: ''; position: absolute; inset: -60%; z-index: -2;
+    background: conic-gradient(from 0deg, transparent 0 55%, #ff2a85, #00f2fe, transparent 85%); animation: spin 3s linear infinite; }
+  .spin-border::after { content: ''; position: absolute; inset: 2px; border-radius: inherit; z-index: -1; background: #10101a; }
+  @keyframes spin { to { transform: rotate(360deg) } }
+  .ring-wave { animation: ring 1.8s ease-out infinite; }
+  @keyframes ring { 0% { transform: scale(.85); opacity: .9 } 100% { transform: scale(1.6); opacity: 0 } }
+  .screen { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transform: translateX(14px); transition: opacity .25s, transform .25s; }
+  .screen.active { opacity: 1; pointer-events: auto; transform: none; }
+  .sheet-wrap { position: absolute; inset: 0; z-index: 60; background: rgba(0,0,0,.6); opacity: 0; pointer-events: none; transition: opacity .25s; }
+  .sheet-wrap.open { opacity: 1; pointer-events: auto; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; transform: translateY(100%); transition: transform .3s cubic-bezier(.2,.9,.3,1); }
+  .sheet-wrap.open .sheet { transform: none; }
+  .chip-on { background: linear-gradient(135deg, rgba(255,42,133,.25), rgba(0,242,254,.18)); border-color: rgba(255,42,133,.7) !important; color: #fff !important; }
+  input[type=range] { accent-color: #ff2a85; }
+  .toggle { width: 46px; height: 26px; border-radius: 99px; background: #2a2a3a; position: relative; transition: background .2s; flex-shrink: 0; }
+  .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 99px; background: #fff; transition: transform .2s; }
+  .toggle.on { background: linear-gradient(90deg, #3ee08f, #00f2fe); }
+  .toggle.on::after { transform: translateX(20px); }
+  .nav-link.on { background: rgba(255,42,133,.15); color: #fff; border-color: rgba(255,42,133,.6); }
+</style>
+</head>
+<body class="text-white font-sans min-h-screen flex items-start justify-center gap-8 p-0 sm:p-6">
+
+<!-- Screen index (desktop only) -->
+<aside class="hidden lg:block w-64 sticky top-6 self-start">
+  <div class="text-2xl font-black grad-text mb-1">VIBE</div>
+  <p class="text-xs text-gray-400 mb-4">Clickable UI prototype · tap anything inside the phone, or jump to a screen here.</p>
+  <div id="navList" class="space-y-1.5 max-h-[80vh] overflow-y-auto pr-1"></div>
+</aside>
+
+<!-- Phone -->
+<div id="phone" class="relative w-full max-w-[420px] h-[100dvh] sm:h-[880px] sm:rounded-[42px] bg-cyberDark overflow-hidden shadow-2xl sm:border sm:border-gray-800">
+
+  <!-- ========== SPLASH ========== -->
+  <section class="screen" data-screen="splash" data-title="1 · Splash">
+    <div class="flex-1 flex flex-col items-center justify-center relative overflow-hidden">
+      <div class="absolute w-80 h-80 rounded-full bg-neonPink/20 blur-3xl -top-10 -left-20"></div>
+      <div class="absolute w-80 h-80 rounded-full bg-neonCyan/15 blur-3xl bottom-10 -right-24"></div>
+      <img src="assets/home.png" class="w-44 h-44 object-contain float-icon glow-active" alt="">
+      <h1 class="text-6xl font-black grad-text mt-2 tracking-tight">VIBE</h1>
+      <p class="text-gray-400 mt-2 text-sm">Talk. Connect. Earn.</p>
+      <div class="mt-10 w-40 h-1.5 rounded-full bg-cyberCard overflow-hidden"><div class="h-full w-2/3 btn-neon rounded-full"></div></div>
+    </div>
+    <div class="p-6"><button onclick="go('login')" class="w-full h-14 rounded-2xl btn-neon font-bold">Get Started</button></div>
+  </section>
+
+  <!-- ========== LOGIN ========== -->
+  <section class="screen" data-screen="login" data-title="2 · Login">
+    <div class="flex-1 px-6 pt-16 flex flex-col">
+      <img src="assets/chat.png" class="w-28 h-28 object-contain heartbeat -ml-2" alt="">
+      <h2 class="text-3xl font-extrabold mt-2">Welcome to <span class="grad-text">VIBE</span></h2>
+      <p class="text-gray-400 mt-2 text-sm">Video chat with real people. Become a host and earn — open for everyone.</p>
+      <label class="text-xs text-gray-400 mt-10 mb-2">Mobile number</label>
+      <div class="flex items-center h-14 rounded-2xl neon-border-soft px-4 gap-3">
+        <span class="font-semibold">🇮🇳 +91</span><span class="w-px h-6 bg-gray-700"></span>
+        <input class="bg-transparent outline-none flex-1 text-lg tracking-wider" placeholder="98765 43210" inputmode="numeric">
+      </div>
+      <button onclick="go('otp')" class="w-full h-14 rounded-2xl btn-neon font-bold mt-5">Send OTP</button>
+      <div class="flex items-center gap-3 my-6 text-xs text-gray-500"><span class="flex-1 h-px bg-gray-800"></span>or<span class="flex-1 h-px bg-gray-800"></span></div>
+      <button onclick="go('otp')" class="w-full h-14 rounded-2xl bg-white text-black font-semibold flex items-center justify-center gap-3">
+        <span class="font-black text-lg text-[#4285F4]">G</span> Continue with Google</button>
+      <p class="text-[11px] text-gray-500 text-center mt-auto pb-8">By continuing you confirm you are 18+ and agree to the <span class="text-neonCyan">Terms</span> & <span class="text-neonCyan">Privacy Policy</span></p>
+    </div>
+  </section>
+
+  <!-- ========== OTP ========== -->
+  <section class="screen" data-screen="otp" data-title="3 · OTP">
+    <header class="flex items-center px-4 pt-6 pb-2"><button onclick="go('login')" class="w-10 h-10 rounded-xl bg-cyberCard flex items-center justify-center"><i data-lucide="arrow-left" class="w-5 h-5"></i></button></header>
+    <div class="flex-1 px-6 pt-6">
+      <h2 class="text-2xl font-extrabold">Enter OTP</h2>
+      <p class="text-gray-400 text-sm mt-1">Sent to +91 98765 43210</p>
+      <div class="flex gap-3 mt-8">
+        <div class="flex-1 h-16 rounded-2xl neon-border flex items-center justify-center text-2xl font-bold">4</div>
+        <div class="flex-1 h-16 rounded-2xl neon-border flex items-center justify-center text-2xl font-bold">8</div>
+        <div class="flex-1 h-16 rounded-2xl neon-border flex items-center justify-center text-2xl font-bold">2</div>
+        <div class="flex-1 h-16 rounded-2xl neon-border-soft flex items-center justify-center text-2xl font-bold text-gray-600">_</div>
+        <div class="flex-1 h-16 rounded-2xl neon-border-soft flex items-center justify-center text-2xl font-bold text-gray-600">_</div>
+        <div class="flex-1 h-16 rounded-2xl neon-border-soft flex items-center justify-center text-2xl font-bold text-gray-600">_</div>
+      </div>
+      <p class="text-sm text-gray-400 mt-5">Resend in <span class="text-neonCyan font-semibold">00:24</span></p>
+      <button onclick="go('setup')" class="w-full h-14 rounded-2xl btn-neon font-bold mt-10">Verify</button>
+    </div>
+  </section>
+
+  <!-- ========== PROFILE SETUP ========== -->
+  <section class="screen" data-screen="setup" data-title="4 · Profile setup">
+    <div class="flex-1 overflow-y-auto px-6 pt-10 pb-6">
+      <h2 class="text-2xl font-extrabold">Create your profile</h2>
+      <p class="text-gray-400 text-sm mt-1">This is how others will see you</p>
+      <div class="flex justify-center mt-6">
+        <div class="avatar-ring rounded-full relative">
+          <div class="w-28 h-28 rounded-full bg-cyberCard border-4 border-cyberDark flex items-center justify-center"><i data-lucide="camera" class="w-8 h-8 text-gray-400"></i></div>
+          <div class="absolute bottom-1 right-1 w-8 h-8 rounded-full btn-neon flex items-center justify-center border-2 border-cyberDark"><i data-lucide="plus" class="w-4 h-4"></i></div>
+        </div>
+      </div>
+      <label class="text-xs text-gray-400 mt-8 mb-2 block">Name</label>
+      <input class="w-full h-13 py-3.5 rounded-2xl neon-border-soft px-4 bg-transparent outline-none" value="Sudhanshu">
+      <label class="text-xs text-gray-400 mt-5 mb-2 block">I am</label>
+      <div class="grid grid-cols-3 gap-3" data-chipgroup>
+        <button class="chip h-12 rounded-2xl border border-cyberLine bg-cyberCard text-gray-300 font-semibold chip-on">♂ Male</button>
+        <button class="chip h-12 rounded-2xl border border-cyberLine bg-cyberCard text-gray-300 font-semibold">♀ Female</button>
+        <button class="chip h-12 rounded-2xl border border-cyberLine bg-cyberCard text-gray-300 font-semibold">⚧ Other</button>
+      </div>
+      <label class="text-xs text-gray-400 mt-5 mb-2 block">Date of birth</label>
+      <div class="h-12 rounded-2xl neon-border-soft px-4 flex items-center justify-between"><span>01 / 01 / 2000</span><i data-lucide="calendar" class="w-5 h-5 text-gray-400"></i></div>
+      <label class="text-xs text-gray-400 mt-5 mb-2 block">Languages</label>
+      <div class="flex flex-wrap gap-2" data-chipgroup data-multi>
+        <button class="chip px-4 h-10 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300 chip-on">Hindi</button>
+        <button class="chip px-4 h-10 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300 chip-on">English</button>
+        <button class="chip px-4 h-10 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300">Tamil</button>
+        <button class="chip px-4 h-10 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300">Telugu</button>
+        <button class="chip px-4 h-10 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300">Bengali</button>
+        <button class="chip px-4 h-10 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300">Marathi</button>
+      </div>
+    </div>
+    <div class="p-6 pt-2"><button onclick="go('home')" class="w-full h-14 rounded-2xl btn-neon font-bold">Continue</button></div>
+  </section>
+
+  <!-- ========== HOME / DISCOVER ========== -->
+  <section class="screen" data-screen="home" data-title="5 · Home (Discover)" data-tab="home">
+    <header class="flex items-center justify-between px-5 pt-5 pb-3">
+      <div class="text-2xl font-black grad-text">VIBE</div>
+      <div class="flex items-center gap-2">
+        <button onclick="go('wallet')" class="flex items-center gap-2 pl-1.5 pr-3 h-9 rounded-full bg-gradient-to-r from-yellow-900/30 to-yellow-800/10 border border-cyberGold/30">
+          <span class="coin w-6 h-6 rounded-full text-black text-[10px] font-black flex items-center justify-center">C</span>
+          <span class="text-cyberGold font-semibold text-sm">2,850</span><i data-lucide="plus" class="w-3.5 h-3.5 text-cyberGold"></i>
+        </button>
+        <button onclick="go('notifications')" class="relative w-9 h-9 rounded-xl bg-cyberCard border border-cyberLine flex items-center justify-center">
+          <i data-lucide="bell" class="w-[18px] h-[18px] text-gray-300"></i>
+          <span class="absolute -top-1 -right-1 w-3 h-3 bg-neonPink rounded-full border-2 border-cyberDark"></span>
+        </button>
+      </div>
+    </header>
+    <div class="flex items-center justify-between px-5 pb-2">
+      <div class="flex gap-6" data-tabs>
+        <button class="tabbtn relative text-lg font-bold text-white" data-on>Discover<span class="bar absolute -bottom-1.5 left-0 w-full h-1 rounded-full bg-gradient-to-r from-neonPink to-neonCyan"></span></button>
+        <button class="tabbtn relative text-lg font-bold text-gray-500">Following<span class="bar absolute -bottom-1.5 left-0 w-full h-1 rounded-full bg-gradient-to-r from-neonPink to-neonCyan hidden"></span></button>
+        <button class="tabbtn relative text-lg font-bold text-gray-500">New<span class="bar absolute -bottom-1.5 left-0 w-full h-1 rounded-full bg-gradient-to-r from-neonPink to-neonCyan hidden"></span></button>
+      </div>
+      <button onclick="openSheet('filterSheet')" class="flex items-center gap-1.5 px-3 h-9 rounded-full bg-cyberCard border border-cyberLine text-gray-300 text-sm"><i data-lucide="sliders-horizontal" class="w-4 h-4"></i>Filter</button>
+    </div>
+    <div class="flex-1 overflow-y-auto px-4 pb-32">
+      <!-- Gender quick filter -->
+      <div class="flex gap-2 py-3" data-chipgroup id="genderChips">
+        <button class="chip px-4 h-9 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300 chip-on" data-g="all">✨ All</button>
+        <button class="chip px-4 h-9 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300" data-g="F">♀ Girls</button>
+        <button class="chip px-4 h-9 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300" data-g="M">♂ Boys</button>
+        <button class="chip px-4 h-9 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300" data-g="online">🟢 Online</button>
+      </div>
+      <!-- Become host banner -->
+      <div onclick="go('hostIntro')" class="relative rounded-2xl overflow-hidden neon-border p-4 flex items-center gap-3 cursor-pointer mb-3">
+        <img src="assets/profile.png" class="w-16 h-16 object-contain float-icon" alt="">
+        <div class="flex-1">
+          <div class="font-bold">Become a Host · Earn money</div>
+          <div class="text-xs text-gray-400">Open for everyone 18+ · Boys & Girls · No agency needed</div>
+        </div>
+        <i data-lucide="chevron-right" class="w-5 h-5 text-neonPink"></i>
+      </div>
+      <!-- Online now -->
+      <div class="flex items-center justify-between mt-1 mb-2"><h3 class="font-semibold text-gray-300 text-sm">Online now</h3><span class="text-xs text-gray-500">See all</span></div>
+      <div id="stories" class="flex gap-4 overflow-x-auto pb-3"></div>
+      <div id="grid" class="grid grid-cols-2 gap-3"></div>
+    </div>
+    <!-- Random match FAB -->
+    <button onclick="go('match')" class="absolute left-1/2 -translate-x-1/2 bottom-28 z-20 spin-border rounded-full h-14 pl-2 pr-6 flex items-center gap-3 shadow-2xl">
+      <span class="w-10 h-10 rounded-full btn-neon flex items-center justify-center"><i data-lucide="shuffle" class="w-5 h-5"></i></span>
+      <span class="text-left leading-tight"><span class="block font-bold">Random Match</span><span class="block text-[11px] text-cyberGold">from 40 coins/min</span></span>
+    </button>
+  </section>
+
+  <!-- ========== PROFILE DETAIL ========== -->
+  <section class="screen" data-screen="profile" data-title="6 · Host profile">
+    <div class="flex-1 overflow-y-auto pb-28">
+      <div class="relative h-[420px] overflow-hidden">
+        <div id="pBg" class="absolute inset-0 bg-gradient-to-br from-pink-500/70 to-pink-800/90"></div>
+        <div class="absolute inset-0 flex items-center justify-center"><i data-lucide="user" class="w-40 h-40 text-white/70"></i></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-cyberDark via-transparent to-black/30"></div>
+        <button onclick="back()" class="absolute top-5 left-4 w-10 h-10 glass-light rounded-xl flex items-center justify-center"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+        <div class="absolute top-5 right-4 flex gap-2">
+          <button onclick="toast('Shared')" class="w-10 h-10 glass-light rounded-xl flex items-center justify-center"><i data-lucide="share-2" class="w-5 h-5"></i></button>
+          <button onclick="openSheet('safetySheet')" class="w-10 h-10 glass-light rounded-xl flex items-center justify-center"><i data-lucide="more-horizontal" class="w-5 h-5"></i></button>
+        </div>
+        <div class="absolute top-20 left-4 flex items-center gap-1.5 px-2.5 py-1 rounded-full glass-light text-xs"><i data-lucide="play" class="w-3 h-3"></i>Intro video</div>
+        <div class="absolute bottom-24 right-4 flex items-center gap-2 px-3 py-1.5 rounded-full glass-light"><span class="w-2 h-2 bg-onlineGreen rounded-full online-pulse"></span><span class="text-xs font-semibold text-onlineGreen">ONLINE</span></div>
+        <div class="absolute bottom-5 left-4 right-4 flex gap-2">
+          <div class="w-16 h-16 rounded-xl border-2 border-neonPink bg-white/10"></div>
+          <div class="w-16 h-16 rounded-xl bg-white/10"></div>
+          <div class="w-16 h-16 rounded-xl bg-white/10"></div>
+          <div class="w-16 h-16 rounded-xl bg-white/10 flex items-center justify-center text-sm font-semibold">+6</div>
+        </div>
+      </div>
+      <div class="px-5 space-y-4">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="flex items-center gap-2"><h2 id="pName" class="text-2xl font-extrabold">Priya</h2>
+              <span class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center"><i data-lucide="check" class="w-3 h-3"></i></span></div>
+            <p class="text-sm text-gray-400 mt-1 flex items-center gap-1.5">ID: 40362391 <i data-lucide="copy" class="w-3.5 h-3.5"></i></p>
+          </div>
+          <button onclick="toggleFollow(this)" class="flex items-center gap-1.5 px-4 h-10 rounded-full btn-neon text-sm font-bold"><i data-lucide="user-plus" class="w-4 h-4"></i><span>Follow</span></button>
+        </div>
+        <div class="flex flex-wrap gap-2 text-sm">
+          <span id="pGender" class="px-3 py-1 rounded-full bg-neonPink/15 border border-neonPink/40 text-neonPink">♀ 24</span>
+          <span id="pCity" class="px-3 py-1 rounded-full bg-cyberCard border border-cyberLine text-gray-300">📍 Mumbai</span>
+          <span class="px-3 py-1 rounded-full bg-cyberGold/15 border border-cyberGold/40 text-cyberGold">★ Lv.12</span>
+          <span class="px-3 py-1 rounded-full bg-neonCyan/10 border border-neonCyan/40 text-neonCyan">⭐ 4.8 (1.2k)</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center">
+          <div class="rounded-2xl bg-cyberCard border border-cyberLine py-3"><div class="font-bold">12.4k</div><div class="text-[11px] text-gray-500">Followers</div></div>
+          <div class="rounded-2xl bg-cyberCard border border-cyberLine py-3"><div class="font-bold">3,210</div><div class="text-[11px] text-gray-500">Calls</div></div>
+          <div class="rounded-2xl bg-cyberCard border border-cyberLine py-3"><div class="font-bold">96%</div><div class="text-[11px] text-gray-500">Answer rate</div></div>
+        </div>
+        <div class="flex gap-3 p-3 rounded-2xl bg-cyberCard border border-cyberLine"><i data-lucide="quote" class="w-5 h-5 text-cyberGold shrink-0 mt-0.5"></i><p class="text-sm text-gray-300">Music lover, chai addict ☕ Let's talk about movies, travel and life 💫</p></div>
+        <div><h4 class="text-sm font-semibold text-gray-300 mb-2">Speaks</h4>
+          <div class="flex gap-2"><span class="px-3 py-1.5 rounded-xl bg-cyberCard border border-cyberLine text-sm">Hindi</span><span class="px-3 py-1.5 rounded-xl bg-cyberCard border border-cyberLine text-sm">English</span></div></div>
+        <div><h4 class="text-sm font-semibold text-gray-300 mb-2">What people say</h4>
+          <div class="flex flex-wrap gap-2 text-xs">
+            <span class="px-3 py-1.5 rounded-full bg-cyberCard border border-cyberLine">😊 Friendly · 842</span>
+            <span class="px-3 py-1.5 rounded-full bg-cyberCard border border-cyberLine">🎵 Great vibe · 610</span>
+            <span class="px-3 py-1.5 rounded-full bg-cyberCard border border-cyberLine">😂 Funny · 355</span>
+          </div></div>
+      </div>
+    </div>
+    <div class="absolute bottom-0 left-0 right-0 p-4 pb-6 bg-gradient-to-t from-cyberDark via-cyberDark/95 to-transparent flex gap-3">
+      <button onclick="go('chat')" class="w-14 h-14 rounded-2xl bg-cyberCard border border-cyberLine flex items-center justify-center"><img src="assets/chat.png" class="w-10 h-10 object-contain" alt="Chat"></button>
+      <button onclick="openSheet('giftSheet')" class="w-14 h-14 rounded-2xl bg-cyberCard border border-cyberLine flex items-center justify-center text-2xl">🎁</button>
+      <button onclick="go('calling')" class="flex-1 h-14 rounded-2xl spin-border flex items-center justify-center gap-3">
+        <span class="w-9 h-9 rounded-full btn-neon flex items-center justify-center"><i data-lucide="video" class="w-5 h-5"></i></span>
+        <span class="text-left leading-tight"><span class="block font-bold">Video Call</span><span id="pRate" class="block text-xs text-cyberGold">60 coins/min</span></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ========== RANDOM MATCH ========== -->
+  <section class="screen" data-screen="match" data-title="7 · Random match">
+    <header class="flex items-center justify-between px-4 pt-5"><button onclick="back()" class="w-10 h-10 rounded-xl bg-cyberCard flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
+      <div class="flex items-center gap-2 px-3 h-9 rounded-full bg-cyberCard border border-cyberGold/30"><span class="coin w-5 h-5 rounded-full"></span><span class="text-cyberGold text-sm font-semibold">2,850</span></div></header>
+    <div class="flex-1 flex flex-col items-center justify-center px-6">
+      <div class="relative w-56 h-56 flex items-center justify-center">
+        <span class="absolute inset-0 rounded-full border-2 border-neonPink/60 ring-wave"></span>
+        <span class="absolute inset-0 rounded-full border-2 border-neonCyan/60 ring-wave" style="animation-delay:.9s"></span>
+        <div class="avatar-ring rounded-full"><div class="w-40 h-40 rounded-full bg-cyberCard border-4 border-cyberDark flex items-center justify-center"><img src="assets/home.png" class="w-28 h-28 object-contain float-icon" alt=""></div></div>
+      </div>
+      <h2 class="text-2xl font-extrabold mt-8">Finding someone for you…</h2>
+      <p class="text-gray-400 text-sm mt-2 text-center">Only real people who are online and accepting calls</p>
+      <div class="w-full mt-8"><label class="text-xs text-gray-400 mb-2 block">Match with</label>
+        <div class="grid grid-cols-3 gap-2" data-chipgroup>
+          <button class="chip h-11 rounded-xl border border-cyberLine bg-cyberCard text-sm text-gray-300 chip-on">Anyone</button>
+          <button class="chip h-11 rounded-xl border border-cyberLine bg-cyberCard text-sm text-gray-300">♀ Girls</button>
+          <button class="chip h-11 rounded-xl border border-cyberLine bg-cyberCard text-sm text-gray-300">♂ Boys</button>
+        </div></div>
+    </div>
+    <div class="p-6"><button onclick="go('call')" class="w-full h-14 rounded-2xl btn-neon font-bold">Start · 40 coins/min</button></div>
+  </section>
+
+  <!-- ========== OUTGOING CALL ========== -->
+  <section class="screen" data-screen="calling" data-title="8 · Outgoing call">
+    <div class="absolute inset-0 bg-gradient-to-br from-pink-600/50 via-cyberDark to-cyan-700/40"></div>
+    <div class="relative flex-1 flex flex-col items-center pt-24 px-6">
+      <div class="relative w-36 h-36 flex items-center justify-center">
+        <span class="absolute inset-0 rounded-full border-2 border-white/40 ring-wave"></span>
+        <div class="avatar-ring rounded-full"><div class="w-32 h-32 rounded-full bg-gradient-to-br from-pink-400 to-pink-700 border-4 border-cyberDark flex items-center justify-center"><i data-lucide="user" class="w-16 h-16 text-white/80"></i></div></div>
+      </div>
+      <h2 class="text-2xl font-extrabold mt-6">Priya</h2>
+      <p class="text-gray-300 mt-1">Ringing…</p>
+      <div class="mt-4 px-4 py-2 rounded-full glass-light text-sm text-cyberGold flex items-center gap-2"><span class="coin w-4 h-4 rounded-full"></span>60 coins/min · Balance 2,850 (≈ 47 min)</div>
+      <p class="text-xs text-gray-400 mt-3">You are charged only after she picks up</p>
+    </div>
+    <div class="relative pb-16 flex justify-center gap-10">
+      <button onclick="toast('Mic muted')" class="w-16 h-16 rounded-full glass-light flex items-center justify-center"><i data-lucide="mic-off" class="w-6 h-6"></i></button>
+      <button onclick="back()" class="w-16 h-16 rounded-full bg-dangerRed flex items-center justify-center shadow-lg shadow-red-500/40"><i data-lucide="phone-off" class="w-7 h-7"></i></button>
+      <button onclick="go('call')" class="w-16 h-16 rounded-full glass-light flex items-center justify-center text-[10px] text-gray-300">demo:<br>pick up</button>
+    </div>
+  </section>
+
+  <!-- ========== IN CALL ========== -->
+  <section class="screen" data-screen="call" data-title="9 · Video call">
+    <div class="absolute inset-0 bg-gradient-to-br from-pink-500/70 via-purple-900/80 to-cyan-800/70"></div>
+    <div class="absolute inset-0 flex items-center justify-center"><i data-lucide="user" class="w-56 h-56 text-white/30"></i></div>
+    <div class="relative flex items-center justify-between px-4 pt-5">
+      <div class="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full glass-light">
+        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-pink-400 to-pink-700"></div>
+        <div class="leading-tight"><div class="text-sm font-bold">Priya</div><div class="text-[11px] text-gray-300">ID 40362391</div></div>
+        <button onclick="toast('Following Priya')" class="ml-1 w-7 h-7 rounded-full btn-neon flex items-center justify-center"><i data-lucide="plus" class="w-4 h-4"></i></button>
+      </div>
+      <div class="flex flex-col items-end gap-1.5">
+        <div class="px-3 py-1 rounded-full glass-light text-sm font-mono flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-dangerRed animate-pulse"></span><span id="callTimer">04:12</span></div>
+        <div class="px-3 py-1 rounded-full glass-light text-xs text-cyberGold flex items-center gap-1.5"><span class="coin w-3.5 h-3.5 rounded-full"></span>2,598 · 60/min</div>
+      </div>
+    </div>
+    <!-- self preview -->
+    <div class="absolute right-4 top-24 w-28 h-40 rounded-2xl border-2 border-white/30 bg-gradient-to-br from-cyan-600 to-indigo-800 flex items-center justify-center overflow-hidden"><i data-lucide="user" class="w-12 h-12 text-white/50"></i><span class="absolute bottom-1.5 text-[10px] text-white/70">You</span></div>
+    <!-- gift burst message -->
+    <div class="absolute left-4 top-1/2 px-3 py-2 rounded-2xl glass-light text-sm flex items-center gap-2"><span class="text-xl">🌹</span>You sent a Rose</div>
+    <div class="relative mt-auto px-4 pb-10">
+      <div class="mb-4 mx-auto w-fit px-4 py-2 rounded-full bg-black/50 border border-cyberGold/40 text-xs text-cyberGold flex items-center gap-2"><i data-lucide="alert-triangle" class="w-4 h-4"></i>~43 min left · <button onclick="openSheet('lowBalSheet')" class="underline font-semibold">Top up</button></div>
+      <div class="flex items-center justify-between">
+        <button onclick="toast('Mic off')" class="w-14 h-14 rounded-full glass-light flex items-center justify-center"><i data-lucide="mic" class="w-6 h-6"></i></button>
+        <button onclick="toast('Camera flipped')" class="w-14 h-14 rounded-full glass-light flex items-center justify-center"><i data-lucide="switch-camera" class="w-6 h-6"></i></button>
+        <button onclick="go('rate')" class="w-[72px] h-[72px] rounded-full bg-dangerRed flex items-center justify-center shadow-lg shadow-red-500/40"><i data-lucide="phone-off" class="w-8 h-8"></i></button>
+        <button onclick="toast('Beauty filter on')" class="w-14 h-14 rounded-full glass-light flex items-center justify-center"><i data-lucide="sparkles" class="w-6 h-6"></i></button>
+        <button onclick="openSheet('giftSheet')" class="w-14 h-14 rounded-full btn-neon flex items-center justify-center text-2xl">🎁</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== RATE CALL ========== -->
+  <section class="screen" data-screen="rate" data-title="10 · Call ended / rate">
+    <div class="flex-1 flex flex-col items-center px-6 pt-20">
+      <div class="avatar-ring rounded-full"><div class="w-24 h-24 rounded-full bg-gradient-to-br from-pink-400 to-pink-700 border-4 border-cyberDark"></div></div>
+      <h2 class="text-xl font-bold mt-4">Call with Priya ended</h2>
+      <div class="flex gap-6 mt-4 text-center">
+        <div><div class="text-lg font-bold">06:24</div><div class="text-xs text-gray-500">Duration</div></div>
+        <div><div class="text-lg font-bold text-cyberGold">420</div><div class="text-xs text-gray-500">Coins spent</div></div>
+      </div>
+      <p class="text-gray-300 mt-8">How was your call?</p>
+      <div class="flex gap-2 mt-3 text-3xl" id="stars"><span>★</span><span>★</span><span>★</span><span>★</span><span class="text-gray-600">★</span></div>
+      <div class="flex flex-wrap gap-2 justify-center mt-6" data-chipgroup data-multi>
+        <button class="chip px-4 h-9 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300 chip-on">😊 Friendly</button>
+        <button class="chip px-4 h-9 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300">🎵 Great vibe</button>
+        <button class="chip px-4 h-9 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300">😂 Funny</button>
+        <button class="chip px-4 h-9 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300">🧠 Smart</button>
+      </div>
+      <button onclick="openSheet('safetySheet')" class="mt-6 text-sm text-dangerRed flex items-center gap-1.5"><i data-lucide="flag" class="w-4 h-4"></i>Report a problem</button>
+    </div>
+    <div class="p-6 flex gap-3"><button onclick="go('home')" class="flex-1 h-14 rounded-2xl bg-cyberCard border border-cyberLine font-semibold">Skip</button><button onclick="toast('Thanks for rating!');go('home')" class="flex-1 h-14 rounded-2xl btn-neon font-bold">Submit</button></div>
+  </section>
+
+  <!-- ========== CHATS LIST ========== -->
+  <section class="screen" data-screen="chats" data-title="11 · Chats" data-tab="chats">
+    <header class="flex items-center justify-between px-5 pt-5 pb-3">
+      <h1 class="text-2xl font-extrabold">Messages</h1>
+      <button onclick="toast('Search')" class="w-9 h-9 rounded-xl bg-cyberCard border border-cyberLine flex items-center justify-center"><i data-lucide="search" class="w-[18px] h-[18px]"></i></button>
+    </header>
+    <div class="flex gap-2 px-5 pb-3" data-chipgroup>
+      <button class="chip px-4 h-9 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300 chip-on">Chats</button>
+      <button class="chip px-4 h-9 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300">Calls</button>
+      <button class="chip px-4 h-9 rounded-full border border-cyberLine bg-cyberCard text-sm text-gray-300">Following</button>
+    </div>
+    <div id="chatList" class="flex-1 overflow-y-auto px-3 pb-32"></div>
+  </section>
+
+  <!-- ========== CHAT ========== -->
+  <section class="screen" data-screen="chat" data-title="12 · Chat">
+    <header class="flex items-center gap-3 px-4 pt-5 pb-3 border-b border-cyberLine glass">
+      <button onclick="back()" class="w-9 h-9 rounded-xl bg-cyberCard flex items-center justify-center"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+      <div class="relative"><div class="w-11 h-11 rounded-full bg-gradient-to-br from-pink-400 to-pink-700"></div><span class="absolute bottom-0 right-0 w-3 h-3 bg-onlineGreen rounded-full border-2 border-cyberDark"></span></div>
+      <div class="flex-1 leading-tight" onclick="go('profile')"><div class="font-bold">Priya</div><div class="text-xs text-onlineGreen">Online · usually replies fast</div></div>
+      <button onclick="go('calling')" class="w-10 h-10 rounded-xl btn-neon flex items-center justify-center"><i data-lucide="video" class="w-5 h-5"></i></button>
+      <button onclick="openSheet('safetySheet')" class="w-9 h-9 rounded-xl bg-cyberCard flex items-center justify-center"><i data-lucide="more-vertical" class="w-5 h-5"></i></button>
+    </header>
+    <div class="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-[radial-gradient(circle_at_80%_20%,rgba(255,42,133,.08),transparent_50%),radial-gradient(circle_at_10%_80%,rgba(0,242,254,.06),transparent_50%)]">
+      <div class="text-center text-[11px] text-gray-500">Today</div>
+      <div class="flex justify-end"><div class="max-w-[75%] px-4 py-2.5 rounded-2xl rounded-br-md btn-neon text-sm">Hi Priya! Loved your playlist 🎵</div></div>
+      <div class="flex justify-start"><div class="max-w-[75%] px-4 py-2.5 rounded-2xl rounded-bl-md bg-cyberCard border border-cyberLine text-sm">Haha thank you 😄 which song did you like?</div></div>
+      <div class="flex justify-end"><div class="max-w-[75%] px-4 py-2.5 rounded-2xl rounded-br-md btn-neon text-sm">Kesariya on loop since morning</div></div>
+      <div class="flex justify-start"><div class="max-w-[75%] px-4 py-2.5 rounded-2xl rounded-bl-md bg-cyberCard border border-cyberLine text-sm">Same!! Call karte hain? I'm free for 20 min ☕</div></div>
+      <div class="flex justify-center"><div class="px-4 py-2 rounded-full bg-cyberCard border border-cyberGold/30 text-xs text-cyberGold flex items-center gap-2">🌹 You sent a Rose · 20 coins</div></div>
+      <div class="flex justify-center"><div class="px-4 py-2 rounded-full bg-cyberCard border border-cyberLine text-xs text-gray-400 flex items-center gap-2"><i data-lucide="video" class="w-3.5 h-3.5"></i>Video call · 06:24</div></div>
+      <div class="flex justify-end text-[11px] text-gray-500 items-center gap-1">Seen <i data-lucide="check-check" class="w-3.5 h-3.5 text-neonCyan"></i></div>
+    </div>
+    <div class="px-3 pt-2 pb-5 glass border-t border-cyberLine">
+      <div class="flex gap-2 overflow-x-auto pb-2">
+        <button class="shrink-0 px-3 h-8 rounded-full bg-cyberCard border border-cyberLine text-xs">👋 Hi!</button>
+        <button class="shrink-0 px-3 h-8 rounded-full bg-cyberCard border border-cyberLine text-xs">How's your day?</button>
+        <button class="shrink-0 px-3 h-8 rounded-full bg-cyberCard border border-cyberLine text-xs">Free for a call?</button>
+        <button class="shrink-0 px-3 h-8 rounded-full bg-cyberCard border border-cyberLine text-xs">Where are you from?</button>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toast('Photo picker')" class="w-11 h-11 rounded-full bg-cyberCard flex items-center justify-center"><i data-lucide="image" class="w-5 h-5 text-gray-300"></i></button>
+        <div class="flex-1 h-11 rounded-full neon-border-soft px-4 flex items-center text-sm text-gray-500">Type a message…</div>
+        <button onclick="openSheet('giftSheet')" class="w-11 h-11 rounded-full bg-cyberCard flex items-center justify-center text-xl">🎁</button>
+        <button onclick="toast('Sent')" class="w-11 h-11 rounded-full btn-neon flex items-center justify-center"><i data-lucide="send" class="w-5 h-5"></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== ME ========== -->
+  <section class="screen" data-screen="me" data-title="13 · Me" data-tab="me">
+    <div class="flex-1 overflow-y-auto pb-32">
+      <div class="relative px-5 pt-6 pb-5">
+        <div class="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-neonPink/15 to-transparent"></div>
+        <div class="relative flex justify-end gap-2">
+          <button onclick="go('notifications')" class="w-9 h-9 rounded-xl bg-cyberCard border border-cyberLine flex items-center justify-center"><i data-lucide="bell" class="w-[18px] h-[18px]"></i></button>
+          <button onclick="go('settings')" class="w-9 h-9 rounded-xl bg-cyberCard border border-cyberLine flex items-center justify-center"><i data-lucide="settings" class="w-[18px] h-[18px]"></i></button>
+        </div>
+        <div class="relative flex items-center gap-4 mt-2">
+          <div class="avatar-ring rounded-full"><div class="w-20 h-20 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-700 border-4 border-cyberDark flex items-center justify-center"><i data-lucide="user" class="w-10 h-10 text-white/80"></i></div></div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2"><h2 class="text-xl font-extrabold">Sudhanshu</h2><span class="px-2 py-0.5 rounded-full bg-cyberGold/15 border border-cyberGold/40 text-cyberGold text-[11px]">Lv.3</span></div>
+            <p class="text-xs text-gray-400 mt-0.5">ID: 10159076 · ♂ 26</p>
+            <button onclick="go('editProfile')" class="mt-2 text-xs text-neonCyan flex items-center gap-1"><i data-lucide="pencil" class="w-3 h-3"></i>Edit profile</button>
+          </div>
+        </div>
+        <div class="relative grid grid-cols-3 gap-2 mt-5 text-center">
+          <div class="rounded-2xl bg-cyberCard border border-cyberLine py-2.5"><div class="font-bold">48</div><div class="text-[11px] text-gray-500">Following</div></div>
+          <div class="rounded-2xl bg-cyberCard border border-cyberLine py-2.5"><div class="font-bold">12</div><div class="text-[11px] text-gray-500">Followers</div></div>
+          <div class="rounded-2xl bg-cyberCard border border-cyberLine py-2.5" onclick="go('visitors')"><div class="font-bold">7</div><div class="text-[11px] text-gray-500">Visitors</div></div>
+        </div>
+      </div>
+      <div class="px-5 space-y-3">
+        <!-- Wallet -->
+        <div class="rounded-2xl p-4 bg-gradient-to-br from-yellow-900/40 via-cyberCard to-cyberCard border border-cyberGold/30 flex items-center gap-3">
+          <span class="coin w-12 h-12 rounded-full text-black font-black flex items-center justify-center">C</span>
+          <div class="flex-1"><div class="text-xs text-gray-400">Coin balance</div><div class="text-2xl font-extrabold text-cyberGold">2,850</div></div>
+          <button onclick="go('wallet')" class="px-5 h-10 rounded-full bg-cyberGold text-black font-bold text-sm">Recharge</button>
+        </div>
+        <!-- Become host CTA -->
+        <div onclick="go('hostIntro')" class="rounded-2xl p-4 neon-border flex items-center gap-3 cursor-pointer">
+          <img src="assets/profile.png" class="w-14 h-14 object-contain float-icon" alt="">
+          <div class="flex-1"><div class="font-bold">Become a Host</div><div class="text-xs text-gray-400">Anyone 18+ can join. Set your own rate & earn per minute.</div></div>
+          <span class="px-3 h-8 rounded-full btn-neon text-xs font-bold flex items-center">Apply</span>
+        </div>
+        <div onclick="go('hostDash')" class="rounded-2xl p-3 bg-cyberCard border border-dashed border-neonCyan/40 text-xs text-neonCyan text-center cursor-pointer">Demo: already a host? → open Host Dashboard</div>
+        <!-- Menu -->
+        <div class="rounded-2xl bg-cyberCard border border-cyberLine divide-y divide-cyberLine">
+          <div onclick="go('vip')" class="flex items-center gap-3 p-4 cursor-pointer"><span class="text-xl">👑</span><span class="flex-1">VIP</span><span class="text-xs text-cyberGold">Get 20% off calls</span><i data-lucide="chevron-right" class="w-4 h-4 text-gray-500"></i></div>
+          <div onclick="openSheet('checkinSheet')" class="flex items-center gap-3 p-4 cursor-pointer"><span class="text-xl">📅</span><span class="flex-1">Daily check-in</span><span class="text-xs text-onlineGreen">+20 free coins</span><i data-lucide="chevron-right" class="w-4 h-4 text-gray-500"></i></div>
+          <div onclick="go('level')" class="flex items-center gap-3 p-4 cursor-pointer"><span class="text-xl">⭐</span><span class="flex-1">My level</span><span class="text-xs text-gray-500">Lv.3</span><i data-lucide="chevron-right" class="w-4 h-4 text-gray-500"></i></div>
+          <div onclick="toast('Invite link copied')" class="flex items-center gap-3 p-4 cursor-pointer"><span class="text-xl">🎉</span><span class="flex-1">Invite friends</span><span class="text-xs text-gray-500">Both get 100 coins</span><i data-lucide="chevron-right" class="w-4 h-4 text-gray-500"></i></div>
+          <div onclick="go('support')" class="flex items-center gap-3 p-4 cursor-pointer"><span class="text-xl">💬</span><span class="flex-1">Help & support</span><i data-lucide="chevron-right" class="w-4 h-4 text-gray-500"></i></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== WALLET ========== -->
+  <section class="screen" data-screen="wallet" data-title="14 · Wallet / Recharge">
+    <header class="flex items-center gap-3 px-4 pt-5 pb-3"><button onclick="back()" class="w-10 h-10 rounded-xl bg-cyberCard flex items-center justify-center"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h1 class="text-xl font-bold flex-1">Wallet</h1><button onclick="toast('History')" class="text-sm text-neonCyan">History</button></header>
+    <div class="flex-1 overflow-y-auto px-5 pb-6">
+      <div class="rounded-3xl p-5 bg-gradient-to-br from-yellow-700/40 via-cyberSurface to-cyberCard border border-cyberGold/40 relative overflow-hidden">
+        <div class="absolute -right-8 -top-8 w-36 h-36 rounded-full bg-cyberGold/20 blur-2xl"></div>
+        <div class="text-sm text-gray-300">Coin balance</div>
+        <div class="flex items-center gap-3 mt-1"><span class="coin w-10 h-10 rounded-full"></span><span class="text-4xl font-black text-cyberGold">2,850</span></div>
+        <div class="text-xs text-gray-400 mt-2">≈ 47 min of calls at 60/min</div>
+      </div>
+      <div class="mt-4 rounded-2xl p-3 bg-onlineGreen/10 border border-onlineGreen/30 text-sm flex items-center gap-2"><span class="text-xl">🎁</span><span class="flex-1">First recharge bonus: <b>+50% extra coins</b></span></div>
+      <h3 class="font-semibold mt-6 mb-3">Choose a pack</h3>
+      <div class="grid grid-cols-3 gap-3" data-chipgroup id="packs"></div>
+      <h3 class="font-semibold mt-6 mb-3">Pay with</h3>
+      <div class="grid grid-cols-4 gap-2 text-center text-xs" data-chipgroup>
+        <button class="chip rounded-2xl border border-cyberLine bg-cyberCard py-3 text-gray-300 chip-on"><div class="text-lg font-black text-[#5f259f]">Pe</div>PhonePe</button>
+        <button class="chip rounded-2xl border border-cyberLine bg-cyberCard py-3 text-gray-300"><div class="text-lg font-black text-[#4285F4]">G</div>GPay</button>
+        <button class="chip rounded-2xl border border-cyberLine bg-cyberCard py-3 text-gray-300"><div class="text-lg font-black text-[#00baf2]">P</div>Paytm</button>
+        <button class="chip rounded-2xl border border-cyberLine bg-cyberCard py-3 text-gray-300"><i data-lucide="credit-card" class="w-5 h-5 mx-auto mb-1"></i>Card</button>
+      </div>
+    </div>
+    <div class="p-5 pt-2"><button onclick="toast('Payment flow (Razorpay / Play Billing)')" class="w-full h-14 rounded-2xl btn-neon font-bold">Pay ₹199</button></div>
+  </section>
+
+  <!-- ========== VIP ========== -->
+  <section class="screen" data-screen="vip" data-title="15 · VIP">
+    <header class="flex items-center gap-3 px-4 pt-5 pb-3"><button onclick="back()" class="w-10 h-10 rounded-xl bg-cyberCard flex items-center justify-center"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h1 class="text-xl font-bold">VIP</h1></header>
+    <div class="flex-1 overflow-y-auto px-5 pb-6">
+      <div class="rounded-3xl p-6 text-center bg-gradient-to-br from-yellow-600/40 via-cyberSurface to-purple-900/40 border border-cyberGold/40">
+        <div class="text-6xl">👑</div><h2 class="text-2xl font-black text-cyberGold mt-2">VIBE VIP</h2><p class="text-sm text-gray-300 mt-1">Talk more, pay less</p>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mt-5 text-sm">
+        <div class="rounded-2xl bg-cyberCard border border-cyberLine p-3"><div class="text-xl">💸</div><div class="font-semibold mt-1">20% off calls</div></div>
+        <div class="rounded-2xl bg-cyberCard border border-cyberLine p-3"><div class="text-xl">🪙</div><div class="font-semibold mt-1">Daily bonus coins</div></div>
+        <div class="rounded-2xl bg-cyberCard border border-cyberLine p-3"><div class="text-xl">✨</div><div class="font-semibold mt-1">VIP badge & frame</div></div>
+        <div class="rounded-2xl bg-cyberCard border border-cyberLine p-3"><div class="text-xl">👀</div><div class="font-semibold mt-1">See who visited you</div></div>
+      </div>
+      <div class="space-y-3 mt-5" data-chipgroup>
+        <button class="chip w-full rounded-2xl border border-cyberLine bg-cyberCard p-4 flex items-center justify-between text-gray-300"><span><b class="text-white">1 Month</b> · +3,000 coins</span><span class="font-bold text-white">₹299</span></button>
+        <button class="chip w-full rounded-2xl border border-cyberLine bg-cyberCard p-4 flex items-center justify-between text-gray-300 chip-on"><span><b class="text-white">3 Months</b> · +10,000 coins <span class="ml-1 px-2 py-0.5 rounded-full bg-neonPink text-[10px] text-white">POPULAR</span></span><span class="font-bold text-white">₹699</span></button>
+        <button class="chip w-full rounded-2xl border border-cyberLine bg-cyberCard p-4 flex items-center justify-between text-gray-300"><span><b class="text-white">12 Months</b> · +45,000 coins</span><span class="font-bold text-white">₹1,999</span></button>
+      </div>
+      <p class="text-[11px] text-gray-500 text-center mt-3">Auto-renews. Cancel anytime from Play Store.</p>
+    </div>
+    <div class="p-5 pt-2"><button onclick="toast('Subscribe flow')" class="w-full h-14 rounded-2xl bg-gradient-to-r from-cyberGold to-yellow-500 text-black font-extrabold">Get VIP · ₹699</button></div>
+  </section>
+
+  <!-- ========== LEVEL ========== -->
+  <section class="screen" data-screen="level" data-title="16 · Level">
+    <header class="flex items-center gap-3 px-4 pt-5 pb-3"><button onclick="back()" class="w-10 h-10 rounded-xl bg-cyberCard flex items-center justify-center"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h1 class="text-xl font-bold">My Level</h1></header>
+    <div class="flex-1 overflow-y-auto px-5 pb-6">
+      <div class="rounded-3xl p-5 neon-border">
+        <div class="flex items-center justify-between"><span class="text-3xl font-black grad-text">Lv.3</span><span class="text-sm text-gray-400">Next: Lv.4</span></div>
+        <div class="h-2.5 rounded-full bg-cyberDark mt-4 overflow-hidden"><div class="h-full w-[62%] rounded-full bg-gradient-to-r from-neonPink to-neonCyan"></div></div>
+        <div class="text-xs text-gray-400 mt-2">620 / 1,000 XP · earn XP by calls, chats and gifts</div>
+      </div>
+      <h3 class="font-semibold mt-6 mb-3">Level rewards</h3>
+      <div class="space-y-2" id="levels"></div>
+    </div>
+  </section>
+
+  <!-- ========== NOTIFICATIONS ========== -->
+  <section class="screen" data-screen="notifications" data-title="17 · Notifications">
+    <header class="flex items-center gap-3 px-4 pt-5 pb-3"><button onclick="back()" class="w-10 h-10 rounded-xl bg-cyberCard flex items-center justify-center"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h1 class="text-xl font-bold flex-1">Notifications</h1><button class="text-sm text-neonCyan">Mark all read</button></header>
+    <div class="flex-1 overflow-y-auto px-4 pb-6 space-y-2">
+      <div class="flex gap-3 p-3 rounded-2xl bg-cyberCard border border-neonPink/30"><span class="w-10 h-10 rounded-full bg-neonPink/20 flex items-center justify-center">❤️</span><div class="flex-1 text-sm"><b>Priya</b> started following you<div class="text-xs text-gray-500">2m ago</div></div></div>
+      <div class="flex gap-3 p-3 rounded-2xl bg-cyberCard border border-cyberLine"><span class="w-10 h-10 rounded-full bg-cyberGold/20 flex items-center justify-center">🪙</span><div class="flex-1 text-sm">Recharge successful: <b>+1,500 coins</b><div class="text-xs text-gray-500">1h ago</div></div></div>
+      <div class="flex gap-3 p-3 rounded-2xl bg-cyberCard border border-cyberLine"><span class="w-10 h-10 rounded-full bg-neonCyan/20 flex items-center justify-center">📞</span><div class="flex-1 text-sm">Missed call from <b>Arjun</b><div class="text-xs text-gray-500">3h ago</div></div><button onclick="go('calling')" class="self-center px-3 h-8 rounded-full btn-neon text-xs font-bold">Call back</button></div>
+      <div class="flex gap-3 p-3 rounded-2xl bg-cyberCard border border-cyberLine"><span class="w-10 h-10 rounded-full bg-onlineGreen/20 flex items-center justify-center">✅</span><div class="flex-1 text-sm">Your host application was <b class="text-onlineGreen">approved</b> 🎉<div class="text-xs text-gray-500">Yesterday</div></div></div>
+      <div class="flex gap-3 p-3 rounded-2xl bg-cyberCard border border-cyberLine"><span class="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">📢</span><div class="flex-1 text-sm">VIBE: Weekend offer, 2x XP on all calls<div class="text-xs text-gray-500">2d ago</div></div></div>
+    </div>
+  </section>
+
+  <!-- ========== VISITORS ========== -->
+  <section class="screen" data-screen="visitors" data-title="18 · Visitors">
+    <header class="flex items-center gap-3 px-4 pt-5 pb-3"><button onclick="back()" class="w-10 h-10 rounded-xl bg-cyberCard flex items-center justify-center"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h1 class="text-xl font-bold">Who visited you</h1></header>
+    <div class="flex-1 overflow-y-auto px-4 pb-6 space-y-2" id="visitorList"></div>
+  </section>
+
+  <!-- ========== EDIT PROFILE ========== -->
+  <section class="screen" data-screen="editProfile" data-title="19 · Edit profile">
+    <header class="flex items-center gap-3 px-4 pt-5 pb-3"><button onclick="back()" class="w-10 h-10 rounded-xl bg-cyberCard flex items-center justify-center"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h1 class="text-xl font-bold flex-1">Edit profile</h1><button onclick="toast('Saved');back()" class="text-sm text-neonPink font-semibold">Save</button></header>
+    <div class="flex-1 overflow-y-auto px-5 pb-6">
+      <h3 class="text-sm text-gray-400 mb-2">Photos (up to 9)</h3>
+      <div class="grid grid-cols-3 gap-2">
+        <div class="aspect-[3/4] rounded-xl bg-gradient-to-br from-cyan-500 to-indigo-700 relative"><span class="absolute bottom-1 left-1 text-[10px] px-1.5 rounded bg-black/50">Main</span></div>
+        <div class="aspect-[3/4] rounded-xl bg-gradient-to-br from-purple-500 to-pink-700"></div>
+        <div class="aspect-[3/4] rounded-xl border-2 border-dashed border-cyberLine flex items-center justify-center"><i data-lucide="plus" class="w-6 h-6 text-gray-500"></i></div>
+      </div>
+      <div class="mt-5 rounded-2xl bg-cyberCard border border-cyberLine divide-y divide-cyberLine text-sm">
+        <div class="flex justify-between p-4"><span class="text-gray-400">Name</span><span>Sudhanshu</span></div>
+        <div class="flex justify-between p-4"><span class="text-gray-400">Gender</span><span>Male</span></div>
+        <div class="flex justify-between p-4"><span class="text-gray-400">Birthday</span><span>01 Jan 2000</span></div>
+        <div class="flex justify-between p-4"><span class="text-gray-400">City</span><span>Delhi</span></div>
+        <div class="flex justify-between p-4"><span class="text-gray-400">Languages</span><span>Hindi, English</span></div>
+        <div class="p-4"><div class="text-gray-400 mb-1">Bio</div><div>Cricket, coding & late-night chai ☕</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SETTINGS ========== -->
+  <section class="screen" data-screen="settings" data-title="20 · Settings">
+    <header class="flex items-center gap-3 px-4 pt-5 pb-3"><button onclick="back()" class="w-10 h-10 rounded-xl bg-cyberCard flex items-center justify-center"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h1 class="text-xl font-bold">Settings</h1></header>
+    <div class="flex-1 overflow-y-auto px-5 pb-6 space-y-4 text-sm">
+      <div class="rounded-2xl bg-cyberCard border border-cyberLine divide-y divide-cyberLine">
+        <div class="flex items-center justify-between p-4"><span>Who can call me</span><span class="text-gray-400">Everyone ›</span></div>
+        <div class="flex items-center justify-between p-4"><span>Show me as online</span><span class="toggle on" onclick="this.classList.toggle('on')"></span></div>
+        <div class="flex items-center justify-between p-4"><span>Notifications</span><span class="toggle on" onclick="this.classList.toggle('on')"></span></div>
+        <div class="flex items-center justify-between p-4"><span>Language</span><span class="text-gray-400">English ›</span></div>
+      </div>
+      <div class="rounded-2xl bg-cyberCard border border-cyberLine divide-y divide-cyberLine">
+        <div class="flex items-center justify-between p-4"><span>Blocked users</span><span class="text-gray-400">3 ›</span></div>
+        <div class="flex items-center justify-between p-4"><span>Safety centre</span><span class="text-gray-400">›</span></div>
+        <div class="flex items-center justify-between p-4"><span>Terms & Privacy</span><span class="text-gray-400">›</span></div>
+        <div class="flex items-center justify-between p-4"><span>About VIBE</span><span class="text-gray-400">v1.0.0 ›</span></div>
+      </div>
+      <div class="rounded-2xl bg-cyberCard border border-cyberLine divide-y divide-cyberLine">
+        <div class="p-4 text-gray-300" onclick="toast('Logged out');go('login')">Log out</div>
+        <div class="p-4 text-dangerRed">Delete account</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SUPPORT ========== -->
+  <section class="screen" data-screen="support" data-title="21 · Help & support">
+    <header class="flex items-center gap-3 px-4 pt-5 pb-3"><button onclick="back()" class="w-10 h-10 rounded-xl bg-cyberCard flex items-center justify-center"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h1 class="text-xl font-bold">Help & support</h1></header>
+    <div class="flex-1 overflow-y-auto px-5 pb-6 space-y-2 text-sm">
+      <div class="rounded-2xl p-4 neon-border flex items-center gap-3"><img src="assets/chat.png" class="w-12 h-12 object-contain" alt=""><div class="flex-1"><b>Chat with support</b><div class="text-xs text-gray-400">Hindi & English · replies in ~10 min</div></div><i data-lucide="chevron-right" class="w-5 h-5 text-neonPink"></i></div>
+      <h3 class="text-gray-400 pt-3 pb-1">Common questions</h3>
+      <div class="rounded-2xl bg-cyberCard border border-cyberLine divide-y divide-cyberLine">
+        <div class="p-4 flex justify-between">How do coins work?<span class="text-gray-500">›</span></div>
+        <div class="p-4 flex justify-between">How do I become a host?<span class="text-gray-500">›</span></div>
+        <div class="p-4 flex justify-between">When do hosts get paid?<span class="text-gray-500">›</span></div>
+        <div class="p-4 flex justify-between">Payment failed, coins not added<span class="text-gray-500">›</span></div>
+        <div class="p-4 flex justify-between">Report someone<span class="text-gray-500">›</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== HOST INTRO ========== -->
+  <section class="screen" data-screen="hostIntro" data-title="22 · Become a Host">
+    <header class="flex items-center px-4 pt-5"><button onclick="back()" class="w-10 h-10 rounded-xl bg-cyberCard flex items-center justify-center"><i data-lucide="arrow-left" class="w-5 h-5"></i></button></header>
+    <div class="flex-1 overflow-y-auto px-6 pb-6">
+      <div class="flex justify-center"><img src="assets/profile.png" class="w-44 h-44 object-contain float-icon glow-active" alt=""></div>
+      <h1 class="text-3xl font-black text-center">Become a <span class="grad-text">Host</span></h1>
+      <p class="text-gray-400 text-center text-sm mt-2">Talk to people, make friends, and earn for every minute you're on a call.</p>
+      <div class="flex justify-center gap-2 mt-4 text-xs">
+        <span class="px-3 py-1.5 rounded-full bg-onlineGreen/10 border border-onlineGreen/40 text-onlineGreen">✓ Open for everyone 18+</span>
+        <span class="px-3 py-1.5 rounded-full bg-neonCyan/10 border border-neonCyan/40 text-neonCyan">♂ ♀ Boys & Girls</span>
+      </div>
+      <div class="space-y-3 mt-6">
+        <div class="flex gap-3 p-4 rounded-2xl bg-cyberCard border border-cyberLine"><span class="text-2xl">💰</span><div><b>Set your own rate</b><div class="text-xs text-gray-400">Choose 30 to 200 coins/min. Keep 60% of every coin.</div></div></div>
+        <div class="flex gap-3 p-4 rounded-2xl bg-cyberCard border border-cyberLine"><span class="text-2xl">🕒</span><div><b>Work when you want</b><div class="text-xs text-gray-400">One switch to go online or offline. No fixed hours.</div></div></div>
+        <div class="flex gap-3 p-4 rounded-2xl bg-cyberCard border border-cyberLine"><span class="text-2xl">🏦</span><div><b>Withdraw to UPI or bank</b><div class="text-xs text-gray-400">Minimum ₹500. Paid weekly.</div></div></div>
+        <div class="flex gap-3 p-4 rounded-2xl bg-cyberCard border border-cyberLine"><span class="text-2xl">🙅</span><div><b>No agency needed</b><div class="text-xs text-gray-400">Apply directly from the app. Optional: join an agency later.</div></div></div>
+        <div class="flex gap-3 p-4 rounded-2xl bg-cyberCard border border-cyberLine"><span class="text-2xl">🛡️</span><div><b>Stay safe</b><div class="text-xs text-gray-400">Block, report and end any call anytime. Face verified users only.</div></div></div>
+      </div>
+    </div>
+    <div class="p-5 pt-2"><button onclick="go('hostApply')" class="w-full h-14 rounded-2xl btn-neon font-bold">Apply now · takes 3 min</button></div>
+  </section>
+
+  <!-- ========== HOST APPLY ========== -->
+  <section class="screen" data-screen="hostApply" data-title="23 · Host application">
+    <header class="flex items-center gap-3 px-4 pt-5 pb-2"><button onclick="back()" class="w-10 h-10 rounded-xl bg-cyberCard flex items-center justify-center"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h1 class="text-xl font-bold">Host application</h1></header>
+    <div class="px-5 pb-2"><div class="flex gap-1.5"><span class="flex-1 h-1.5 rounded-full bg-neonPink"></span><span class="flex-1 h-1.5 rounded-full bg-neonPink"></span><span class="flex-1 h-1.5 rounded-full bg-neonPink/60"></span><span class="flex-1 h-1.5 rounded-full bg-cyberLine"></span></div></div>
+    <div class="flex-1 overflow-y-auto px-5 pb-6 space-y-3 pt-2">
+      <div class="flex items-center gap-3 p-4 rounded-2xl bg-cyberCard border border-onlineGreen/40"><span class="w-10 h-10 rounded-full bg-onlineGreen/20 flex items-center justify-center"><i data-lucide="check" class="w-5 h-5 text-onlineGreen"></i></span><div class="flex-1"><b>1. Profile photos</b><div class="text-xs text-gray-400">3 photos added</div></div></div>
+      <div class="flex items-center gap-3 p-4 rounded-2xl bg-cyberCard border border-onlineGreen/40"><span class="w-10 h-10 rounded-full bg-onlineGreen/20 flex items-center justify-center"><i data-lucide="check" class="w-5 h-5 text-onlineGreen"></i></span><div class="flex-1"><b>2. Face verification</b><div class="text-xs text-gray-400">Live selfie matched to photos</div></div></div>
+      <div class="flex items-center gap-3 p-4 rounded-2xl neon-border"><span class="w-10 h-10 rounded-full btn-neon flex items-center justify-center"><i data-lucide="video" class="w-5 h-5"></i></span><div class="flex-1"><b>3. Intro video</b><div class="text-xs text-gray-400">10–30 sec, say hi & what you like to talk about</div></div><button onclick="toast('Camera opens')" class="px-3 h-8 rounded-full btn-neon text-xs font-bold">Record</button></div>
+      <div class="p-4 rounded-2xl bg-cyberCard border border-cyberLine">
+        <div class="flex items-center gap-3"><span class="w-10 h-10 rounded-full bg-cyberLine flex items-center justify-center font-bold">4</span><b class="flex-1">Your call rate</b><span class="text-cyberGold font-bold"><span id="rateVal">60</span> coins/min</span></div>
+        <input type="range" min="30" max="200" step="10" value="60" class="w-full mt-4" oninput="document.getElementById('rateVal').textContent=this.value;document.getElementById('earnVal').textContent=Math.round(this.value*60*0.066*0.6)">
+        <div class="flex justify-between text-[11px] text-gray-500"><span>30</span><span>200</span></div>
+        <div class="mt-3 rounded-xl bg-onlineGreen/10 border border-onlineGreen/30 p-3 text-xs">You earn ≈ <b class="text-onlineGreen">₹<span id="earnVal">143</span> per hour</b> of calls (60% share). New hosts start at max 80/min until Lv.5.</div>
+      </div>
+      <div class="p-4 rounded-2xl bg-cyberCard border border-cyberLine text-xs text-gray-400 flex gap-3"><span class="toggle on shrink-0" onclick="this.classList.toggle('on')"></span>I am 18+, this is my real face, and I agree to the Host Rules (no nudity, no asking for personal payment, no fake identity).</div>
+    </div>
+    <div class="p-5 pt-2"><button onclick="go('hostReview')" class="w-full h-14 rounded-2xl btn-neon font-bold">Submit application</button></div>
+  </section>
+
+  <!-- ========== HOST UNDER REVIEW ========== -->
+  <section class="screen" data-screen="hostReview" data-title="24 · Application submitted">
+    <div class="flex-1 flex flex-col items-center justify-center px-8 text-center">
+      <div class="relative w-40 h-40 flex items-center justify-center"><span class="absolute inset-0 rounded-full border-2 border-neonCyan/50 ring-wave"></span><img src="assets/home.png" class="w-32 h-32 object-contain float-icon" alt=""></div>
+      <h2 class="text-2xl font-extrabold mt-6">Application submitted!</h2>
+      <p class="text-gray-400 text-sm mt-2">We usually review within 24 hours. You'll get a notification when you're approved.</p>
+      <div class="mt-6 w-full rounded-2xl bg-cyberCard border border-cyberLine p-4 text-left text-sm space-y-2">
+        <div class="flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-onlineGreen"></i>Submitted</div>
+        <div class="flex items-center gap-2"><i data-lucide="loader" class="w-4 h-4 text-neonCyan"></i>Under review</div>
+        <div class="flex items-center gap-2 text-gray-500"><i data-lucide="circle" class="w-4 h-4"></i>Start earning</div>
+      </div>
+    </div>
+    <div class="p-6 flex gap-3"><button onclick="go('home')" class="flex-1 h-14 rounded-2xl bg-cyberCard border border-cyberLine font-semibold">Back to home</button><button onclick="go('hostDash')" class="flex-1 h-14 rounded-2xl btn-neon font-bold text-sm">Demo: approved →</button></div>
+  </section>
+
+  <!-- ========== HOST DASHBOARD ========== -->
+  <section class="screen" data-screen="hostDash" data-title="25 · Host dashboard">
+    <header class="flex items-center gap-3 px-4 pt-5 pb-3"><button onclick="go('me')" class="w-10 h-10 rounded-xl bg-cyberCard flex items-center justify-center"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h1 class="text-xl font-bold flex-1">Host centre</h1><span class="px-2.5 py-1 rounded-full bg-neonCyan/10 border border-neonCyan/40 text-neonCyan text-xs">Host Lv.2</span></header>
+    <div class="flex-1 overflow-y-auto px-5 pb-6 space-y-3">
+      <div id="onlineCard" class="rounded-3xl p-5 neon-border flex items-center gap-4">
+        <div class="relative"><div class="w-14 h-14 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-700"></div><span id="onDot" class="absolute bottom-0 right-0 w-4 h-4 bg-onlineGreen rounded-full border-2 border-cyberDark online-pulse"></span></div>
+        <div class="flex-1"><div class="font-bold text-lg" id="onTitle">You're online</div><div class="text-xs text-gray-400" id="onSub">People can see and call you now</div></div>
+        <span class="toggle on" onclick="toggleOnline(this)"></span>
+      </div>
+      <div class="rounded-3xl p-5 bg-gradient-to-br from-onlineGreen/20 via-cyberCard to-cyberCard border border-onlineGreen/30">
+        <div class="flex justify-between items-start"><div><div class="text-xs text-gray-400">Withdrawable</div><div class="text-3xl font-black">₹1,846</div><div class="text-xs text-gray-400 mt-1">Today: <span class="text-onlineGreen font-semibold">+₹312</span> · This week ₹1,240</div></div>
+          <button onclick="go('withdraw')" class="px-4 h-10 rounded-full bg-onlineGreen text-black font-bold text-sm">Withdraw</button></div>
+      </div>
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <div class="rounded-2xl bg-cyberCard border border-cyberLine py-3"><div class="font-bold">2h 14m</div><div class="text-[11px] text-gray-500">Call time today</div></div>
+        <div class="rounded-2xl bg-cyberCard border border-cyberLine py-3"><div class="font-bold">18</div><div class="text-[11px] text-gray-500">Calls</div></div>
+        <div class="rounded-2xl bg-cyberCard border border-cyberLine py-3"><div class="font-bold">⭐ 4.7</div><div class="text-[11px] text-gray-500">Rating</div></div>
+      </div>
+      <div class="rounded-2xl bg-cyberCard border border-cyberLine p-4">
+        <div class="flex items-center justify-between"><b>My call rate</b><span class="text-cyberGold font-bold">60 coins/min</span></div>
+        <div class="text-xs text-gray-400 mt-1">Unlock up to 120/min at Host Lv.5</div>
+        <div class="h-2 rounded-full bg-cyberDark mt-3 overflow-hidden"><div class="h-full w-[40%] rounded-full bg-gradient-to-r from-neonPink to-neonCyan"></div></div>
+      </div>
+      <div class="rounded-2xl bg-cyberCard border border-cyberLine divide-y divide-cyberLine text-sm">
+        <div onclick="go('incoming')" class="flex items-center gap-3 p-4 cursor-pointer"><span class="text-lg">📞</span><span class="flex-1">Demo: incoming call (host view)</span><i data-lucide="chevron-right" class="w-4 h-4 text-gray-500"></i></div>
+        <div class="flex items-center gap-3 p-4"><span class="text-lg">🎬</span><span class="flex-1">My photos & intro video</span><i data-lucide="chevron-right" class="w-4 h-4 text-gray-500"></i></div>
+        <div class="flex items-center gap-3 p-4"><span class="text-lg">📊</span><span class="flex-1">Earnings history</span><i data-lucide="chevron-right" class="w-4 h-4 text-gray-500"></i></div>
+        <div class="flex items-center gap-3 p-4"><span class="text-lg">🏢</span><span class="flex-1">Join an agency <span class="text-xs text-gray-500">(optional)</span></span><i data-lucide="chevron-right" class="w-4 h-4 text-gray-500"></i></div>
+        <div class="flex items-center gap-3 p-4"><span class="text-lg">📜</span><span class="flex-1">Host rules</span><i data-lucide="chevron-right" class="w-4 h-4 text-gray-500"></i></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== INCOMING CALL (host) ========== -->
+  <section class="screen" data-screen="incoming" data-title="26 · Incoming call (host)">
+    <div class="absolute inset-0 bg-gradient-to-br from-cyan-600/50 via-cyberDark to-pink-700/50"></div>
+    <div class="relative flex-1 flex flex-col items-center pt-24 px-6">
+      <div class="relative w-36 h-36 flex items-center justify-center"><span class="absolute inset-0 rounded-full border-2 border-neonCyan/60 ring-wave"></span><span class="absolute inset-0 rounded-full border-2 border-neonPink/60 ring-wave" style="animation-delay:.9s"></span>
+        <div class="avatar-ring rounded-full"><div class="w-32 h-32 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-700 border-4 border-cyberDark flex items-center justify-center"><i data-lucide="user" class="w-16 h-16 text-white/80"></i></div></div></div>
+      <h2 class="text-2xl font-extrabold mt-6">Rahul, 27</h2>
+      <p class="text-gray-300 mt-1">Incoming video call…</p>
+      <div class="flex gap-2 mt-3 text-xs"><span class="px-3 py-1 rounded-full glass-light">📍 Pune</span><span class="px-3 py-1 rounded-full glass-light">Lv.6</span><span class="px-3 py-1 rounded-full glass-light">⭐ Good caller</span></div>
+      <div class="mt-5 px-4 py-2 rounded-full bg-onlineGreen/15 border border-onlineGreen/40 text-sm text-onlineGreen">You earn ≈ ₹2.4/min (60 coins/min)</div>
+    </div>
+    <div class="relative pb-16 flex justify-center gap-16">
+      <div class="flex flex-col items-center gap-2"><button onclick="back()" class="w-[72px] h-[72px] rounded-full bg-dangerRed flex items-center justify-center shadow-lg shadow-red-500/40"><i data-lucide="phone-off" class="w-8 h-8"></i></button><span class="text-xs text-gray-300">Decline</span></div>
+      <div class="flex flex-col items-center gap-2"><button onclick="go('call')" class="w-[72px] h-[72px] rounded-full bg-onlineGreen flex items-center justify-center shadow-lg shadow-green-500/40 animate-bounce"><i data-lucide="video" class="w-8 h-8 text-black"></i></button><span class="text-xs text-gray-300">Accept</span></div>
+    </div>
+  </section>
+
+  <!-- ========== WITHDRAW ========== -->
+  <section class="screen" data-screen="withdraw" data-title="27 · Withdraw">
+    <header class="flex items-center gap-3 px-4 pt-5 pb-3"><button onclick="back()" class="w-10 h-10 rounded-xl bg-cyberCard flex items-center justify-center"><i data-lucide="arrow-left" class="w-5 h-5"></i></button><h1 class="text-xl font-bold">Withdraw</h1></header>
+    <div class="flex-1 overflow-y-auto px-5 pb-6">
+      <div class="rounded-3xl p-5 bg-gradient-to-br from-onlineGreen/20 via-cyberCard to-cyberCard border border-onlineGreen/30"><div class="text-xs text-gray-400">Available</div><div class="text-4xl font-black">₹1,846</div><div class="text-xs text-gray-400 mt-1">Minimum withdrawal ₹500 · paid every Monday</div></div>
+      <h3 class="font-semibold mt-6 mb-3">Amount</h3>
+      <div class="grid grid-cols-3 gap-2" data-chipgroup>
+        <button class="chip h-12 rounded-2xl border border-cyberLine bg-cyberCard text-gray-300 font-semibold">₹500</button>
+        <button class="chip h-12 rounded-2xl border border-cyberLine bg-cyberCard text-gray-300 font-semibold">₹1,000</button>
+        <button class="chip h-12 rounded-2xl border border-cyberLine bg-cyberCard text-gray-300 font-semibold chip-on">All</button>
+      </div>
+      <h3 class="font-semibold mt-6 mb-3">Send to</h3>
+      <div class="space-y-2" data-chipgroup>
+        <button class="chip w-full rounded-2xl border border-cyberLine bg-cyberCard p-4 flex items-center gap-3 text-gray-300 chip-on"><span class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center font-black text-sm">UPI</span><span class="flex-1 text-left"><b class="text-white">UPI</b><div class="text-xs">sudhanshu@ybl</div></span></button>
+        <button class="chip w-full rounded-2xl border border-cyberLine bg-cyberCard p-4 flex items-center gap-3 text-gray-300"><span class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center"><i data-lucide="landmark" class="w-5 h-5"></i></span><span class="flex-1 text-left"><b class="text-white">Bank account</b><div class="text-xs">Add account</div></span></button>
+      </div>
+      <p class="text-[11px] text-gray-500 mt-4">PAN required for withdrawals above ₹10,000/year. TDS as per law.</p>
+    </div>
+    <div class="p-5 pt-2"><button onclick="toast('Withdrawal requested');back()" class="w-full h-14 rounded-2xl bg-onlineGreen text-black font-extrabold">Withdraw ₹1,846</button></div>
+  </section>
+
+  <!-- ========== BOTTOM TAB BAR ========== -->
+  <nav id="tabbar" class="absolute bottom-0 left-0 right-0 z-30 hidden">
+    <svg class="absolute -top-8 left-0 w-full h-10 pointer-events-none" viewBox="0 0 420 40" preserveAspectRatio="none">
+      <path d="M150,40 Q170,40 182,26 Q196,10 210,10 Q224,10 238,26 Q250,40 270,40" stroke="url(#cg)" stroke-width="2" fill="none"/>
+      <defs><linearGradient id="cg" x1="0" x2="1"><stop offset="0" stop-color="#ff2a85" stop-opacity=".2"/><stop offset=".5" stop-color="#ff2a85"/><stop offset="1" stop-color="#00f2fe" stop-opacity=".2"/></linearGradient></defs>
+    </svg>
+    <div class="glass border-t border-gray-700/50 h-20 flex items-end justify-around pb-2">
+      <button onclick="go('home')" data-tabbtn="home" class="flex flex-col items-center -mt-6 w-24">
+        <img src="assets/home.png" class="w-16 h-16 object-contain transition" alt=""><span class="text-xs -mt-1">Home</span></button>
+      <button onclick="go('chats')" data-tabbtn="chats" class="relative flex flex-col items-center -mt-14 w-24">
+        <img src="assets/chat.png" class="w-24 h-24 object-contain heartbeat" alt=""><span class="text-xs -mt-4">Chats</span>
+        <span class="absolute top-2 right-3 w-6 h-6 rounded-full btn-neon text-[11px] font-bold flex items-center justify-center border-2 border-cyberDark">3</span></button>
+      <button onclick="go('me')" data-tabbtn="me" class="flex flex-col items-center -mt-6 w-24">
+        <img src="assets/profile.png" class="w-16 h-16 object-contain transition" alt=""><span class="text-xs -mt-1">Me</span></button>
+    </div>
+  </nav>
+
+  <!-- ========== SHEETS ========== -->
+  <div id="filterSheet" class="sheet-wrap" onclick="closeSheet(event)">
+    <div class="sheet rounded-t-3xl bg-cyberCard border-t border-cyberLine p-5 pb-8">
+      <div class="w-10 h-1 rounded-full bg-gray-600 mx-auto mb-4"></div>
+      <h3 class="text-lg font-bold mb-4">Filter</h3>
+      <div class="text-xs text-gray-400 mb-2">Show</div>
+      <div class="grid grid-cols-3 gap-2" data-chipgroup><button class="chip h-10 rounded-xl border border-cyberLine bg-cyberDark text-sm text-gray-300 chip-on">Everyone</button><button class="chip h-10 rounded-xl border border-cyberLine bg-cyberDark text-sm text-gray-300">♀ Girls</button><button class="chip h-10 rounded-xl border border-cyberLine bg-cyberDark text-sm text-gray-300">♂ Boys</button></div>
+      <div class="text-xs text-gray-400 mt-4 mb-2">Age: 18 – 35</div><input type="range" class="w-full" value="40">
+      <div class="text-xs text-gray-400 mt-4 mb-2">Max price: 120 coins/min</div><input type="range" class="w-full" value="60">
+      <div class="text-xs text-gray-400 mt-4 mb-2">Language</div>
+      <div class="flex flex-wrap gap-2" data-chipgroup data-multi><button class="chip px-3 h-9 rounded-full border border-cyberLine bg-cyberDark text-sm text-gray-300 chip-on">Hindi</button><button class="chip px-3 h-9 rounded-full border border-cyberLine bg-cyberDark text-sm text-gray-300">English</button><button class="chip px-3 h-9 rounded-full border border-cyberLine bg-cyberDark text-sm text-gray-300">Tamil</button><button class="chip px-3 h-9 rounded-full border border-cyberLine bg-cyberDark text-sm text-gray-300">Bengali</button></div>
+      <button onclick="closeSheet()" class="w-full h-12 rounded-2xl btn-neon font-bold mt-6">Apply</button>
+    </div>
+  </div>
+
+  <div id="giftSheet" class="sheet-wrap" onclick="closeSheet(event)">
+    <div class="sheet rounded-t-3xl bg-cyberCard border-t border-cyberLine p-5 pb-8">
+      <div class="w-10 h-1 rounded-full bg-gray-600 mx-auto mb-4"></div>
+      <div class="flex items-center justify-between mb-4"><h3 class="text-lg font-bold">Send a gift</h3><div class="flex items-center gap-2 text-cyberGold text-sm"><span class="coin w-5 h-5 rounded-full"></span>2,850</div></div>
+      <div class="grid grid-cols-4 gap-2" data-chipgroup id="gifts"></div>
+      <button onclick="closeSheet();toast('🌹 Gift sent!')" class="w-full h-12 rounded-2xl btn-neon font-bold mt-5">Send</button>
+    </div>
+  </div>
+
+  <div id="safetySheet" class="sheet-wrap" onclick="closeSheet(event)">
+    <div class="sheet rounded-t-3xl bg-cyberCard border-t border-cyberLine p-5 pb-8 space-y-2">
+      <div class="w-10 h-1 rounded-full bg-gray-600 mx-auto mb-3"></div>
+      <button onclick="closeSheet();toast('Reported. Our team will review it.')" class="w-full h-12 rounded-2xl bg-cyberDark border border-cyberLine flex items-center gap-3 px-4"><i data-lucide="flag" class="w-5 h-5 text-dangerRed"></i>Report</button>
+      <button onclick="closeSheet();toast('User blocked')" class="w-full h-12 rounded-2xl bg-cyberDark border border-cyberLine flex items-center gap-3 px-4"><i data-lucide="ban" class="w-5 h-5 text-dangerRed"></i>Block</button>
+      <button onclick="closeSheet()" class="w-full h-12 rounded-2xl bg-cyberDark border border-cyberLine">Cancel</button>
+    </div>
+  </div>
+
+  <div id="lowBalSheet" class="sheet-wrap" onclick="closeSheet(event)">
+    <div class="sheet rounded-t-3xl bg-cyberCard border-t border-cyberLine p-5 pb-8">
+      <div class="w-10 h-1 rounded-full bg-gray-600 mx-auto mb-4"></div>
+      <h3 class="text-lg font-bold">Quick top-up</h3><p class="text-xs text-gray-400 mt-1">Your call continues while you pay</p>
+      <div class="grid grid-cols-3 gap-2 mt-4" data-chipgroup>
+        <button class="chip rounded-2xl border border-cyberLine bg-cyberDark p-3 text-gray-300"><div class="text-cyberGold font-bold">600</div><div class="text-xs">₹49</div></button>
+        <button class="chip rounded-2xl border border-cyberLine bg-cyberDark p-3 text-gray-300 chip-on"><div class="text-cyberGold font-bold">1,500</div><div class="text-xs">₹99</div></button>
+        <button class="chip rounded-2xl border border-cyberLine bg-cyberDark p-3 text-gray-300"><div class="text-cyberGold font-bold">3,500</div><div class="text-xs">₹199</div></button>
+      </div>
+      <button onclick="closeSheet();toast('Coins added')" class="w-full h-12 rounded-2xl btn-neon font-bold mt-5">Pay ₹99</button>
+    </div>
+  </div>
+
+  <div id="checkinSheet" class="sheet-wrap" onclick="closeSheet(event)">
+    <div class="sheet rounded-t-3xl bg-cyberCard border-t border-cyberLine p-5 pb-8">
+      <div class="w-10 h-1 rounded-full bg-gray-600 mx-auto mb-4"></div>
+      <h3 class="text-lg font-bold">Daily check-in</h3><p class="text-xs text-gray-400 mt-1">Free coins every day. No purchase needed.</p>
+      <div class="grid grid-cols-7 gap-1.5 mt-4 text-center" id="checkin"></div>
+      <button onclick="closeSheet();toast('+20 coins collected')" class="w-full h-12 rounded-2xl btn-neon font-bold mt-5">Collect today's 20 coins</button>
+    </div>
+  </div>
+
+  <!-- toast -->
+  <div id="toast" class="absolute top-6 left-1/2 -translate-x-1/2 z-[80] px-4 py-3 rounded-xl bg-cyberCard border border-neonCyan/60 text-sm flex items-center gap-2 opacity-0 -translate-y-6 transition pointer-events-none"><i data-lucide="sparkles" class="w-4 h-4 text-neonCyan"></i><span id="toastMsg"></span></div>
+</div>
+
+<script>
+const hosts = [
+  { n: 'Priya', a: 24, g: 'F', c: 'Mumbai', r: 60, s: 'LIVE', grad: 'from-pink-500/70 to-pink-800/90', v: true },
+  { n: 'Arjun', a: 26, g: 'M', c: 'Delhi', r: 50, s: 'ONLINE', grad: 'from-cyan-500/70 to-indigo-800/90', v: true },
+  { n: 'Ananya', a: 22, g: 'F', c: 'Bangalore', r: 80, s: 'ONLINE', grad: 'from-purple-500/70 to-purple-800/90', vip: true },
+  { n: 'Rahul', a: 27, g: 'M', c: 'Pune', r: 40, s: 'BUSY', grad: 'from-amber-500/70 to-orange-800/90' },
+  { n: 'Diya', a: 23, g: 'F', c: 'Chennai', r: 60, s: 'LIVE', grad: 'from-emerald-500/70 to-green-800/90', isNew: true },
+  { n: 'Kabir', a: 25, g: 'M', c: 'Jaipur', r: 70, s: 'ONLINE', grad: 'from-sky-500/70 to-blue-800/90', v: true },
+  { n: 'Meera', a: 28, g: 'F', c: 'Kolkata', r: 100, s: 'OFFLINE', grad: 'from-rose-500/70 to-fuchsia-800/90', vip: true },
+  { n: 'Vikram', a: 29, g: 'M', c: 'Hyderabad', r: 60, s: 'ONLINE', grad: 'from-indigo-500/70 to-violet-800/90' },
+];
+const statusStyle = { LIVE: ['bg-onlineGreen online-pulse', 'text-onlineGreen'], ONLINE: ['bg-neonCyan', 'text-neonCyan'], BUSY: ['bg-orange-400', 'text-orange-300'], OFFLINE: ['bg-gray-500', 'text-gray-400'] };
+let gFilter = 'all';
+
+function renderGrid() {
+  const list = hosts.filter(h => gFilter === 'all' || (gFilter === 'online' ? h.s !== 'OFFLINE' : h.g === gFilter));
+  document.getElementById('grid').innerHTML = list.map((h) => {
+    const [dot, txt] = statusStyle[h.s];
+    const badge = h.vip ? '<span class="px-2 py-0.5 rounded-full bg-gradient-to-r from-cyberGold to-yellow-500 text-black text-[10px] font-bold">VIP</span>'
+      : h.isNew ? '<span class="px-2 py-0.5 rounded-full btn-neon text-[10px] font-bold">NEW</span>'
+      : h.v ? '<span class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center"><i data-lucide="check" class="w-3 h-3"></i></span>' : '';
+    const gChip = h.g === 'F' ? '<span class="text-neonPink">♀</span>' : '<span class="text-neonCyan">♂</span>';
+    return `<div onclick="openProfile(${hosts.indexOf(h)})" class="relative h-64 rounded-2xl overflow-hidden neon-border cursor-pointer active:scale-[.98] transition">
+      <div class="absolute inset-0 bg-gradient-to-br ${h.grad}"></div>
+      <div class="absolute inset-0 flex items-center justify-center"><i data-lucide="user" class="w-20 h-20 text-white/50"></i></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-transparent"></div>
+      <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/50 backdrop-blur-sm"><span class="w-2 h-2 rounded-full ${dot}"></span><span class="text-[10px] font-bold ${txt}">${h.s}</span></div>
+      <div class="absolute top-2.5 right-2.5">${badge}</div>
+      <div class="absolute bottom-3 left-3 right-14">
+        <h3 class="font-bold">${h.n}, ${h.a} ${gChip}</h3>
+        <p class="text-gray-300 text-[11px]">${h.c}</p>
+        <p class="text-cyberGold text-[11px] font-semibold mt-0.5 flex items-center gap-1"><span class="coin w-3 h-3 rounded-full inline-block"></span>${h.r}/min</p>
+      </div>
+      <button onclick="event.stopPropagation();go('calling')" class="absolute bottom-3 right-3 w-10 h-10 ${h.s === 'OFFLINE' || h.s === 'BUSY' ? 'bg-gray-700' : 'btn-neon'} rounded-xl flex items-center justify-center"><i data-lucide="video" class="w-5 h-5"></i></button>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+function renderStatic() {
+  document.getElementById('stories').innerHTML = hosts.filter(h => h.s !== 'OFFLINE').map(h => `
+    <div onclick="openProfile(${hosts.indexOf(h)})" class="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer">
+      <div class="avatar-ring rounded-full relative"><div class="w-14 h-14 rounded-full bg-gradient-to-br ${h.grad} border-2 border-cyberDark flex items-center justify-center"><i data-lucide="user" class="w-7 h-7 text-white/70"></i></div>
+      <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-onlineGreen rounded-full border-2 border-cyberDark online-pulse"></span></div>
+      <span class="text-xs text-gray-400">${h.n}</span></div>`).join('');
+
+  const chats = [
+    ['Priya', 'Same!! Call karte hain? ☕', '2m', 2, 'from-pink-500 to-pink-800', true],
+    ['Arjun', 'Bro that match was insane 🏏', '15m', 0, 'from-cyan-500 to-indigo-800', true],
+    ['Ananya', '📞 Video call · 12:40', '1h', 1, 'from-purple-500 to-purple-800', false],
+    ['Kabir', 'Thanks for the rose 🌹', '3h', 0, 'from-sky-500 to-blue-800', false],
+    ['VIBE Team', 'Welcome! Here are 100 free coins 🎁', '1d', 0, 'from-yellow-500 to-orange-700', false],
+  ];
+  document.getElementById('chatList').innerHTML = chats.map(([n, m, t, u, g, on]) => `
+    <div onclick="go('chat')" class="flex items-center gap-3 p-3 rounded-2xl hover:bg-cyberCard cursor-pointer">
+      <div class="relative"><div class="w-14 h-14 rounded-full bg-gradient-to-br ${g}"></div>${on ? '<span class="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 bg-onlineGreen rounded-full border-2 border-cyberDark"></span>' : ''}</div>
+      <div class="flex-1 min-w-0"><div class="flex justify-between"><b>${n}</b><span class="text-xs text-gray-500">${t}</span></div>
+      <div class="flex justify-between items-center mt-0.5"><span class="text-sm text-gray-400 truncate pr-2">${m}</span>${u ? `<span class="w-5 h-5 rounded-full btn-neon text-[11px] font-bold flex items-center justify-center">${u}</span>` : ''}</div></div>
+    </div>`).join('');
+
+  const packs = [[600, 49], [1500, 99, 'Popular'], [3500, 199, '+50% first'], [8000, 399], [18000, 799, 'Best value'], [40000, 1599]];
+  document.getElementById('packs').innerHTML = packs.map(([c, p, tag], i) => `
+    <button class="chip relative rounded-2xl border border-cyberLine bg-cyberCard pt-5 pb-3 text-gray-300 ${i === 2 ? 'chip-on' : ''}">
+      ${tag ? `<span class="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full btn-neon text-[9px] font-bold text-white">${tag}</span>` : ''}
+      <span class="coin w-8 h-8 rounded-full block mx-auto"></span><div class="text-cyberGold font-extrabold mt-2">${c.toLocaleString('en-IN')}</div><div class="text-xs mt-0.5">₹${p}</div></button>`).join('');
+
+  const gifts = [['🌹', 'Rose', 20], ['☕', 'Chai', 50], ['🍫', 'Chocolate', 99], ['🧸', 'Teddy', 199], ['💐', 'Bouquet', 299], ['💍', 'Ring', 999], ['🏎️', 'Car', 2999], ['🏰', 'Castle', 9999]];
+  document.getElementById('gifts').innerHTML = gifts.map(([e, n, c], i) => `
+    <button class="chip rounded-2xl border border-cyberLine bg-cyberDark py-3 text-gray-300 ${i === 0 ? 'chip-on' : ''}"><div class="text-3xl">${e}</div><div class="text-[11px] mt-1">${n}</div><div class="text-[11px] text-cyberGold font-semibold">${c}</div></button>`).join('');
+
+  document.getElementById('levels').innerHTML = [[1, 'Profile frame'], [3, 'Chat bubble style'], [5, '5% off calls'], [10, 'Animated entry'], [20, '10% off calls + badge']].map(([l, r]) => `
+    <div class="flex items-center gap-3 p-3 rounded-2xl bg-cyberCard border ${l <= 3 ? 'border-onlineGreen/40' : 'border-cyberLine'}"><span class="w-11 h-11 rounded-xl ${l <= 3 ? 'btn-neon' : 'bg-cyberLine'} flex items-center justify-center font-bold text-sm">Lv${l}</span><span class="flex-1 text-sm">${r}</span>${l <= 3 ? '<i data-lucide="check" class="w-5 h-5 text-onlineGreen"></i>' : '<i data-lucide="lock" class="w-4 h-4 text-gray-500"></i>'}</div>`).join('');
+
+  document.getElementById('visitorList').innerHTML = hosts.slice(0, 6).map(h => `
+    <div onclick="openProfile(${hosts.indexOf(h)})" class="flex items-center gap-3 p-3 rounded-2xl bg-cyberCard border border-cyberLine cursor-pointer"><div class="w-12 h-12 rounded-full bg-gradient-to-br ${h.grad}"></div><div class="flex-1"><b>${h.n}, ${h.a}</b><div class="text-xs text-gray-400">${h.c} · visited ${Math.floor(Math.random() * 50) + 2}m ago</div></div><button onclick="event.stopPropagation();go('chat')" class="px-3 h-8 rounded-full btn-neon text-xs font-bold">Say hi</button></div>`).join('');
+
+  document.getElementById('checkin').innerHTML = [10, 10, 20, 20, 30, 30, 100].map((c, i) => `
+    <div class="rounded-xl py-2 ${i < 2 ? 'bg-onlineGreen/15 border border-onlineGreen/40' : i === 2 ? 'neon-border' : 'bg-cyberDark border border-cyberLine'}"><div class="text-[10px] text-gray-400">D${i + 1}</div><div class="text-lg">${i === 6 ? '🎁' : '🪙'}</div><div class="text-[11px] text-cyberGold font-semibold">${i < 2 ? '✓' : c}</div></div>`).join('');
+}
+
+// ---- navigation ----
+const historyStack = [];
+let current = null;
+function go(id, push = true) {
+  const next = document.querySelector(`[data-screen="${id}"]`);
+  if (!next) return;
+  if (current && push && current !== id) historyStack.push(current);
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s === next));
+  current = id;
+  const tab = next.dataset.tab;
+  document.getElementById('tabbar').classList.toggle('hidden', !tab);
+  document.querySelectorAll('[data-tabbtn]').forEach(b => {
+    const on = b.dataset.tabbtn === tab;
+    b.querySelector('img').classList.toggle('glow-active', on);
+    b.querySelector('img').style.opacity = on ? 1 : .6;
+    b.querySelector('span').className = (b.dataset.tabbtn === 'chats' ? 'text-xs -mt-4 ' : 'text-xs -mt-1 ') + (on ? 'text-neonPink font-semibold' : 'text-gray-400');
+  });
+  document.querySelectorAll('.nav-link').forEach(a => a.classList.toggle('on', a.dataset.to === id));
+  try { localStorage.setItem('vibe-screen', id); } catch (e) {}
+}
+function back() { const prev = historyStack.pop(); go(prev || 'home', false); }
+
+function openProfile(i) {
+  const h = hosts[i];
+  document.getElementById('pName').textContent = h.n;
+  document.getElementById('pBg').className = `absolute inset-0 bg-gradient-to-br ${h.grad}`;
+  document.getElementById('pCity').textContent = `📍 ${h.c}`;
+  document.getElementById('pRate').textContent = `${h.r} coins/min`;
+  const pg = document.getElementById('pGender');
+  pg.textContent = `${h.g === 'F' ? '♀' : '♂'} ${h.a}`;
+  pg.className = h.g === 'F' ? 'px-3 py-1 rounded-full bg-neonPink/15 border border-neonPink/40 text-neonPink' : 'px-3 py-1 rounded-full bg-neonCyan/10 border border-neonCyan/40 text-neonCyan';
+  go('profile');
+}
+function toggleFollow(btn) { const s = btn.querySelector('span'); const f = s.textContent === 'Follow'; s.textContent = f ? 'Following' : 'Follow'; btn.classList.toggle('btn-neon', !f); btn.classList.toggle('bg-cyberCard', f); }
+function toggleOnline(t) {
+  t.classList.toggle('on'); const on = t.classList.contains('on');
+  document.getElementById('onTitle').textContent = on ? "You're online" : "You're offline";
+  document.getElementById('onSub').textContent = on ? 'People can see and call you now' : 'Nobody can call you. Go online to earn.';
+  document.getElementById('onDot').className = `absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-cyberDark ${on ? 'bg-onlineGreen online-pulse' : 'bg-gray-500'}`;
+}
+function openSheet(id) { document.getElementById(id).classList.add('open'); }
+function closeSheet(e) { if (e && e.target !== e.currentTarget) return; document.querySelectorAll('.sheet-wrap.open').forEach(s => s.classList.remove('open')); }
+let toastT;
+function toast(m) {
+  const t = document.getElementById('toast'); document.getElementById('toastMsg').textContent = m;
+  t.classList.remove('opacity-0', '-translate-y-6'); clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.add('opacity-0', '-translate-y-6'), 1800);
+}
+
+// chip groups (single / multi select)
+document.addEventListener('click', e => {
+  const chip = e.target.closest('.chip'); if (!chip) return;
+  const grp = chip.closest('[data-chipgroup]'); if (!grp) return;
+  if (grp.hasAttribute('data-multi')) chip.classList.toggle('chip-on');
+  else { grp.querySelectorAll('.chip').forEach(c => c.classList.remove('chip-on')); chip.classList.add('chip-on'); }
+  if (grp.id === 'genderChips') { gFilter = chip.dataset.g; renderGrid(); }
+});
+// top text tabs
+document.querySelectorAll('[data-tabs]').forEach(g => g.addEventListener('click', e => {
+  const b = e.target.closest('.tabbtn'); if (!b) return;
+  g.querySelectorAll('.tabbtn').forEach(x => { x.classList.toggle('text-white', x === b); x.classList.toggle('text-gray-500', x !== b); x.querySelector('.bar').classList.toggle('hidden', x !== b); });
+}));
+// call timer
+let secs = 252;
+setInterval(() => { secs++; document.getElementById('callTimer').textContent = `${String(Math.floor(secs / 60)).padStart(2, '0')}:${String(secs % 60).padStart(2, '0')}`; }, 1000);
+
+// side nav
+document.getElementById('navList').innerHTML = [...document.querySelectorAll('.screen')].map(s =>
+  `<button class="nav-link w-full text-left px-3 py-2 rounded-xl border border-transparent text-sm text-gray-400 hover:text-white" data-to="${s.dataset.screen}" onclick="go('${s.dataset.screen}')">${s.dataset.title}</button>`).join('');
+
+renderStatic(); renderGrid();
+let start = 'splash';
+try { start = localStorage.getItem('vibe-screen') || 'splash'; } catch (e) {}
+go(start, false);
+lucide.createIcons();
+</script>
+</body>
+</html>

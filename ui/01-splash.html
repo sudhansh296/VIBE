@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Splash</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .orbit { position: absolute; inset: 0; border-radius: 9999px; border: 1px dashed rgba(255,255,255,.08); }
+  .orbit-dot { position: absolute; width: 10px; height: 10px; border-radius: 9999px; top: -5px; left: calc(50% - 5px); }
+  .spin-slow { animation: spin 14s linear infinite; }
+  .spin-rev { animation: spin 20s linear infinite reverse; }
+  @keyframes spin { to { transform: rotate(360deg) } }
+  .logo-in { animation: logo-in 1s cubic-bezier(.2,1.4,.4,1) both; }
+  @keyframes logo-in { from { opacity: 0; transform: scale(.6) translateY(20px) } to { opacity: 1; transform: none } }
+  .fade-up { animation: fade-up .7s ease-out both; }
+  @keyframes fade-up { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: none } }
+  .progress { animation: progress 2.6s ease-in-out forwards; }
+  @keyframes progress { from { width: 0 } to { width: 100% } }
+  .sparkle { position: absolute; width: 4px; height: 4px; border-radius: 9999px; background: #fff; animation: twinkle 2.4s ease-in-out infinite; }
+  @keyframes twinkle { 0%,100% { opacity: .1; transform: scale(.6) } 50% { opacity: 1; transform: scale(1.4) } }
+</style>
+</head>
+<body>
+<main class="phone">
+  <!-- splash video (assets/splash.mp4); falls back to the animated layout below if missing -->
+  <video id="splashVideo" class="absolute inset-0 w-full h-full object-cover z-20 hidden" muted playsinline preload="auto">
+    <source src="assets/icons/splash-720.mp4" type="video/mp4">
+  </video>
+  <!-- background glow -->
+  <div class="blob w-80 h-80 bg-neonPink/25 -top-16 -left-24"></div>
+  <div class="blob w-80 h-80 bg-neonCyan/20 bottom-24 -right-28"></div>
+  <div class="blob w-56 h-56 bg-purple-600/20 top-1/2 left-1/3"></div>
+  <div id="sparkles" class="absolute inset-0 pointer-events-none"></div>
+
+  <section class="relative flex-1 flex flex-col items-center justify-center">
+    <!-- mascot with orbit rings -->
+    <div class="relative w-64 h-64 flex items-center justify-center logo-in">
+      <div class="orbit spin-slow"><span class="orbit-dot bg-neonPink shadow-[0_0_14px_#ff2a85]"></span></div>
+      <div class="orbit spin-rev" style="inset:28px"><span class="orbit-dot bg-neonCyan shadow-[0_0_14px_#00f2fe]"></span></div>
+      <img src="assets/icons/home.webp" alt="" class="relative w-44 h-44 object-contain float glow">
+    </div>
+
+    <h1 class="text-7xl font-black grad-text tracking-tight mt-2 fade-up" style="animation-delay:.35s">VIBE</h1>
+    <p class="text-gray-300 mt-3 text-base fade-up" style="animation-delay:.55s">Talk · Connect · Earn</p>
+
+    <div class="flex items-center gap-2 mt-6 text-xs text-gray-400 fade-up" style="animation-delay:.75s">
+      <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10"><span class="w-1.5 h-1.5 rounded-full bg-onlineGreen"></span>Real people</span>
+      <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">🔒 Safe calls</span>
+      <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">💰 Anyone can host</span>
+    </div>
+  </section>
+
+  <footer class="relative px-8 pb-12 flex flex-col items-center fade-up" style="animation-delay:.9s">
+    <div class="w-48 h-1.5 rounded-full bg-white/10 overflow-hidden"><div class="h-full rounded-full btn-neon progress"></div></div>
+    <p id="status" class="text-xs text-gray-500 mt-3">Loading…</p>
+    <p class="text-[10px] text-gray-600 mt-6">v1.0.0 · Made in India 🇮🇳</p>
+  </footer>
+</main>
+
+<script>
+  // random sparkles
+  const sp = document.getElementById('sparkles');
+  for (let i = 0; i < 26; i++) {
+    const s = document.createElement('span');
+    s.className = 'sparkle';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.animationDelay = (Math.random() * 2.4) + 's';
+    s.style.background = ['#fff', '#ff2a85', '#00f2fe', '#f6dc9b'][i % 4];
+    sp.appendChild(s);
+  }
+  // play splash.mp4 if present, otherwise use the animated fallback
+  const video = document.getElementById('splashVideo');
+  let fallback = null;
+  function useFallback() {
+    if (fallback) return;
+    video.remove();
+    setTimeout(() => (document.getElementById('status').textContent = 'Ready'), 2400);
+    fallback = setTimeout(() => vibe.go('02-login.html'), 3000);
+  }
+  video.addEventListener('canplay', () => {
+    if (fallback) return;
+    video.classList.remove('hidden');
+    video.play().catch(useFallback);
+  }, { once: true });
+  // hold the last frame for 2s, tap anywhere to replay
+  let leave = null;
+  video.addEventListener('ended', () => { leave = setTimeout(() => vibe.go('02-login.html'), 2000); });
+  video.addEventListener('click', () => { clearTimeout(leave); video.currentTime = 0; video.play(); });
+  video.querySelector('source').addEventListener('error', useFallback);
+  setTimeout(() => { if (video.readyState < 3) useFallback(); }, 1500);
+</script>
+</body>
+</html>

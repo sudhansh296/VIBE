@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Edit profile</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .lbl { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: #6b6b7b; margin: 20px 0 8px; display: block; }
+  .field { width: 100%; background: #12121c; border: 1.5px solid #262636; border-radius: 16px; padding: 14px 16px; outline: none; font-size: 14px; color: #fff; }
+  .field:focus { border-color: #ff2a85; box-shadow: 0 0 0 4px rgba(255,42,133,.15); }
+  .locked { opacity: .65; display: flex; align-items: center; justify-content: space-between; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-neonPink/10 -top-24 -left-24"></div>
+
+  <header class="relative flex items-center gap-3 px-4 pt-5 pb-2">
+    <button onclick="history.length > 1 ? history.back() : vibe.go('17-me.html')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Back">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 class="text-xl font-semibold">Edit profile</h1>
+  </header>
+
+  <section class="relative flex-1 overflow-y-auto px-5 pb-6">
+    <div class="flex flex-col items-center mt-3">
+      <button id="av" class="relative" aria-label="Change photo">
+        <div class="avatar-ring"><div class="w-24 h-24 rounded-full border-4 border-cyberDark flex items-center justify-center text-4xl font-light" style="background:linear-gradient(160deg,#1d1a28,#121019)" id="avL">S</div></div>
+        <span class="absolute right-0 bottom-0 w-8 h-8 rounded-full btn-neon flex items-center justify-center border-2 border-cyberDark"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 8h-3l-2-3H9L7 8H4a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1Z"/><circle cx="12" cy="13.5" r="3"/></svg></span>
+      </button>
+      <p class="text-xs text-gray-500 mt-3">Tap to change your photo</p>
+    </div>
+
+    <span class="lbl">Name</span>
+    <input id="name" class="field" maxlength="24" value="Sudhanshu">
+
+    <span class="lbl">Gender</span>
+    <div class="field locked"><span>Male</span><span class="text-[11px] text-gray-500 flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Can't be changed</span></div>
+
+    <span class="lbl">Date of birth</span>
+    <div class="field locked"><span>14 Mar 2000 · 26 yrs</span><span class="text-[11px] text-gray-500 flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Can't be changed</span></div>
+
+    <span class="lbl">City</span>
+    <input id="city" class="field" maxlength="30" value="Delhi">
+
+    <span class="lbl">About me</span>
+    <textarea id="bio" maxlength="150" rows="3" class="field resize-none" placeholder="Tell people a little about you">Chai, cricket and late-night talks.</textarea>
+    <div class="text-right text-[11px] text-gray-500 mt-1"><span id="cnt">0</span>/150</div>
+
+    <span class="lbl">Languages</span>
+    <div id="langs" class="flex flex-wrap gap-2"></div>
+
+    <button id="hostMedia" class="mt-6 w-full rounded-2xl border border-cyberGold/30 bg-cyberGold/5 p-4 flex items-center gap-3 text-left">
+      <span class="w-11 h-11 rounded-xl bg-cyberGold/10 border border-cyberGold/40 text-cyberGold flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M6 3h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3Z"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></span>
+      <span class="flex-1"><b class="block text-sm font-medium">Photos and videos</b><span class="text-xs text-gray-400">Add, lock and manage your gallery. Changes are reviewed.</span></span><span class="text-gray-600">›</span></button>
+  </section>
+
+  <footer class="relative p-5 pt-3 glass border-t border-cyberLine/60"><button id="save" class="btn-neon w-full h-14 rounded-2xl font-bold">Save changes</button></footer>
+</main>
+<script>
+  const $ = id => document.getElementById(id);
+  const LANGS = ['Hindi', 'English', 'Punjabi', 'Bengali', 'Tamil', 'Telugu', 'Marathi', 'Kannada', 'Gujarati'];
+  const sel = new Set(['Hindi', 'English']);
+  function paint() {
+    $('langs').innerHTML = LANGS.map(l => `<button data-l="${l}" class="chip h-10 px-4 rounded-full text-sm ${sel.has(l) ? 'on' : ''}">${l}</button>`).join('');
+    $('save').disabled = $('name').value.trim().length < 2 || sel.size === 0;
+    $('cnt').textContent = $('bio').value.length;
+    $('avL').textContent = ($('name').value.trim()[0] || 'S').toUpperCase();
+  }
+  $('langs').onclick = e => { const b = e.target.closest('[data-l]'); if (!b) return; sel.has(b.dataset.l) ? sel.delete(b.dataset.l) : sel.add(b.dataset.l); paint(); };
+  ['name', 'city', 'bio'].forEach(id => $(id).oninput = paint);
+  $('av').onclick = () => vibe.toast('Choose a photo from camera or gallery');
+  $('hostMedia').onclick = () => vibe.go('35-my-media.html');
+  // DEMO. The server validates the name/photo (moderation) and stores the profile.
+  $('save').onclick = () => { vibe.toast('Profile saved'); setTimeout(() => history.length > 1 ? history.back() : vibe.go('17-me.html'), 800); };
+  paint();
+</script>
+</body>
+</html>

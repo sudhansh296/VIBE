@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · App states</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .seg { display: flex; padding: 3px; border-radius: 99px; background: #12121c; border: 1px solid #262636; overflow-x: auto; }
+  .seg button { flex: 1; height: 30px; padding: 0 10px; border-radius: 99px; font-size: 11px; color: #8b8b9a; white-space: nowrap; } .seg .on { background: #26263a; color: #fff; }
+  .sk { background: linear-gradient(90deg, #14141f 25%, #1e1e2c 50%, #14141f 75%); background-size: 200% 100%; animation: sh 1.4s linear infinite; border-radius: 16px; }
+  @keyframes sh { from { background-position: 200% 0 } to { background-position: -200% 0 } }
+  .bar { height: 6px; border-radius: 6px; background: #1c1c28; overflow: hidden; } .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #ff2a85, #00f2fe); transition: width 1.2s ease; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div id="blob" class="blob w-80 h-80 -top-28 left-1/2 -translate-x-1/2"></div>
+  <div class="relative px-4 pt-4 z-10"><div class="seg" id="seg">
+    <button data-s="loading" class="on">Loading</button><button data-s="offline">No internet</button><button data-s="error">Error</button><button data-s="maint">Maintenance</button><button data-s="update">Update</button><button data-s="force">Must update</button></div></div>
+  <section class="relative flex-1 overflow-y-auto px-6 pb-6 flex flex-col items-center justify-center text-center" id="body"></section>
+</main>
+<script>
+  // DEMO switcher (top) lets you review every state. In the real app: Loading = skeletons while the API answers; No internet = the
+  // phone has no connection; Error = the server failed; Maintenance and Must update come from the SERVER (admin panel > Settings:
+  // maintenance on/off + message, minimum app version + store link).
+  const $ = i => document.getElementById(i);
+  const svg = (d, c) => `<div class="w-24 h-24 rounded-3xl flex items-center justify-center float" style="border:1px solid ${c}66;background:${c}1a;color:${c}"><svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">${d}</svg></div>`;
+  const S = {
+    offline: { c: '#ff4d5e', ic: '<path d="M2 8.8a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r=".8" fill="currentColor"/><path d="m3 3 18 18"/>', t: 'No internet connection', s: 'Check your Wi-Fi or mobile data and try again.', b: 'Try again', b2: '' },
+    error: { c: '#ff9a3c', ic: '<path d="M12 3 2 20h20Z"/><path d="M12 10v4M12 17h.01"/>', t: 'Something went wrong', s: 'We could not load this right now. Please try again in a moment.', b: 'Try again', b2: 'Go to Home' },
+    maint: { c: '#f6dc9b', ic: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4Z"/>', t: 'We are making VIBE better', s: 'VIBE is under maintenance. We will be back soon. Your coins and chats are safe.', b: 'Check again', b2: '', note: 'Back by about 4:30 pm' },
+    update: { c: '#00f2fe', ic: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>', t: 'A new version is ready', s: 'Update for the latest features and fixes.', b: 'Update now', b2: 'Later', note: 'Version 1.1.0' },
+    force: { c: '#ff2a85', ic: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>', t: 'Please update VIBE', s: 'This version is too old and no longer works. Update from the Play Store to continue.', b: 'Update on Play Store', b2: '', note: 'Required · Version 1.1.0' },
+  };
+  function paint(k) {
+    document.querySelectorAll('#seg button').forEach(b => b.classList.toggle('on', b.dataset.s === k));
+    if (k === 'loading') {
+      $('blob').className = 'blob w-80 h-80 bg-neonPink/10 -top-28 left-1/2 -translate-x-1/2';
+      $('body').className = 'relative flex-1 overflow-y-auto px-5 pt-5 pb-6 block';
+      $('body').innerHTML = `<div class="sk h-10 w-40 mb-5"></div><div class="flex gap-4 mb-5">${'<div class="sk w-16 h-16 !rounded-full shrink-0"></div>'.repeat(5)}</div>
+        <div class="grid grid-cols-2 gap-3">${'<div class="sk h-60"></div>'.repeat(4)}</div>`;
+      return;
+    }
+    const s = S[k]; $('blob').className = 'blob w-80 h-80 -top-28 left-1/2 -translate-x-1/2'; $('blob').style.background = s.c + '1a';
+    $('body').className = 'relative flex-1 overflow-y-auto px-6 pb-6 flex flex-col items-center justify-center text-center';
+    $('body').innerHTML = svg(s.ic, s.c) + `<h1 class="text-2xl font-light mt-6">${s.t}</h1><p class="text-sm text-gray-400 mt-2 leading-relaxed max-w-[300px]">${s.s}</p>
+      ${s.note ? `<div class="mt-4 px-4 py-1.5 rounded-full text-xs" style="border:1px solid ${s.c}66;color:${s.c};background:${s.c}14">${s.note}</div>` : ''}
+      ${k === 'update' || k === 'force' ? '<div class="w-full max-w-[260px] mt-5"><div class="bar"><i id="pg"></i></div></div>' : ''}
+      <button class="btn-neon w-full max-w-[300px] h-14 rounded-2xl font-bold mt-8" onclick="vibe.toast('${s.b}')">${s.b}</button>
+      ${s.b2 ? `<button class="mt-3 text-sm text-gray-400" onclick="vibe.go('05-home.html')">${s.b2}</button>` : ''}`;
+    if ($('pg')) setTimeout(() => $('pg').style.width = k === 'force' ? '35%' : '60%', 80);
+  }
+  $('seg').onclick = e => { const b = e.target.closest('[data-s]'); if (b) paint(b.dataset.s); };
+  paint(new URLSearchParams(location.search).get('s') || 'loading');
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="vibe_dark">#FF07070C</color>
+
+    <style name="Theme.VIBE" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/vibe_dark</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <!-- System splash is just the dark background (no icon); the video splash runs right after in Compose -->
+    <style name="Theme.VIBE.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/vibe_dark</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_empty</item>
+        <item name="windowSplashScreenAnimationDuration">0</item>
+        <item name="postSplashScreenTheme">@style/Theme.VIBE</item>
+    </style>
+</resources>

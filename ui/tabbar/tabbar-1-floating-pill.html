@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tab bar · 1 Floating glass pill</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="../assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/theme.css">
+<style>
+  /* Option 1: a floating frosted capsule; the active tab sits on a glowing gradient disc */
+  .pill { position: absolute; left: 16px; right: 16px; bottom: 18px; height: 78px; border-radius: 28px;
+    background: rgba(18,18,28,.72); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+    border: 1px solid rgba(255,255,255,.08); box-shadow: 0 20px 50px -12px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.06);
+    display: flex; align-items: center; justify-content: space-around; z-index: 30; }
+  .tab { position: relative; width: 84px; height: 68px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .tab .disc { position: absolute; top: 4px; width: 52px; height: 52px; border-radius: 18px; opacity: 0; transform: scale(.6);
+    background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.35), transparent 45%), linear-gradient(135deg, #ff2a85, #7a1fd1 60%, #00f2fe);
+    box-shadow: 0 0 24px rgba(255,42,133,.65); transition: all .35s cubic-bezier(.2,1.4,.4,1); }
+  .tab img { position: relative; width: 50px; height: 50px; object-fit: contain; opacity: .55; filter: grayscale(.35); transition: all .35s cubic-bezier(.2,1.4,.4,1); }
+  .tab span { font-size: 11px; color: #8a8a99; margin-top: -2px; transition: color .2s; }
+  .tab.active .disc { opacity: 1; transform: scale(1); }
+  .tab.active img { opacity: 1; filter: none; transform: translateY(-4px) scale(1.08); }
+  .tab.active span { color: #fff; font-weight: 600; }
+  .badge { position: absolute; top: 2px; right: 14px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 99px; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; background: #ff2a85; border: 2px solid #12121c; z-index: 2; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <section id="content" class="flex-1 overflow-y-auto pb-32"></section>
+  <nav class="pill">
+    <button class="tab active" data-tab><span class="disc"></span><img src="../assets/icons/home.webp" alt=""><span>Home</span></button>
+    <button class="tab" data-tab><span class="disc"></span><img src="../assets/icons/chat.webp" alt=""><span>Chats</span><b class="badge">3</b></button>
+    <button class="tab" data-tab><span class="disc"></span><img src="../assets/icons/profile.webp" alt=""><span>Me</span></button>
+  </nav>
+</main>
+<script src="shell.js"></script>
+</body>
+</html>

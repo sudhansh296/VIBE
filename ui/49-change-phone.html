@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Change phone number</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .otp { width: 46px; height: 56px; border-radius: 14px; background: #12121c; border: 1.5px solid #262636; text-align: center; font-size: 22px; font-weight: 600; color: #fff; outline: none; }
+  .otp:focus { border-color: #ff2a85; box-shadow: 0 0 0 4px rgba(255,42,133,.15); }
+  .pane { display: none; } .pane.show { display: block; }
+  .ok-pop { animation: pop .5s cubic-bezier(.2,1.5,.4,1) both; } @keyframes pop { from { transform: scale(.5); opacity: 0 } to { transform: none; opacity: 1 } }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-neonPink/10 -top-24 -left-24"></div>
+  <header class="relative flex items-center gap-3 px-4 pt-5 pb-2">
+    <button id="back" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Back"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 class="text-xl font-semibold flex-1">Change phone number</h1>
+  </header>
+  <section class="relative flex-1 overflow-y-auto px-5 pt-2 pb-6">
+    <!-- 1 number -->
+    <div class="pane show" data-p="0">
+      <div class="rounded-2xl bg-cyberCard border border-cyberLine p-4 text-sm"><span class="text-gray-500">Current number</span><div class="font-semibold mt-0.5">+91 98••••4321</div></div>
+      <p class="text-sm text-gray-400 mt-5 leading-relaxed">Enter your new number. We will send a 6 digit code to it. Your account, coins and chats stay the same.</p>
+      <div class="neon-field rounded-2xl flex items-center gap-3 px-4 h-14 mt-4"><span class="text-gray-300">+91</span><span class="w-px h-6 bg-white/15"></span><input id="ph" inputmode="numeric" maxlength="10" class="flex-1 bg-transparent outline-none text-lg tracking-wider" placeholder="New mobile number"></div>
+      <p id="phE" class="text-xs text-dangerRed mt-2 h-4"></p>
+    </div>
+    <!-- 2 otp -->
+    <div class="pane" data-p="1">
+      <p class="text-sm text-gray-400 leading-relaxed">Enter the 6 digit code sent to <b id="sent" class="text-white"></b></p>
+      <div id="boxes" class="flex gap-2 justify-between mt-6"></div>
+      <p id="otpE" class="text-xs text-dangerRed mt-3 h-4"></p>
+      <button id="resend" class="text-sm text-gray-500 mt-2" disabled>Resend code in <span id="sec">30</span>s</button>
+    </div>
+    <!-- 3 done -->
+    <div class="pane text-center pt-16" data-p="2">
+      <div class="ok-pop w-24 h-24 mx-auto rounded-full flex items-center justify-center border-2 border-onlineGreen text-onlineGreen"><svg class="w-12 h-12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></div>
+      <h2 class="text-2xl font-light mt-5">Number updated</h2><p class="text-sm text-gray-400 mt-2">You will now log in with <b id="newn" class="text-white"></b></p>
+    </div>
+  </section>
+  <footer class="relative p-5 pt-3 glass border-t border-cyberLine/60"><button id="go" class="btn-neon w-full h-14 rounded-2xl font-bold" disabled></button></footer>
+</main>
+<script>
+  // DEMO. The server sends and checks the OTP (demo code 123456) and rejects a number that already has an account.
+  const $ = i => document.getElementById(i);
+  let step = 0, timer = null;
+  $('boxes').innerHTML = Array.from({ length: 6 }, (_, i) => `<input class="otp" inputmode="numeric" maxlength="1" data-i="${i}">`).join('');
+  const boxes = [...document.querySelectorAll('.otp')];
+  function paint() {
+    document.querySelectorAll('.pane').forEach(p => p.classList.toggle('show', +p.dataset.p === step));
+    $('go').textContent = ['Send code', 'Verify', 'Done'][step];
+    $('go').disabled = step === 0 ? $('ph').value.length !== 10 : step === 1 ? boxes.some(b => !b.value) : false;
+  }
+  $('ph').oninput = e => { e.target.value = e.target.value.replace(/\D/g, ''); $('phE').textContent = ''; paint(); };
+  boxes.forEach((b, i) => { b.oninput = () => { b.value = b.value.replace(/\D/g, ''); if (b.value && boxes[i + 1]) boxes[i + 1].focus(); paint(); };
+    b.onkeydown = e => { if (e.key === 'Backspace' && !b.value && boxes[i - 1]) boxes[i - 1].focus(); }; });
+  function startTimer() { let s = 30; $('sec').textContent = s; $('resend').disabled = true; clearInterval(timer); timer = setInterval(() => { s--; $('sec').textContent = s; if (s <= 0) { clearInterval(timer); $('resend').innerHTML = 'Resend code'; $('resend').disabled = false; } }, 1000); }
+  $('go').onclick = () => {
+    if (step === 0) { if (!/^[6-9]\d{9}$/.test($('ph').value)) return $('phE').textContent = 'Enter a valid 10 digit mobile number'; $('sent').textContent = '+91 ' + $('ph').value; step = 1; startTimer(); paint(); boxes[0].focus(); }
+    else if (step === 1) { if (boxes.map(b => b.value).join('') !== '123456') { $('otpE').textContent = 'Wrong code. Demo code is 123456'; boxes.forEach(b => b.value = ''); boxes[0].focus(); return paint(); } $('newn').textContent = '+91 ' + $('ph').value; step = 2; clearInterval(timer); paint(); }
+    else vibe.go('28-settings.html');
+  };
+  $('resend').onclick = () => { vibe.toast('Code sent again'); startTimer(); };
+  $('back').onclick = () => step === 1 ? (step = 0, paint()) : (history.length > 1 ? history.back() : vibe.go('28-settings.html'));
+  paint();
+</script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Home</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<script src="assets/demo-data.js"></script>
+<script src="assets/status-data.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .card { transition: transform .15s; }
+  .card:active { transform: scale(.97); }
+  .tabtxt.on { color: #fff; }
+  .tabtxt .bar { opacity: 0; transform: scaleX(.3); transition: all .25s; }
+  .tabtxt.on .bar { opacity: 1; transform: none; }
+  .fab-glow { box-shadow: 0 12px 36px -8px rgba(255,42,133,.75); }
+  .live-ring { background: conic-gradient(from 0deg, #ff2a85, #00f2fe, #ff2a85); animation: spin360 4s linear infinite;
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+            mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+    filter: drop-shadow(0 0 6px rgba(255,42,133,.55)); }
+  .live-tag { position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); padding: 1px 6px; border-radius: 99px;
+    font-size: 8px; font-weight: 800; letter-spacing: .08em; color: #fff; background: linear-gradient(90deg, #ff2a85, #c3157a); border: 2px solid #07070c; }
+  .story:active { transform: scale(.95); }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-neonPink/15 -top-24 -left-24"></div>
+
+  <!-- header -->
+  <header class="relative flex items-center justify-between px-5 pt-5 pb-3">
+    <span class="text-2xl font-black grad-text">VIBE</span>
+    <div class="flex items-center gap-2">
+      <button onclick="vibe.go('18-wallet.html')" class="flex items-center gap-2 pl-1.5 pr-3 h-9 rounded-full bg-gradient-to-r from-yellow-900/30 to-yellow-800/10 border border-cyberGold/30">
+        <span class="coin w-6 h-6 text-black text-[10px] font-black flex items-center justify-center">C</span>
+        <span id="bal" class="text-cyberGold font-semibold text-sm"></span>
+        <span class="text-cyberGold text-sm font-bold">+</span>
+      </button>
+      <button onclick="vibe.go('16-notifications.html')" class="relative w-9 h-9 rounded-xl btn-ghost flex items-center justify-center" aria-label="Notifications">
+        <img src="assets/icons/ic-bell.webp" class="w-6 h-6 object-contain" alt="">
+        <span class="absolute -top-1 -right-1 w-3 h-3 bg-neonPink rounded-full border-2 border-cyberDark"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- top tabs + filter -->
+  <div class="relative flex items-center justify-between px-5 pb-1">
+    <div class="flex gap-6" id="topTabs">
+      <button class="tabtxt on relative text-lg font-bold text-gray-500" data-t="discover">Discover<span class="bar absolute -bottom-1.5 left-0 w-full h-1 rounded-full bg-gradient-to-r from-neonPink to-neonCyan"></span></button>
+      <button class="tabtxt relative text-lg font-bold text-gray-500" data-t="following">Following<span class="bar absolute -bottom-1.5 left-0 w-full h-1 rounded-full bg-gradient-to-r from-neonPink to-neonCyan"></span></button>
+      <button class="tabtxt relative text-lg font-bold text-gray-500" data-t="new">New<span class="bar absolute -bottom-1.5 left-0 w-full h-1 rounded-full bg-gradient-to-r from-neonPink to-neonCyan"></span></button>
+    </div>
+    <button onclick="vibe.go('06-filter.html')" class="relative flex items-center gap-1.5 px-3 h-9 rounded-full btn-ghost text-gray-300 text-sm">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+      Filter<span id="filterDot" class="hidden w-2 h-2 rounded-full bg-neonPink"></span>
+    </button>
+  </div>
+
+  <section id="scroll" class="relative flex-1 overflow-y-auto px-4 pb-36">
+    <!-- quick gender filter -->
+    <div class="flex gap-2 py-3 overflow-x-auto" id="quick">
+      <button class="chip on px-4 h-9 rounded-full text-sm shrink-0" data-q="all">✨ All</button>
+      <button class="chip px-4 h-9 rounded-full text-sm shrink-0" data-q="voice">📞 Voice</button>
+      <button class="chip px-4 h-9 rounded-full text-sm shrink-0" data-q="F">♀ Girls</button>
+      <button class="chip px-4 h-9 rounded-full text-sm shrink-0" data-q="M">♂ Boys</button>
+      <button class="chip px-4 h-9 rounded-full text-sm shrink-0" data-q="online">🟢 Online</button>
+    </div>
+
+    <!-- status row: my status + people with a 24h status (ring) + online people (dot) -->
+    <div id="discoverStatus" class="mb-3">
+      <div class="flex items-center justify-between mb-2"><h3 class="font-semibold text-gray-300 text-sm">Status</h3><span class="text-[11px] text-gray-500">Disappears in 24 hours</span></div>
+      <div id="stories" class="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4"></div>
+    </div>
+
+    <div id="discoverView">
+      <div id="grid" class="grid grid-cols-2 gap-3"></div>
+      <p id="noResult" class="hidden text-center text-sm text-gray-500 py-16">No one matches your filters right now.<br><button onclick="resetFilters()" class="text-neonCyan mt-2">Clear filters</button></p>
+    </div>
+
+    <!-- following empty state -->
+    <div id="followingView" class="hidden flex-col items-center text-center pt-10">
+      <img src="assets/icons/ghost-empty.webp" class="w-44 h-44 object-contain float" alt=""
+           onerror="this.src='assets/icons/home.webp'">
+      <h3 class="text-lg font-bold mt-3">No one here yet</h3>
+      <p class="text-sm text-gray-400 mt-1 max-w-[260px]">Follow people you like and they'll show up here when they're online.</p>
+      <button onclick="setTab('discover')" class="mt-6 px-6 h-11 rounded-full btn-neon font-semibold text-sm">Discover people</button>
+    </div>
+  </section>
+
+  <!-- random match button -->
+  <button onclick="vibe.go('08-random-match.html')" class="absolute left-1/2 -translate-x-1/2 bottom-[100px] z-20 spin-border rounded-full h-14 pl-2 pr-6 flex items-center gap-3 fab-glow">
+    <span class="w-10 h-10 rounded-full btn-neon flex items-center justify-center">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></svg>
+    </span>
+    <span class="text-left leading-tight"><span class="block font-bold">Random Match</span><span class="block text-[11px] text-cyberGold">Meet someone new</span></span>
+  </button>
+
+  <div id="tabbar" data-active="home" data-unread="3"></div>
+</main>
+<script src="assets/tabbar.js"></script>
+<script>
+  const D = window.DEMO;
+  document.getElementById('bal').textContent = D.balance.toLocaleString('en-IN');
+
+  // filters saved by 06-filter.html
+  const saved = JSON.parse(sessionStorage.getItem('vibe-filter') || 'null');
+  let quick = 'all';
+  if (saved && saved.show !== 'all') quick = saved.show;
+  document.getElementById('filterDot').classList.toggle('hidden', !saved);
+
+  const PH = c => `<svg class="${c}" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2Z"/></svg>`;
+  const VID = c => `<svg class="${c}" viewBox="0 0 24 24" fill="currentColor"><path d="M5 5.5h8.5a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3z"/><path d="M17.5 10.2l3.4-2.3c.5-.3 1.1 0 1.1.6v6.9c0 .6-.6.9-1.1.6l-3.4-2.3z"/></svg>`;
+
+  function matches(h) {
+    if (quick === 'online' && h.s === 'OFFLINE') return false;
+    if (quick === 'voice' && !h.voice) return false;
+    if (saved && saved.callType === 'voice' && !h.voice) return false;
+    if (saved && saved.callType === 'video' && !h.video) return false;
+    if ((quick === 'F' || quick === 'M') && h.g !== quick) return false;
+    if (saved) {
+      if (h.a < saved.minAge || h.a > saved.maxAge) return false;
+      if (h.r > saved.maxRate) return false;
+      if (saved.onlineOnly && h.s === 'OFFLINE') return false;
+      if (saved.verifiedOnly && !h.v) return false;
+      if (saved.langs.length && !h.langs.some(l => saved.langs.includes(l))) return false;
+    }
+    return true;
+  }
+
+  function badge(h) {
+    if (h.vip) return '<span class="px-2 py-0.5 rounded-full bg-gradient-to-r from-cyberGold to-yellow-500 text-black text-[10px] font-extrabold">VIP</span>';
+    if (h.isNew) return '<span class="px-2 py-0.5 rounded-full btn-neon text-[10px] font-bold">NEW</span>';
+    if (h.v) return '<span class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-[11px] font-black">✓</span>';
+    return '';
+  }
+
+  function render() {
+    let list = D.hosts.filter(matches);
+    if (saved && saved.sort === 'price') list = [...list].sort((a, b) => a.r - b.r);
+    if (saved && saved.sort === 'rating') list = [...list].sort((a, b) => b.rt - a.rt);
+    if (!saved || saved.sort === 'online') list = [...list].sort((a, b) => (a.s === 'OFFLINE') - (b.s === 'OFFLINE'));
+
+    document.getElementById('grid').innerHTML = list.map(h => {
+      const st = D.status[h.s];
+      const canCall = h.s === 'LIVE' || h.s === 'ONLINE';
+      return `<div onclick="openHost(${h.id})" class="card relative h-64 rounded-2xl overflow-hidden neon-border cursor-pointer">
+        ${D.avatar(h, 'absolute inset-0 text-7xl opacity-90')}
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/20"></div>
+        <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/55 backdrop-blur-sm">
+          <span class="w-2 h-2 rounded-full ${st.pulse ? 'pulse-dot' : ''}" style="background:${st.dot};color:${st.dot}"></span>
+          <span class="text-[10px] font-bold" style="color:${st.text}">${h.s}</span></div>
+        <div class="absolute top-2.5 right-2.5">${badge(h)}</div>
+        <div class="absolute bottom-3 left-3 right-14">
+          <h3 class="font-bold truncate">${h.n}, ${h.a} <span style="color:${h.g === 'F' ? '#ff2a85' : '#00f2fe'}">${h.g === 'F' ? '♀' : '♂'}</span></h3>
+          <p class="text-gray-300 text-[11px] truncate">📍 ${h.c} · ⭐ ${h.rt}</p>
+          <p class="text-cyberGold text-[11px] font-semibold mt-0.5 flex items-center gap-1"><span class="coin w-3 h-3"></span>
+            ${h.voice ? `${PH('w-3 h-3 text-onlineGreen')}${h.ar}` : ''}
+            ${h.voice && h.video ? '<span class="text-gray-500">·</span>' : ''}
+            ${h.video ? `${VID('w-3 h-3 text-neonPink')}${h.r}` : ''}<span class="text-gray-400 font-normal">/min</span>
+            ${h.voice && h.video ? '' : `<span class="ml-1 text-[9px] text-gray-400 font-normal">${h.voice ? 'voice only' : 'video only'}</span>`}</p>
+        </div>
+        ${h.voice ? `<button onclick="event.stopPropagation();callHost(${h.id},'audio')" aria-label="Voice call"
+          class="absolute ${h.video ? 'bottom-[60px]' : 'bottom-3'} right-3 w-10 h-10 rounded-xl flex items-center justify-center bg-black/45 backdrop-blur border border-white/15 ${canCall ? '' : 'opacity-50'}">
+          ${ICON('voice', 'w-7 h-7')}</button>` : ''}
+        ${h.video ? `<button onclick="event.stopPropagation();callHost(${h.id},'video')" aria-label="Video call"
+          class="absolute bottom-3 right-3 w-10 h-10 rounded-xl flex items-center justify-center bg-black/45 backdrop-blur border border-white/15 ${canCall ? '' : 'opacity-50'}">
+          ${ICON('video', 'w-7 h-7')}</button>` : ''}
+      </div>`;
+    }).join('');
+    document.getElementById('noResult').classList.toggle('hidden', list.length > 0);
+  }
+
+  // Status row. Ring = has a status (pink to cyan = new, grey = already seen). Green dot = online, orange = busy.
+  function paintStories() {
+    const ST = window.STATUS, seen = ST.seen(), mine = ST.mine();
+    const dot = h => `<span class="absolute bottom-[3px] right-[3px] w-3 h-3 rounded-full border-[2.5px] border-cyberDark" style="background:${D.status[h.s].dot}"></span>`;
+    const face = (h, ring) => `<div class="relative w-[64px] h-[64px]">
+        <span class="absolute inset-0 rounded-full ${ring === 'new' ? 'live-ring' : ring === 'seen' ? 'border-2 border-white/20' : 'border border-white/10'}"></span>
+        <div class="absolute inset-[4px] rounded-full flex items-center justify-center text-lg font-semibold text-white/90"
+             style="background:radial-gradient(circle at 30% 22%,rgba(255,255,255,.14),transparent 45%),linear-gradient(160deg,${h.grad[0]}40,#14141f 72%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)">${h.n[0]}</div>${dot(h)}</div>`;
+    const cell = (inner, label, go) => `<div onclick="${go}" class="story flex flex-col items-center gap-2 shrink-0 cursor-pointer w-[64px]">${inner}<span class="text-[11px] text-gray-400 tracking-wide truncate w-full text-center">${label}</span></div>`;
+    // my status first
+    const me = `<div class="relative w-[64px] h-[64px]"><span class="absolute inset-0 rounded-full ${mine ? 'live-ring' : 'border border-dashed border-white/25'}"></span>
+      <div class="absolute inset-[4px] rounded-full flex items-center justify-center text-lg font-semibold text-white/90" style="background:linear-gradient(160deg,#1d1a28,#121019)">S</div>
+      ${mine ? '' : '<span class="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full btn-neon flex items-center justify-center border-2 border-cyberDark text-sm font-bold leading-none">+</span>'}</div>`;
+    let html = cell(me, 'My status', mine ? "vibe.go('34-my-status.html')" : "vibe.go('33-status-create.html')");
+    const withStatus = ST.items.map((it, i) => ({ it, i, h: D.hosts.find(x => x.id === it.id) })).filter(x => x.h && x.h.s !== 'OFFLINE');
+    withStatus.sort((a, b) => seen.includes(a.it.id) - seen.includes(b.it.id));
+    html += withStatus.map(({ it, i, h }) => cell(face(h, seen.includes(it.id) ? 'seen' : 'new'), h.n, `vibe.go('32-status-view.html?i=${i}')`)).join('');
+    html += ST.onlineOnly.map(id => D.hosts.find(x => x.id === id)).filter(h => h && h.s !== 'OFFLINE').map(h => cell(face(h, 'none'), h.n, `openHost(${h.id})`)).join('');
+    document.getElementById('stories').innerHTML = html;
+  }
+
+  function openHost(id) { vibe.go(`07-host-profile.html?id=${id}`); }
+  function callHost(id, type = 'video') {
+    const h = D.hosts.find(x => x.id === id);
+    if (h.s === 'BUSY') return vibe.toast(`${h.n} is on another call`);
+    if (h.s === 'OFFLINE') return vibe.toast(`${h.n} is offline · we'll notify you`);
+    vibe.go(type === 'audio' ? `13-audio-call.html?id=${h.id}` : `09-outgoing-call.html?id=${h.id}`);
+  }
+  function resetFilters() { sessionStorage.removeItem('vibe-filter'); location.reload(); }
+
+  // quick chips
+  document.querySelectorAll('#quick .chip').forEach(c => {
+    c.classList.toggle('on', c.dataset.q === quick);
+    c.addEventListener('click', () => {
+      quick = c.dataset.q;
+      document.querySelectorAll('#quick .chip').forEach(x => x.classList.toggle('on', x === c));
+      render();
+    });
+  });
+
+  // top tabs
+  function setTab(t) {
+    document.querySelectorAll('.tabtxt').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+    const following = t === 'following';
+    document.getElementById('discoverView').classList.toggle('hidden', following);
+    document.getElementById('discoverStatus').classList.toggle('hidden', following);
+    const fv = document.getElementById('followingView');
+    fv.classList.toggle('hidden', !following); fv.classList.toggle('flex', following);
+    if (t === 'new') vibe.toast('Showing newest members first');
+  }
+  document.querySelectorAll('.tabtxt').forEach(b => b.addEventListener('click', () => setTab(b.dataset.t)));
+
+  render();
+  paintStories();
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Community guidelines</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .rule { display: flex; gap: 12px; align-items: flex-start; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .rule:last-child { border: 0; }
+  .mk { width: 26px; height: 26px; border-radius: 99px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; font-weight: 800; }
+  .step { position: relative; display: flex; gap: 14px; padding-bottom: 18px; }
+  .step:not(:last-child)::before { content: ''; position: absolute; left: 15px; top: 34px; bottom: 2px; width: 2px; background: #262636; border-radius: 2px; }
+  .sn { width: 32px; height: 32px; border-radius: 99px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; border: 1.5px solid; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-neonPink/10 -top-24 -right-24"></div>
+
+  <header class="relative flex items-center gap-3 px-4 pt-5 pb-2">
+    <button onclick="history.length > 1 ? history.back() : vibe.go('41-safety-center.html')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Back">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 class="text-xl font-semibold">Community guidelines</h1>
+  </header>
+
+  <section class="relative flex-1 overflow-y-auto px-5 pb-10">
+    <p class="text-sm text-gray-400 mt-2 leading-relaxed">VIBE is for friendly, respectful conversations between people who are 18 or older. These rules apply to everyone: users and hosts.</p>
+
+    <h3 class="text-[10px] tracking-[.16em] uppercase text-onlineGreen mt-6 mb-1">Please do</h3>
+    <div class="rounded-2xl border border-onlineGreen/25 bg-onlineGreen/5 px-4">
+      <div class="rule"><span class="mk bg-onlineGreen/20 text-onlineGreen">✓</span><span class="text-sm text-gray-200">Be kind and respect the other person's no.</span></div>
+      <div class="rule"><span class="mk bg-onlineGreen/20 text-onlineGreen">✓</span><span class="text-sm text-gray-200">Use your own real photos and your real age.</span></div>
+      <div class="rule"><span class="mk bg-onlineGreen/20 text-onlineGreen">✓</span><span class="text-sm text-gray-200">Keep calls and payments inside VIBE.</span></div>
+      <div class="rule"><span class="mk bg-onlineGreen/20 text-onlineGreen">✓</span><span class="text-sm text-gray-200">Block and report anything that feels wrong.</span></div>
+    </div>
+
+    <h3 class="text-[10px] tracking-[.16em] uppercase text-dangerRed mt-6 mb-1">Never do</h3>
+    <div class="rounded-2xl border border-dangerRed/25 bg-dangerRed/5 px-4">
+      <div class="rule"><span class="mk bg-dangerRed/20 text-dangerRed">✕</span><span class="text-sm text-gray-200"><b>Nudity or sexual content</b>, in photos, videos, calls or chat.</span></div>
+      <div class="rule"><span class="mk bg-dangerRed/20 text-dangerRed">✕</span><span class="text-sm text-gray-200"><b>Abuse, threats or hate</b> against anyone.</span></div>
+      <div class="rule"><span class="mk bg-dangerRed/20 text-dangerRed">✕</span><span class="text-sm text-gray-200"><b>Asking for money</b>, phone numbers, UPI or social ids outside VIBE.</span></div>
+      <div class="rule"><span class="mk bg-dangerRed/20 text-dangerRed">✕</span><span class="text-sm text-gray-200"><b>Fake profiles</b>, stolen photos, scams or spam.</span></div>
+      <div class="rule"><span class="mk bg-dangerRed/20 text-dangerRed">✕</span><span class="text-sm text-gray-200"><b>Anyone under 18.</b> We remove these accounts.</span></div>
+      <div class="rule"><span class="mk bg-dangerRed/20 text-dangerRed">✕</span><span class="text-sm text-gray-200"><b>Recording or sharing</b> a call or someone's photo without their consent.</span></div>
+    </div>
+
+    <h3 class="text-[10px] tracking-[.16em] uppercase text-gray-500 mt-7 mb-4">What happens if rules are broken</h3>
+    <div>
+      <div class="step"><span class="sn border-cyberGold text-cyberGold bg-cyberGold/10">1</span><div><b class="text-sm font-medium">Warning</b><div class="text-xs text-gray-500 mt-0.5">The content is removed and you get a message</div></div></div>
+      <div class="step"><span class="sn border-orange-400 text-orange-300 bg-orange-400/10">2</span><div><b class="text-sm font-medium">Temporary ban</b><div class="text-xs text-gray-500 mt-0.5">You can't use calls, chat or your host status for some days</div></div></div>
+      <div class="step"><span class="sn border-dangerRed text-dangerRed bg-dangerRed/10">3</span><div><b class="text-sm font-medium">Permanent ban</b><div class="text-xs text-gray-500 mt-0.5">The account is closed. Serious cases skip straight to this. Unpaid earnings may be held</div></div></div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 mt-2">
+      <button onclick="vibe.go('36-report-user.html')" class="h-12 rounded-2xl btn-ghost text-sm font-semibold">Report someone</button>
+      <button onclick="vibe.go('37-blocked-users.html')" class="h-12 rounded-2xl btn-ghost text-sm font-semibold">Blocked users</button>
+    </div>
+    <p class="text-[11px] text-gray-600 text-center mt-6">The rules and how we act on them are managed by VIBE and may be updated.</p>
+  </section>
+</main>
+</body>
+</html>

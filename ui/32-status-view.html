@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Status</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<script src="assets/demo-data.js"></script>
+<script src="assets/status-data.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .seg { flex: 1; height: 3px; border-radius: 3px; background: rgba(255,255,255,.3); overflow: hidden; }
+  .seg i { display: block; height: 100%; width: 0; background: #fff; }
+  .seg.done i { width: 100%; }
+  .glassbtn { width: 42px; height: 42px; border-radius: 99px; background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.25); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+  .heart.on svg { fill: #ff2a85; color: #ff2a85; transform: scale(1.15); }
+  .heart svg { transition: all .2s; }
+  .pop { position: absolute; left: 50%; bottom: 90px; font-size: 44px; animation: up 1s ease-out forwards; pointer-events: none; color: #ff2a85; }
+  @keyframes up { from { opacity: 1; transform: translate(-50%, 0) scale(.6) } to { opacity: 0; transform: translate(-50%, -160px) scale(1.5) } }
+</style>
+</head>
+<body>
+<main class="phone" id="stage">
+  <div id="bg" class="absolute inset-0"></div>
+  <div class="absolute inset-0 bg-gradient-to-b from-black/55 via-transparent to-black/70"></div>
+
+  <!-- tap zones: left = back, right = next, hold = pause -->
+  <div id="left" class="absolute left-0 top-24 bottom-28 w-1/3 z-10"></div>
+  <div id="right" class="absolute right-0 top-24 bottom-28 w-2/3 z-10"></div>
+
+  <div class="relative z-20 px-3 pt-4">
+    <div id="bars" class="flex gap-1.5"></div>
+    <div class="flex items-center gap-3 mt-3">
+      <button id="who" class="flex items-center gap-3 flex-1 min-w-0 text-left">
+        <span id="av" class="relative w-10 h-10 rounded-full flex items-center justify-center font-semibold text-lg shrink-0 border border-white/30"></span>
+        <span class="min-w-0"><b id="nm" class="block text-[15px] truncate"></b><span id="ago" class="text-[11px] text-white/70"></span></span>
+      </button>
+      <button id="close" class="glassbtn" aria-label="Close"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+  </div>
+
+  <div class="relative z-0 flex-1 flex items-center justify-center px-8 text-center"><p id="txt" class="text-[26px] font-semibold leading-snug drop-shadow-lg"></p></div>
+
+  <div class="relative z-20 p-4 pb-5 flex items-center gap-3">
+    <input id="reply" class="flex-1 h-12 rounded-full bg-black/35 border border-white/30 px-5 text-sm outline-none placeholder-white/60 backdrop-blur" placeholder="Reply to status…">
+    <button id="heart" class="heart glassbtn" aria-label="Like"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 21s-7-4.4-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.6-9.5 9-9.5 9Z"/></svg></button>
+    <button id="call" class="w-12 h-12 rounded-full btn-neon flex items-center justify-center" aria-label="Video call"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5.5 6h7.5a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H5.5a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3z"/><path d="m16 11 5-3v8l-5-3"/></svg></button>
+  </div>
+</main>
+<script>
+  const ST = window.STATUS, DUR = 5000;
+  const params = new URLSearchParams(location.search);
+  let who = +params.get('i') || 0, slide = 0, t0 = 0, raf = 0, paused = false, elapsed = 0;
+  const $ = id => document.getElementById(id);
+
+  function load() {
+    const it = ST.items[who]; if (!it) return leave();
+    const s = it.slides[slide];
+    $('bg').style.background = `linear-gradient(160deg, ${s.bg[0]}, ${s.bg[1]} 55%, ${s.bg[2]})`;
+    $('txt').textContent = s.text; $('nm').textContent = it.n; $('ago').textContent = s.ago;
+    $('av').style.background = `linear-gradient(160deg, ${it.grad[0]}, ${it.grad[1]})`; $('av').textContent = it.n[0];
+    $('bars').innerHTML = it.slides.map((_, i) => `<div class="seg ${i < slide ? 'done' : ''}"><i id="b${i}"></i></div>`).join('');
+    $('heart').classList.remove('on'); $('reply').value = '';
+    ST.markSeen(it.id); elapsed = 0; t0 = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
+  }
+  function tick(now) {
+    if (!paused) elapsed += now - t0; t0 = now;
+    const b = $('b' + slide); if (b) b.style.width = Math.min(100, elapsed / DUR * 100) + '%';
+    if (elapsed >= DUR) return next(); raf = requestAnimationFrame(tick);
+  }
+  function next() { const it = ST.items[who]; if (slide < it.slides.length - 1) { slide++; load(); } else if (who < ST.items.length - 1) { who++; slide = 0; load(); } else leave(); }
+  function prev() { if (slide > 0) { slide--; load(); } else if (who > 0) { who--; slide = 0; load(); } else load(); }
+  function leave() { cancelAnimationFrame(raf); history.length > 1 ? history.back() : vibe.go('05-home.html'); }
+
+  $('right').onclick = next; $('left').onclick = prev; $('close').onclick = leave;
+  ['right', 'left'].forEach(id => { const el = $(id); el.onpointerdown = () => paused = true; el.onpointerup = el.onpointerleave = () => paused = false; });
+  $('reply').onfocus = () => paused = true; $('reply').onblur = () => paused = false;
+  $('reply').onkeydown = e => { if (e.key === 'Enter' && $('reply').value.trim()) { vibe.toast('Reply sent'); $('reply').value = ''; $('reply').blur(); } };
+  $('heart').onclick = () => { $('heart').classList.toggle('on'); if ($('heart').classList.contains('on')) { const p = document.createElement('div'); p.className = 'pop'; p.textContent = '♥'; $('stage').appendChild(p); setTimeout(() => p.remove(), 1000); } };
+  $('call').onclick = () => vibe.go('09-outgoing-call.html');
+  $('who').onclick = () => vibe.go('07-host-profile.html?id=' + ST.items[who].id);
+  load();
+</script>
+</body>
+</html>

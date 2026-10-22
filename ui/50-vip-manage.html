@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Manage VIP</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .kv { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,.06); } .kv:last-child { border: 0; } .kv span:first-child { color: #8b8b9a; }
+  .perk { display: flex; gap: 10px; align-items: center; padding: 9px 0; font-size: 13px; color: #d1d5db; }
+  .sw { width: 50px; height: 30px; border-radius: 99px; background: #2a2a3a; position: relative; flex-shrink: 0; transition: background .2s; }
+  .sw::after { content: ''; position: absolute; left: 3px; top: 3px; width: 24px; height: 24px; border-radius: 99px; background: #fff; transition: transform .2s; }
+  .sw.on { background: linear-gradient(135deg, #3ee08f, #0ea5a0); } .sw.on::after { transform: translateX(20px); }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-80 h-80 bg-cyberGold/15 -top-28 left-1/2 -translate-x-1/2"></div>
+  <header class="relative flex items-center gap-3 px-4 pt-5 pb-2">
+    <button onclick="history.length > 1 ? history.back() : vibe.go('19-vip.html')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Back"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 class="text-xl font-semibold">My VIP</h1>
+  </header>
+  <section class="relative flex-1 overflow-y-auto px-5 pb-8">
+    <div class="text-center mt-2"><img src="assets/icons/ic-vip.webp" class="w-24 h-24 object-contain mx-auto float" alt="">
+      <div id="badge" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mt-2 text-black" style="background:linear-gradient(90deg,#f6dc9b,#eab308)">VIP ACTIVE</div></div>
+
+    <div class="rounded-2xl bg-cyberCard border border-cyberLine px-4 mt-5">
+      <div class="kv"><span>Plan</span><b class="font-medium">3 Months</b></div>
+      <div class="kv"><span id="rl">Renews on</span><b class="font-medium" id="rd">15 Jan 2027</b></div>
+      <div class="kv"><span>Price</span><b class="font-medium">₹699 / 3 months</b></div>
+      <div class="kv"><span>Paid with</span><b class="font-medium">UPI · rahul@okaxis</b></div>
+    </div>
+
+    <div class="flex items-center gap-3 rounded-2xl bg-cyberCard border border-cyberLine p-4 mt-3"><div class="flex-1"><b class="text-sm font-medium">Auto renew</b><div class="text-xs text-gray-500" id="arT">VIP renews automatically</div></div><button id="ar" class="sw on" aria-label="Auto renew"></button></div>
+
+    <h3 class="text-[10px] tracking-[.16em] uppercase text-gray-500 mt-6 mb-1">Your VIP benefits</h3>
+    <div class="rounded-2xl bg-cyberCard border border-cyberLine px-4">
+      <div class="perk"><span class="text-cyberGold">✓</span>Cheaper voice and video calls</div><div class="perk"><span class="text-cyberGold">✓</span>Free chat with every host</div>
+      <div class="perk"><span class="text-cyberGold">✓</span>VIP badge and profile frame</div><div class="perk"><span class="text-cyberGold">✓</span>Full visitors list</div></div>
+
+    <div class="grid grid-cols-2 gap-3 mt-5">
+      <button onclick="vibe.go('19-vip.html')" class="h-12 rounded-2xl btn-ghost text-sm font-semibold">Change plan</button>
+      <button onclick="vibe.go('45-receipt.html')" class="h-12 rounded-2xl btn-ghost text-sm font-semibold">Receipts</button>
+    </div>
+    <button id="cancel" class="w-full mt-4 text-sm text-dangerRed">Cancel VIP</button>
+    <p class="text-[11px] text-gray-600 text-center mt-4 leading-relaxed">If you cancel, VIP stays until the end of the period you paid for. No refund for the time left.</p>
+  </section>
+
+  <div id="cw" class="sheet-wrap" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="sheet glass rounded-t-3xl p-6 border-t border-cyberLine">
+      <h3 class="text-lg font-semibold text-center">Cancel VIP?</h3>
+      <p class="text-sm text-gray-400 text-center mt-2 leading-relaxed">You will keep VIP until 15 Jan 2027. After that you lose cheaper calls, free chat and the full visitors list.</p>
+      <div class="grid grid-cols-2 gap-3 mt-6"><button onclick="document.getElementById('cw').classList.remove('open')" class="h-12 rounded-2xl btn-neon font-bold">Keep VIP</button><button id="cy" class="h-12 rounded-2xl btn-ghost font-semibold text-dangerRed">Cancel VIP</button></div>
+    </div>
+  </div>
+</main>
+<script>
+  // DEMO. The plan, dates and renewal are managed by the SERVER (and the payment provider). Cancelling only stops auto renew.
+  const $ = i => document.getElementById(i);
+  let auto = true;
+  function paint() { $('ar').classList.toggle('on', auto); $('arT').textContent = auto ? 'VIP renews automatically' : 'Auto renew is off'; $('rl').textContent = auto ? 'Renews on' : 'Ends on'; $('badge').textContent = auto ? 'VIP ACTIVE' : 'ENDS 15 JAN'; $('cancel').style.display = auto ? '' : 'none'; }
+  $('ar').onclick = () => { if (auto) $('cw').classList.add('open'); else { auto = true; vibe.toast('Auto renew on'); paint(); } };
+  $('cancel').onclick = () => $('cw').classList.add('open');
+  $('cy').onclick = () => { auto = false; $('cw').classList.remove('open'); vibe.toast('Auto renew turned off'); paint(); };
+  paint();
+</script>
+</body>
+</html>

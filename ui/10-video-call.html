@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Video call</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<script src="assets/demo-data.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="stylesheet" href="assets/call.css">
+<style>
+  .remote .face { background: radial-gradient(circle at 50% 40%, #6a5580, #2d2340 70%); }
+  .remote .body { background: radial-gradient(circle at 50% 0, #47395c, #140f1a 70%); }
+  #pip { touch-action: none; cursor: grab; position: absolute; right: 16px; top: 108px; width: 96px; height: 136px; border-radius: 18px; overflow: hidden; z-index: 20;
+    border: 1px solid rgba(255,255,255,.25); background: radial-gradient(ellipse at 50% 30%, #45435f, #15141f); }
+  #pip span { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.7); }
+  .host-chip { display: flex; align-items: center; gap: 10px; padding: 5px 6px 5px 5px; border-radius: 99px; border: 1px solid rgba(255,255,255,.14); background: rgba(7,7,12,.5); }
+  .host-chip .c-ring { padding: 3px; } .host-chip .c-av { width: 32px; height: 32px; font-size: 13px; }
+  .follow { width: 28px; height: 28px; border-radius: 99px; border: 1px solid rgba(255,255,255,.3); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 300; }
+  .follow.done { background: #fff; color: #07070c; font-size: 12px; }
+  /* top bar: glass chips like the earlier design */
+  .tb-chip { display: flex; align-items: center; gap: 10px; padding: 5px 6px 5px 5px; border-radius: 99px; background: rgba(0,0,0,.38); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .tb-follow { width: 34px; height: 34px; border-radius: 99px; background: linear-gradient(135deg, #ff2a85, #c3157a 55%, #7a1fd1); box-shadow: 0 6px 18px -6px rgba(255,42,133,.8);
+    color: #fff; font-size: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; margin-left: 2px; }
+  .tb-follow.done { background: rgba(255,255,255,.2); box-shadow: none; font-size: 14px; }
+  .tb-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 99px; background: rgba(0,0,0,.38); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); font-size: 13px; font-weight: 600; }
+  .tb-pill svg { width: 14px; height: 14px; }
+  .tb-dot { width: 8px; height: 8px; border-radius: 99px; background: #3ee08f; color: #3ee08f; animation: pulse-dot 2s ease-in-out infinite; }
+  .say { height: 44px; border-radius: 99px; border: 1px solid rgba(255,255,255,.14); background: rgba(7,7,12,.5); }
+  .float-coin { position: absolute; right: 22px; top: 84px; color: #f6dc9b; font-size: 12px; font-weight: 600; letter-spacing: .06em; animation: up 1.4s ease-out forwards; z-index: 30; }
+  @keyframes up { from { opacity: 1 } to { opacity: 0; transform: translateY(-22px) } }
+</style>
+</head>
+<body>
+<main class="phone call">
+  <div class="c-cam remote" id="remote"><div class="face"></div><div class="body"></div></div>
+  <div class="c-shade"></div>
+
+  <!-- top -->
+  <div class="relative z-10 flex items-start justify-between px-4 pt-5">
+    <div class="host-chip">
+      <div class="c-ring"><div class="c-av" id="av"></div></div>
+      <div class="leading-tight pr-1"><div class="text-[13px] font-light tracking-wide" id="nm"></div>
+        <div class="c-status !text-[10px] !gap-1.5 !justify-start"><span class="live"></span><span id="timer">00:00</span>
+          <span class="flex items-end gap-[2px] h-2.5 ml-0.5" title="Good connection"><i class="w-[2px] h-1 bg-onlineGreen rounded"></i><i class="w-[2px] h-1.5 bg-onlineGreen rounded"></i><i class="w-[2px] h-2.5 bg-onlineGreen rounded"></i></span></div></div>
+      <button class="follow" id="follow" onclick="follow()">+</button>
+    </div>
+    <div class="flex flex-col items-end gap-1.5">
+      <div class="tb-pill text-cyberGold !text-xs"><span class="coin w-4 h-4"></span><b id="bal"></b><span class="text-gray-400 font-normal" id="rateTxt"></span></div>
+      <button onclick="toVoice()" class="tb-pill text-onlineGreen !text-xs !font-medium" id="voiceBtn"></button>
+    </div>
+  </div>
+
+  <div id="pip"><span>You</span></div>
+  <div id="camOff" class="hidden absolute right-4 top-[108px] w-24 h-[136px] rounded-[18px] bg-cyberCard z-20 items-center justify-center text-[9px] tracking-[.14em] uppercase text-gray-500">Camera off</div>
+
+  <div class="relative z-10 px-4 mt-4">
+    <div id="low" class="c-banner hidden">
+      <span class="flex-1"><b id="leftTxt"></b><span class="block text-[11px] text-gray-400 mt-0.5">Top up to keep talking</span></span>
+      <button onclick="CallSheets.open('topSheet')">Top up</button>
+    </div>
+  </div>
+
+  <div class="flex-1"></div>
+
+  <!-- chat feed + input -->
+  <div class="relative z-10 px-4">
+    <div id="feed" class="c-feed flex flex-col gap-1.5 max-h-40 overflow-hidden justify-end mb-3 pr-16"></div>
+    <div class="flex items-center gap-2">
+      <div class="say flex-1 flex items-center px-4"><input id="say" class="bg-transparent outline-none flex-1 text-sm font-light placeholder:text-gray-500" placeholder="Say something…" maxlength="80"></div>
+      <button onclick="send()" class="c-icon-btn !w-11 !h-11" id="sendBtn" aria-label="Send"></button>
+    </div>
+  </div>
+
+  <footer class="c-ctrls !pt-5">
+    <div class="c-row" id="row"></div>
+  </footer>
+</main>
+
+<script src="assets/call.js"></script>
+<script>
+  // DEMO billing for UI review only: the SERVER charges per minute, pushes the balance and ends the call at zero.
+  const D = window.DEMO, $ = s => document.getElementById(s);
+  const h = D.hosts.find(x => x.id === +(new URLSearchParams(location.search).get('id') || 1)) || D.hosts[0];
+  let balance = D.balance, secs = 0, spent = 0, gifts = 0;
+  const fmt = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+
+  $('av').textContent = h.n[0];
+  $('nm').textContent = h.n;
+  $('rateTxt').textContent = `· ${h.r}/min`;
+  $('sendBtn').innerHTML = CI.send;
+  $('voiceBtn').innerHTML = `${CI.phone}Switch to voice`;
+  $('row').innerHTML = cbtn('mic', 'Mute', 'sm') + cbtn('cam', 'Camera', 'sm') + cbtn('flip', 'Flip', 'sm') + cbtn('gift', 'Gift', 'sm pink')
+    + `<button class="c-btn c-end sm" onclick="CallSheets.open('endSheet')" aria-label="End call"><span class="ic">${CI.end}</span></button>`;
+
+  function paint() {
+    $('bal').textContent = balance.toLocaleString('en-IN');
+    const left = Math.floor(balance / h.r), low = left < 3;
+    $('low').classList.toggle('hidden', !low); $('low').classList.toggle('flex', low);
+    $('leftTxt').textContent = left <= 0 ? 'Less than a minute left' : `About ${left} min left`;
+  }
+  function charge(n, label) {
+    balance -= n; spent += n;
+    const f = document.createElement('div'); f.className = 'float-coin'; f.textContent = `−${n}`;
+    document.querySelector('.phone').appendChild(f); setTimeout(() => f.remove(), 1500);
+    if (label) addMsg('sys', label);
+    paint();
+  }
+  charge(h.r); // first minute at pick-up
+  const tick = setInterval(() => {
+    secs++; $('timer').textContent = fmt(secs);
+    if (secs % 60 === 0) { charge(h.r); if (balance < h.r) { addMsg('sys', 'Balance finished · call ending'); setTimeout(finish, 1500); } }
+  }, 1000);
+
+  function addMsg(who, text) {
+    const el = document.createElement('div'); el.className = 'm';
+    el.innerHTML = who === 'sys' ? `<span class="sys">${text}</span>` : `<b class="${who === 'me' ? 'text-neonCyan' : 'text-neonPink'}">${who === 'me' ? 'You' : h.n}</b>${text.replace(/</g, '&lt;')}`;
+    $('feed').appendChild(el); while ($('feed').children.length > 4) $('feed').firstChild.remove();
+  }
+  setTimeout(() => addMsg('them', 'Hiii 👋 kaise ho?'), 1500);
+  function send() { const v = $('say').value.trim(); if (!v) return; addMsg('me', v); $('say').value = ''; setTimeout(() => addMsg('them', ['😂', 'Sahi baat!', 'Aur batao?', '❤️'][Math.floor(Math.random() * 4)]), 1300); }
+  $('say').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+  function follow() { $('follow').textContent = '✓'; $('follow').classList.add('done'); $('follow').onclick = null; addMsg('sys', `You followed ${h.n}`); }
+
+  $('row').onclick = e => {
+    const b = e.target.closest('.c-btn'); if (!b || b.classList.contains('c-end')) return;
+    const k = b.dataset.k;
+    if (k === 'gift') return CallSheets.open('giftSheet');
+    if (k === 'flip') return vibe.toast('Camera flipped');
+    const on = b.classList.toggle('on');
+    if (k === 'cam') { $('camOff').classList.toggle('hidden', !on); $('camOff').classList.toggle('flex', on); $('pip').style.visibility = on ? 'hidden' : ''; }
+  };
+
+  // draggable self view, snaps to the nearest side
+  (() => {
+    const pip = $('pip'), phone = document.querySelector('.phone'); let sx, sy, ox, oy, drag = false;
+    pip.addEventListener('pointerdown', e => { drag = true; pip.setPointerCapture(e.pointerId); sx = e.clientX; sy = e.clientY; ox = pip.offsetLeft; oy = pip.offsetTop; pip.style.transition = 'none'; });
+    pip.addEventListener('pointermove', e => { if (!drag) return; pip.style.left = ox + e.clientX - sx + 'px'; pip.style.top = oy + e.clientY - sy + 'px'; pip.style.right = 'auto'; });
+    pip.addEventListener('pointerup', () => {
+      drag = false; pip.style.transition = 'left .25s, top .25s';
+      const W = phone.clientWidth, H = phone.clientHeight;
+      pip.style.left = (pip.offsetLeft + pip.offsetWidth / 2 < W / 2 ? 16 : W - pip.offsetWidth - 16) + 'px';
+      pip.style.top = Math.min(Math.max(pip.offsetTop, 100), H - pip.offsetHeight - 220) + 'px';
+    });
+  })();
+
+  CallSheets.mount({
+    getBalance: () => balance,
+    onGift: (g, n, total) => { gifts += n; charge(total, `You sent ${n > 1 ? n + '× ' : ''}${g[1]}`); setTimeout(() => addMsg('them', `Thank you for the ${g[1]}! 🥹`), 1600); },
+    onTopUp: c => { balance += c; paint(); addMsg('sys', `Recharge successful · +${c.toLocaleString('en-IN')}`); },
+    onEnd: () => finish(),
+    summary: () => `${fmt(secs)} · ${spent.toLocaleString('en-IN')} coins`,
+  });
+
+  function toVoice() { clearInterval(tick); vibe.toast(`Switched to voice · ${h.ar} coins/min`); setTimeout(() => vibe.go(`13-audio-call.html?id=${h.id}&connected=1`), 600); }
+  function finish() { clearInterval(tick); vibe.go(`12-rate-call.html?id=${h.id}&secs=${secs}&spent=${spent}&gifts=${gifts}`); }
+  // demo helper: open with #low to see the low-balance state
+  if (location.hash === '#low') { balance = h.r * 2 + 10; paint(); }
+</script>
+</body>
+</html>

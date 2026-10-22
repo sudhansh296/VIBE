@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Create profile</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  select { appearance: none; -webkit-appearance: none; background: transparent; outline: none; width: 100%; }
+  select option { background: #12121c; color: #fff; }
+  .gender { border: 1.5px solid #262636; background: #12121c; transition: all .18s; }
+  .gender.on[data-g="M"] { border-color: #00f2fe; background: linear-gradient(160deg, rgba(0,242,254,.18), #12121c 70%); box-shadow: 0 0 22px -8px #00f2fe; }
+  .gender.on[data-g="F"] { border-color: #ff2a85; background: linear-gradient(160deg, rgba(255,42,133,.2), #12121c 70%); box-shadow: 0 0 22px -8px #ff2a85; }
+  .gender.on[data-g="O"] { border-color: #f6dc9b; background: linear-gradient(160deg, rgba(246,220,155,.16), #12121c 70%); box-shadow: 0 0 22px -8px #f6dc9b; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-neonPink/15 -top-24 -right-24"></div>
+
+  <header class="relative flex items-center px-5 pt-6">
+    <button onclick="vibe.go('03-otp.html')" class="w-10 h-10 rounded-xl btn-ghost flex items-center justify-center" aria-label="Back">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+    <div class="flex-1 flex justify-center gap-1.5 pr-10">
+      <span class="w-6 h-1.5 rounded-full bg-neonPink"></span><span class="w-6 h-1.5 rounded-full bg-neonPink"></span><span class="w-6 h-1.5 rounded-full bg-neonPink"></span>
+    </div>
+  </header>
+
+  <section class="relative flex-1 overflow-y-auto px-6 pt-5 pb-4">
+    <h1 class="text-[26px] font-extrabold">Create your profile</h1>
+    <p class="text-gray-400 text-sm mt-1">This is how others will see you on VIBE</p>
+
+    <!-- photo -->
+    <div class="flex flex-col items-center mt-6">
+      <label class="relative cursor-pointer group">
+        <input id="photoInput" type="file" accept="image/*" class="sr-only">
+        <div class="avatar-ring">
+          <div id="photo" class="w-28 h-28 rounded-full bg-cyberCard border-4 border-cyberDark flex flex-col items-center justify-center bg-cover bg-center overflow-hidden">
+            <span id="camIcon" class="contents">
+              <img src="assets/icons/ghost-camera.webp" alt="" class="w-24 h-24 object-contain"
+                   onerror="this.outerHTML='<svg class=&quot;w-8 h-8 text-gray-500&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot; viewBox=&quot;0 0 24 24&quot;><path d=&quot;M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z&quot;/><circle cx=&quot;12&quot; cy=&quot;13&quot; r=&quot;3&quot;/></svg>'">
+            </span>
+          </div>
+        </div>
+        <span class="absolute bottom-1 right-1 w-9 h-9 rounded-full btn-neon flex items-center justify-center border-[3px] border-cyberDark text-lg font-bold">+</span>
+      </label>
+      <p id="photoHint" class="text-xs text-gray-500 mt-3">Add a clear photo of your face · profiles with photos get 5× more calls</p>
+    </div>
+
+    <!-- name -->
+    <div class="flex justify-between items-end mt-7 mb-2"><label for="name" class="text-xs font-medium text-gray-400">Name</label><span id="nameCount" class="text-[11px] text-gray-600">0/20</span></div>
+    <div class="neon-field h-14 rounded-2xl px-4 flex items-center">
+      <input id="name" maxlength="20" class="bg-transparent outline-none flex-1 text-[15px] placeholder:text-gray-600" placeholder="What should people call you?">
+    </div>
+
+    <!-- gender -->
+    <label class="text-xs font-medium text-gray-400 mt-6 mb-2 block">I am</label>
+    <div class="grid grid-cols-3 gap-3" id="genders">
+      <button class="gender rounded-2xl pt-2 pb-3 flex flex-col items-center gap-1" data-g="M">
+        <img src="assets/icons/ghost-male.webp" alt="" class="w-16 h-16 object-contain" onerror="this.outerHTML='<span class=&quot;text-2xl text-neonCyan h-16 flex items-center&quot;>♂</span>'">
+        <span class="text-sm font-semibold">Male</span></button>
+      <button class="gender rounded-2xl pt-2 pb-3 flex flex-col items-center gap-1" data-g="F">
+        <img src="assets/icons/ghost-female.webp" alt="" class="w-16 h-16 object-contain" onerror="this.outerHTML='<span class=&quot;text-2xl text-neonPink h-16 flex items-center&quot;>♀</span>'">
+        <span class="text-sm font-semibold">Female</span></button>
+      <button class="gender rounded-2xl pt-2 pb-3 flex flex-col items-center gap-1" data-g="O">
+        <img src="assets/icons/ghost-other.webp" alt="" class="w-16 h-16 object-contain" onerror="this.outerHTML='<span class=&quot;text-2xl text-cyberGold h-16 flex items-center&quot;>⚧</span>'">
+        <span class="text-sm font-semibold">Other</span></button>
+    </div>
+    <p class="text-[11px] text-gray-500 mt-2">Gender can't be changed later.</p>
+
+    <!-- dob -->
+    <div class="flex justify-between items-end mt-6 mb-2"><label class="text-xs font-medium text-gray-400">Date of birth</label><span id="age" class="text-[11px] text-gray-500"></span></div>
+    <div class="grid grid-cols-[1fr_1.4fr_1.2fr] gap-2.5">
+      <div class="neon-field h-14 rounded-2xl px-3 flex items-center"><select id="dd" aria-label="Day"><option value="">Day</option></select></div>
+      <div class="neon-field h-14 rounded-2xl px-3 flex items-center"><select id="mm" aria-label="Month"><option value="">Month</option></select></div>
+      <div class="neon-field h-14 rounded-2xl px-3 flex items-center"><select id="yy" aria-label="Year"><option value="">Year</option></select></div>
+    </div>
+    <p id="ageErr" class="text-xs text-dangerRed mt-2 hidden">You must be 18 or older to use VIBE.</p>
+
+    <!-- languages -->
+    <div class="flex justify-between items-end mt-6 mb-2"><label class="text-xs font-medium text-gray-400">Languages I speak</label><span class="text-[11px] text-gray-600">pick up to 3</span></div>
+    <div class="flex flex-wrap gap-2" id="langs"></div>
+
+    <!-- referral -->
+    <details class="mt-6 group">
+      <summary class="text-sm text-neonCyan cursor-pointer list-none flex items-center gap-1">🎁 Have an invite code? <span class="text-gray-500 group-open:rotate-90 transition">›</span></summary>
+      <div class="neon-field h-12 rounded-2xl px-4 flex items-center mt-3">
+        <input class="bg-transparent outline-none flex-1 uppercase tracking-widest placeholder:normal-case placeholder:tracking-normal placeholder:text-gray-600" placeholder="Enter code · you both get 100 coins">
+      </div>
+    </details>
+  </section>
+
+  <footer class="relative p-6 pt-3 glass border-t border-cyberLine/60">
+    <button id="go" disabled class="btn-neon w-full h-14 rounded-2xl font-bold text-[15px]">Continue</button>
+    <p id="need" class="text-[11px] text-gray-500 text-center mt-2">Add your name, gender and date of birth</p>
+  </footer>
+</main>
+
+<script>
+  const state = { name: '', g: '', dob: null, langs: new Set(['Hindi']) };
+
+  // photo preview
+  document.getElementById('photoInput').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return;
+    const url = URL.createObjectURL(f);
+    const ph = document.getElementById('photo');
+    ph.style.backgroundImage = `url(${url})`;
+    document.getElementById('camIcon').remove();
+    document.getElementById('photoHint').innerHTML = '<span class="text-onlineGreen">✓ Looking good!</span> Tap to change';
+  });
+
+  // name
+  const name = document.getElementById('name');
+  name.addEventListener('input', () => {
+    state.name = name.value.trim();
+    document.getElementById('nameCount').textContent = `${name.value.length}/20`;
+    refresh();
+  });
+
+  // gender
+  document.querySelectorAll('.gender').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.gender').forEach(x => x.classList.toggle('on', x === b));
+    state.g = b.dataset.g; refresh();
+  }));
+
+  // dob selects
+  const dd = document.getElementById('dd'), mm = document.getElementById('mm'), yy = document.getElementById('yy');
+  for (let d = 1; d <= 31; d++) dd.add(new Option(d, d));
+  ['January','February','March','April','May','June','July','August','September','October','November','December'].forEach((m, i) => mm.add(new Option(m, i)));
+  const thisYear = new Date().getFullYear();
+  for (let y = thisYear - 13; y >= thisYear - 80; y--) yy.add(new Option(y, y));
+  [dd, mm, yy].forEach(s => s.addEventListener('change', () => {
+    [dd, mm, yy].forEach(x => x.style.color = x.value === '' ? '#6b7280' : '#fff');
+    if (dd.value && mm.value !== '' && yy.value) {
+      const dob = new Date(+yy.value, +mm.value, +dd.value);
+      const now = new Date();
+      let age = now.getFullYear() - dob.getFullYear();
+      if (now < new Date(now.getFullYear(), dob.getMonth(), dob.getDate())) age--;
+      state.dob = age;
+      document.getElementById('age').textContent = `${age} years`;
+      document.getElementById('ageErr').classList.toggle('hidden', age >= 18);
+    } else state.dob = null;
+    refresh();
+  }));
+  [dd, mm, yy].forEach(x => x.style.color = '#6b7280');
+
+  // languages
+  const all = ['Hindi', 'English', 'Bengali', 'Marathi', 'Telugu', 'Tamil', 'Gujarati', 'Kannada', 'Malayalam', 'Punjabi', 'Urdu', 'Odia'];
+  const langs = document.getElementById('langs');
+  all.forEach(l => {
+    const b = document.createElement('button');
+    b.className = 'chip px-4 h-10 rounded-full text-sm' + (state.langs.has(l) ? ' on' : '');
+    b.textContent = l;
+    b.addEventListener('click', () => {
+      if (state.langs.has(l)) state.langs.delete(l);
+      else if (state.langs.size < 3) state.langs.add(l);
+      else { vibe.toast('You can pick up to 3 languages'); return; }
+      b.classList.toggle('on', state.langs.has(l)); refresh();
+    });
+    langs.appendChild(b);
+  });
+
+  function refresh() {
+    const missing = [];
+    if (!state.name) missing.push('name');
+    if (!state.g) missing.push('gender');
+    if (state.dob === null) missing.push('date of birth');
+    if (!state.langs.size) missing.push('a language');
+    const ok = !missing.length && state.dob >= 18;
+    document.getElementById('go').disabled = !ok;
+    document.getElementById('need').textContent = missing.length ? 'Add your ' + missing.join(', ')
+      : state.dob < 18 ? 'VIBE is only for adults (18+)' : 'All set! 🎉';
+  }
+
+  document.getElementById('go').addEventListener('click', () => {
+    sessionStorage.setItem('vibe-profile', JSON.stringify({ name: state.name, g: state.g, age: state.dob, langs: [...state.langs] }));
+    vibe.toast(`Welcome to VIBE, ${state.name}! 🎉`);
+    setTimeout(() => vibe.go('05-home.html'), 1200);
+  });
+</script>
+</body>
+</html>

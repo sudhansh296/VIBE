@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · UI Pages</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-neonPink/20 -top-24 -right-24"></div>
+  <header class="relative px-6 pt-8 pb-4">
+    <div class="flex items-center gap-3"><img src="assets/icons/home.webp" class="w-14 h-14 object-contain float" alt=""><div>
+      <h1 class="text-3xl font-black grad-text">VIBE</h1><p class="text-xs text-gray-400">UI pages · built one by one</p></div></div>
+  </header>
+  <section class="relative flex-1 overflow-y-auto px-5 pb-8" id="list"></section>
+</main>
+<script>
+  const batches = [
+    ['Batch 1 · Start', [
+      ['01-splash.html', 'Splash', 'Logo animation, auto-continues to login'],
+      ['02-login.html', 'Login', 'Phone number + Google, English/हिंदी switch'],
+      ['03-otp.html', 'Verify OTP', '6 boxes, paste support, resend timer'],
+      ['04-profile-setup.html', 'Create profile', 'Photo, name, gender, DOB (18+), languages'],
+    ]],
+    ['Batch 2 · Home', [
+      ['05-home.html', 'Home / Discover', 'Grid, gender chips, online now, become-host banner'],
+      ['06-filter.html', 'Filter', 'Show, age range, max price, languages, sort'],
+      ['07-host-profile.html', 'Host profile', 'Photo slider, stats, bio, gifts, report/block'],
+      ['08-random-match.html', 'Random match', 'Choose → radar search → match found'],
+    ]],
+    ['Batch 3 · Calls', [
+      ['09-outgoing-call.html', 'Outgoing video call', 'Your camera full-screen while ringing, flip/camera/mute, cancel'],
+      ['13-audio-call.html', 'Voice call', 'WhatsApp-style: ringing → timer, voice rings, speaker, switch to video'],
+      ['10-video-call.html', 'Video call', 'Timer, live coins, drag self-view, chat, gifts, top-up, end'],
+      ['11-incoming-call.html', 'Incoming call (host)', 'Accept / decline, earnings, quick replies, 30s timer'],
+      ['12-rate-call.html', 'Call ended / rate', 'Summary, stars, tags, note, follow, report'],
+    ]],
+    ['Batch 4 · Chat', [
+      ['14-chats.html', 'Messages', 'Chats / Calls / Following, unread, typing, long-press actions'],
+      ['15-chat.html', 'Chat', 'Bubbles, ✓✓ seen, typing…, photo, gift, call log, voice/video call'],
+      ['16-notifications.html', 'Notifications', 'Filters, missed calls, follows, gifts, wallet, VIBE news'],
+    ]],
+    ['Batch 5 · Me & Wallet', [
+      ['17-me.html', 'Me', 'Profile, coin balance, host CTA, VIP / check-in / level menu'],
+      ['18-wallet.html', 'Wallet / Recharge', 'Packs, pay methods, history, payment success'],
+      ['19-vip.html', 'VIP', 'Benefits and plans'],
+      ['20-level.html', 'My level', 'XP ring, how to earn, rewards ladder'],
+      ['21-checkin.html', 'Daily check-in', '7-day ladder, collect, streak'],
+    ]],
+    ['Batch 6 · Host', [
+      ['22-become-host.html', 'Become a host', 'Perks, how it works, agency code hint'],
+      ['23-host-application.html', 'Host application', '3 steps: photos + bio, selfie + ID, settings + agency code'],
+      ['24-host-dashboard.html', 'Host dashboard', 'Online switch, earnings, chart, rates, agency'],
+      ['25-host-rates.html', 'Call settings', 'Voice / video on-off, per-minute rates, message price'],
+      ['26-withdraw.html', 'Withdraw', 'Amount, fee + tax preview, UPI / bank, history'],
+    ]],
+    ['Status (24h)', [
+      ['32-status-view.html', 'View status', 'Full-screen story, tap next/back, reply, heart, call'],
+      ['33-status-create.html', 'New status', 'Text on colour or photo, audience, share'],
+      ['34-my-status.html', 'My status', 'Views list, expires in, delete'],
+    ]],
+    ['Safety & rules', [
+      ['36-report-user.html', 'Report user', 'Reasons, details, screenshot, also block'],
+      ['37-blocked-users.html', 'Blocked users', 'List, unblock, empty state'],
+      ['38-terms.html', 'Terms of Service', 'Summary page'],
+      ['39-privacy.html', 'Privacy Policy', 'Summary page'],
+      ['40-guidelines.html', 'Community guidelines', 'Do, never do, what happens'],
+      ['41-safety-center.html', 'Safety center', 'Tools, safety tips, emergency'],
+    ]],
+    ['App states & extras', [
+      ['42-permissions.html', 'Permissions', 'Camera + mic, notifications, if denied'],
+      ['43-app-states.html', 'Loading / offline / error / maintenance / update', 'Switch between every state'],
+      ['44-payment-result.html', 'Payment result', 'Success, failed, pending'],
+      ['45-receipt.html', 'Receipt', 'Amount, coins, ids, download'],
+      ['46-follow-list.html', 'Following / Followers', 'Lists, follow back, empty state'],
+      ['47-invite.html', 'Invite friends', 'Code, share, stats, enter a friend code'],
+      ['48-language.html', 'Language', 'English, Hindi and more'],
+      ['49-change-phone.html', 'Change phone number', 'New number, OTP, done'],
+      ['50-vip-manage.html', 'Manage VIP', 'Plan, renew, cancel'],
+      ['51-gifts-history.html', 'Gifts history', 'Received and sent'],
+    ]],
+    ['Profile media', [
+      ['35-my-media.html', 'Photos & videos', 'Add, lock (paid unlock), replace, delete, review status'],
+      ['07-host-profile.html?id=3', 'Host profile (user view)', 'Locked photos and video, unlock with coins, video player'],
+    ]],
+    ['Batch 7 · Settings', [
+      ['27-edit-profile.html', 'Edit profile', 'Photo, name, city, bio, languages, locked gender and DOB'],
+      ['28-settings.html', 'Settings', 'Account, host, notifications, privacy, language, sign out'],
+      ['29-help.html', 'Help & support', 'FAQ search, chat with us, report a problem'],
+      ['30-visitors.html', 'Visitors', 'Who viewed you, chat / call, VIP unlock'],
+      ['31-delete-account.html', 'Delete account', 'Warnings, type DELETE to confirm'],
+    ]],
+  ];
+  document.getElementById('list').innerHTML = batches.map(([title, pages], bi) => `
+    <h2 class="text-xs font-semibold uppercase tracking-wider ${bi === 0 ? 'text-neonPink' : 'text-gray-500'} mt-5 mb-2">${title}</h2>
+    <div class="space-y-2">${pages.map(([href, name, desc]) => href
+      ? `<a href="${href}" class="flex items-center gap-3 p-4 rounded-2xl neon-border active:scale-[.98] transition">
+           <span class="w-9 h-9 rounded-xl btn-neon flex items-center justify-center text-sm font-bold">${href.slice(0, 2)}</span>
+           <span class="flex-1"><b>${name}</b><span class="block text-xs text-gray-400">${desc}</span></span>
+           <span class="text-[10px] px-2 py-1 rounded-full bg-onlineGreen/15 text-onlineGreen">Ready</span></a>`
+      : `<div class="flex items-center gap-3 p-4 rounded-2xl bg-cyberCard border border-cyberLine opacity-50">
+           <span class="w-9 h-9 rounded-xl bg-cyberLine"></span><span class="flex-1">${name}</span>
+           <span class="text-[10px] px-2 py-1 rounded-full bg-white/5 text-gray-400">Next</span></div>`).join('')}</div>`).join('');
+</script>
+</body>
+</html>

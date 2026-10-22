@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Voice call</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<script src="assets/demo-data.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="stylesheet" href="assets/call.css">
+</head>
+<body>
+<main class="phone call">
+  <div class="wash"></div>
+
+  <div class="c-top">
+    <button class="c-icon-btn" onclick="vibe.toast('Call keeps running in the background')" aria-label="Minimise"></button>
+    <span class="c-enc" id="enc"></span>
+    <span class="c-pill"><span class="coin"></span><span id="bal"></span></span>
+  </div>
+
+  <section class="c-who flex-1 pt-14">
+    <div class="relative">
+      <span class="c-voice" id="v1"></span><span class="c-voice v2" id="v2"></span>
+      <div class="c-ring ringing" id="ring"><div class="c-av w-[124px] h-[124px] text-5xl" id="av"></div></div>
+    </div>
+    <h1 class="c-name text-[30px] mt-8" id="name"></h1>
+    <p class="c-status mt-3 h-5" id="state"></p>
+    <p class="c-meta mt-4" id="meta"></p>
+    <div id="low" class="c-banner hidden w-full mt-6 text-left">
+      <span class="flex-1"><b id="leftTxt"></b><span class="block text-[11px] text-gray-400 mt-0.5">Top up to keep talking</span></span>
+      <button onclick="CallSheets.open('topSheet')">Top up</button>
+    </div>
+  </section>
+
+  <footer class="c-ctrls">
+    <div class="c-row" id="row"></div>
+    <div class="flex justify-center mt-6"><button class="c-btn c-end" onclick="hangUp()" aria-label="End call"><span class="ic"></span></button></div>
+  </footer>
+</main>
+
+<script src="assets/call.js"></script>
+<script>
+  // DEMO only: server rings the host, bills per minute after pick-up and ends the call at zero balance.
+  const D = window.DEMO, $ = s => document.getElementById(s), q = new URLSearchParams(location.search);
+  const h = D.hosts.find(x => x.id === +(q.get('id') || 1)) || D.hosts[0];
+  let balance = D.balance, secs = 0, spent = 0, gifts = 0, connected = false, tick, voiceT;
+  const dots = '<span class="dots"><span>.</span><span>.</span><span>.</span></span>';
+  const fmt = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+
+  document.querySelector('.c-icon-btn').innerHTML = CI.chev;
+  $('enc').innerHTML = `${CI.lock} Encrypted`;
+  $('av').textContent = h.n[0];
+  $('name').textContent = h.n;
+  document.querySelector('.c-end .ic').innerHTML = CI.end;
+  $('row').innerHTML = cbtn('spk', 'Speaker') + cbtn('video', 'Video') + cbtn('mic', 'Mute') + cbtn('gift', 'Gift', 'pink');
+  const meta = note => ($('meta').innerHTML = `<span class="coin"></span><b>${h.ar}</b> coins / min · ${note}`);
+  meta('after pick-up');
+
+  function paint() {
+    $('bal').textContent = balance.toLocaleString('en-IN');
+    const left = Math.floor(balance / h.ar), low = connected && left < 3;
+    $('low').classList.toggle('hidden', !low); $('low').classList.toggle('flex', low);
+    $('leftTxt').textContent = left <= 0 ? 'Less than a minute left' : `About ${left} min left`;
+  }
+  function charge(n) { balance -= n; spent += n; paint(); }
+  paint();
+
+  const already = q.get('connected') === '1'; // switching from a video call: no ringing
+  $('state').innerHTML = `Calling${dots}`;
+  const t1 = already ? 0 : setTimeout(() => ($('state').innerHTML = `Ringing${dots}`), 1500);
+  const t2 = setTimeout(connect, already ? 0 : 4000);
+  function connect() {
+    connected = true; $('ring').classList.remove('ringing'); meta('charging per minute');
+    charge(h.ar);
+    $('state').innerHTML = '<span class="live"></span><span id="timer">00:00</span>';
+    tick = setInterval(() => {
+      secs++; $('timer').textContent = fmt(secs);
+      if (secs % 60 === 0) { charge(h.ar); if (balance < h.ar) { vibe.toast('Balance finished · call ending'); setTimeout(finish, 1200); } }
+    }, 1000);
+    voiceT = setInterval(() => { const l = Math.random(); [['v1', .14], ['v2', .3]].forEach(([v, s]) => { $(v).style.opacity = l > .35 ? .9 : 0; $(v).style.transform = `scale(${1 + s * l})`; }); }, 180);
+  }
+
+  $('row').onclick = e => {
+    const b = e.target.closest('.c-btn'); if (!b) return;
+    const k = b.dataset.k;
+    if (k === 'spk' || k === 'mic') { b.classList.toggle('on'); return vibe.toast(k === 'spk' ? (b.classList.contains('on') ? 'Speaker on' : 'Speaker off') : (b.classList.contains('on') ? 'Muted' : 'Unmuted')); }
+    if (!connected) return vibe.toast('Wait until they pick up');
+    if (k === 'gift') return CallSheets.open('giftSheet');
+    if (k === 'video') {
+      $('state').innerHTML = `Asking to switch to video${dots}`;
+      setTimeout(() => { vibe.toast(`${h.n} turned on video · ${h.r} coins/min`); setTimeout(() => vibe.go(`10-video-call.html?id=${h.id}`), 600); }, 2000);
+    }
+  };
+
+  CallSheets.mount({
+    getBalance: () => balance,
+    onGift: (g, n, total) => { charge(total); gifts += n; },
+    onTopUp: c => { balance += c; paint(); vibe.toast(`+${c.toLocaleString('en-IN')} coins added`); },
+    onEnd: () => finish(),
+    summary: () => `${fmt(secs)} · ${spent.toLocaleString('en-IN')} coins`,
+  });
+  function hangUp() { connected ? CallSheets.open('endSheet') : finish(); }
+  function finish() {
+    [t1, t2].forEach(clearTimeout); clearInterval(tick); clearInterval(voiceT);
+    if (!connected) { vibe.toast('Call cancelled · no coins charged'); return setTimeout(() => history.length > 1 ? history.back() : vibe.go('05-home.html'), 900); }
+    vibe.go(`12-rate-call.html?id=${h.id}&secs=${secs}&spent=${spent}&gifts=${gifts}&type=audio`);
+  }
+</script>
+</body>
+</html>

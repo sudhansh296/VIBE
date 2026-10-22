@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Payment</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .seg { display: flex; padding: 3px; border-radius: 99px; background: #12121c; border: 1px solid #262636; }
+  .seg button { flex: 1; height: 30px; border-radius: 99px; font-size: 12px; color: #8b8b9a; } .seg .on { background: #26263a; color: #fff; }
+  .pop { animation: pop .5s cubic-bezier(.2,1.5,.4,1) both; } @keyframes pop { from { transform: scale(.5); opacity: 0 } to { transform: none; opacity: 1 } }
+  .kv { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,.06); } .kv:last-child { border: 0; } .kv span:first-child { color: #8b8b9a; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div id="blob" class="blob w-80 h-80 -top-28 left-1/2 -translate-x-1/2"></div>
+  <div class="relative px-5 pt-4"><div class="seg" id="seg"><button data-s="success">Success</button><button data-s="failed" class="on">Failed</button><button data-s="pending">Pending</button></div></div>
+  <section class="relative flex-1 overflow-y-auto px-6 pt-8 pb-6 flex flex-col items-center text-center" id="body"></section>
+  <footer class="relative p-5 pt-3"><button id="main" class="btn-neon w-full h-14 rounded-2xl font-bold"></button><button id="alt" class="w-full h-11 mt-2 text-sm text-gray-400"></button></footer>
+</main>
+<script>
+  // DEMO. The result always comes from the SERVER after it checks the payment with Razorpay. The app never adds coins by itself.
+  const $ = i => document.getElementById(i);
+  const R = {
+    success: { c: '#3ee08f', ic: '<path d="m5 12 5 5 9-10"/>', t: 'Payment successful', s: '2,000 coins have been added to your wallet.', main: 'Done', alt: 'View receipt', go: '45-receipt.html',
+      rows: [['Pack', '1,500 + 500 bonus coins'], ['Amount paid', '₹99.00'], ['Method', 'UPI · rahul@okaxis'], ['Order id', 'VB-20261015-8841']] },
+    failed: { c: '#ff4d5e', ic: '<path d="M6 6l12 12M18 6 6 18"/>', t: 'Payment failed', s: 'Your payment did not go through. If money was deducted it is refunded to your account, usually within 24 hours. No coins were added.', main: 'Try again', alt: 'Contact support', go: '29-help.html',
+      rows: [['Amount', '₹99.00'], ['Method', 'Card ••• 4242'], ['Reason', 'Bank declined the payment'], ['Reference', 'VB-20261015-8842']] },
+    pending: { c: '#f6dc9b', ic: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', t: 'Payment is pending', s: 'We are waiting for your bank to confirm. Coins are added automatically as soon as it is confirmed. Please do not pay again.', main: 'Back to Wallet', alt: 'Contact support', go: '29-help.html',
+      rows: [['Amount', '₹99.00'], ['Method', 'UPI · rahul@okaxis'], ['Status', 'Waiting for the bank'], ['Reference', 'VB-20261015-8843']] },
+  };
+  function paint(k) {
+    const r = R[k]; document.querySelectorAll('#seg button').forEach(b => b.classList.toggle('on', b.dataset.s === k)); $('blob').style.background = r.c + '22';
+    $('body').innerHTML = `<div class="pop w-24 h-24 rounded-full flex items-center justify-center" style="border:2px solid ${r.c};color:${r.c}"><svg class="w-12 h-12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">${r.ic}</svg></div>
+      <h1 class="text-2xl font-light mt-6">${r.t}</h1><p class="text-sm text-gray-400 mt-2 leading-relaxed max-w-[310px]">${r.s}</p>
+      <div class="w-full text-left mt-6 rounded-2xl bg-cyberCard border border-cyberLine px-4">${r.rows.map(([a, b]) => `<div class="kv"><span>${a}</span><b class="font-medium text-right">${b}</b></div>`).join('')}</div>`;
+    $('main').textContent = r.main; $('alt').textContent = r.alt; $('alt').onclick = () => vibe.go(r.go);
+    $('main').onclick = () => k === 'failed' ? vibe.go('18-wallet.html') : vibe.go('18-wallet.html');
+  }
+  $('seg').onclick = e => { const b = e.target.closest('[data-s]'); if (b) paint(b.dataset.s); };
+  paint(new URLSearchParams(location.search).get('s') || 'failed');
+</script>
+</body>
+</html>

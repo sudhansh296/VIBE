@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Me</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<script src="assets/demo-data.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .menu a, .menu button { display: flex; align-items: center; gap: 14px; width: 100%; padding: 15px 16px; text-align: left; }
+  .menu a + a, .menu a + button, .menu button + a, .menu button + button { border-top: 1px solid #1c1c28; }
+  .menu svg { width: 22px; height: 22px; flex-shrink: 0; }
+  .ico { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-neonPink/15 -top-24 -left-24"></div>
+  <div class="blob w-60 h-60 bg-neonCyan/10 top-40 -right-24"></div>
+
+  <header class="relative flex justify-end gap-2 px-5 pt-5">
+    <button onclick="vibe.go('16-notifications.html')" class="relative w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Notifications">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-neonPink rounded-full border-2 border-cyberDark"></span></button>
+    <button onclick="vibe.go('28-settings.html')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Settings">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+  </header>
+
+  <section class="relative flex-1 overflow-y-auto px-5 pb-36">
+    <!-- profile -->
+    <div class="flex items-center gap-4 mt-3">
+      <div class="avatar-ring shrink-0"><div class="w-20 h-20 rounded-full bg-cyberCard border-4 border-cyberDark flex items-center justify-center text-3xl font-light" style="background:linear-gradient(160deg,#1d1a28,#121019)">S</div></div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2"><h1 class="text-[22px] font-extrabold truncate">Sudhanshu</h1>
+          <span class="px-2 py-0.5 rounded-full border border-cyberGold/40 bg-cyberGold/10 text-cyberGold text-[11px]">Lv.3</span></div>
+        <p class="text-xs text-gray-400 mt-0.5">ID: 10159076 · 26 · Delhi</p>
+        <button onclick="vibe.go('27-edit-profile.html')" class="mt-2 h-8 px-3 rounded-full border border-white/15 text-[11px] tracking-wide flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4ZM13 7l4 4"/></svg>Edit profile</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-2 mt-5 text-center">
+      <button onclick="vibe.go('46-follow-list.html?t=following')" class="rounded-2xl bg-cyberCard border border-cyberLine py-3"><div class="font-bold">48</div><div class="text-[10px] tracking-[.14em] uppercase text-gray-500 mt-0.5">Following</div></button>
+      <button onclick="vibe.go('46-follow-list.html?t=followers')" class="rounded-2xl bg-cyberCard border border-cyberLine py-3"><div class="font-bold">12</div><div class="text-[10px] tracking-[.14em] uppercase text-gray-500 mt-0.5">Followers</div></button>
+      <button onclick="vibe.go('30-visitors.html')" class="rounded-2xl bg-cyberCard border border-cyberLine py-3"><div class="font-bold">7</div><div class="text-[10px] tracking-[.14em] uppercase text-gray-500 mt-0.5">Visitors</div></button>
+    </div>
+
+    <!-- wallet -->
+    <div class="mt-4 rounded-3xl p-4 flex items-center gap-3 border border-cyberGold/30 relative overflow-hidden" style="background:linear-gradient(135deg,rgba(120,80,10,.35),#12121c 60%)">
+      <div class="absolute -right-8 -top-10 w-32 h-32 rounded-full bg-cyberGold/15 blur-2xl"></div>
+      <span class="coin w-12 h-12 relative"></span>
+      <div class="flex-1 relative"><div class="text-[10px] tracking-[.16em] uppercase text-gray-400">Coin balance</div><div id="bal" class="text-3xl font-extrabold text-cyberGold leading-tight"></div></div>
+      <button onclick="vibe.go('18-wallet.html')" class="relative h-10 px-5 rounded-full bg-cyberGold text-black font-bold text-sm">Recharge</button>
+    </div>
+
+    <!-- host call-to-action -->
+    <button onclick="vibe.go('22-become-host.html')" class="mt-3 w-full rounded-2xl neon-border p-3.5 flex items-center gap-3 text-left relative overflow-hidden">
+      <div class="absolute -right-8 -top-10 w-32 h-32 rounded-full bg-neonPink/20 blur-2xl"></div>
+      <img src="assets/icons/profile.webp" class="w-14 h-14 object-contain float relative" alt="">
+      <div class="flex-1 relative"><div class="font-bold">Become a Host</div><div class="text-xs text-gray-400 mt-0.5">Open for everyone 18+ · Set your own rates and earn per minute</div></div>
+      <span class="text-neonPink text-xl relative">›</span>
+    </button>
+
+    <!-- menu -->
+    <div class="menu mt-4 rounded-2xl bg-cyberCard border border-cyberLine overflow-hidden">
+      <a href="19-vip.html"><span class="ico border-cyberGold/40 bg-cyberGold/10"><img src="assets/icons/ic-vip.webp" class="w-6 h-6 object-contain" alt=""></span>
+        <span class="flex-1">VIP</span><span class="text-xs text-cyberGold">Cheaper calls · free chat</span><span class="text-gray-600">›</span></a>
+      <a href="21-checkin.html"><span class="ico border-onlineGreen/40 text-onlineGreen bg-onlineGreen/10"><svg fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+        <span class="flex-1">Daily check-in</span><span class="text-xs text-onlineGreen">+20 free coins</span><span class="text-gray-600">›</span></a>
+      <a href="20-level.html"><span class="ico border-neonCyan/40 text-neonCyan bg-neonCyan/10"><svg fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3Z"/></svg></span>
+        <span class="flex-1">My level</span><span class="text-xs text-gray-500">Lv.3 · 62%</span><span class="text-gray-600">›</span></a>
+      <button onclick="vibe.go('47-invite.html')"><span class="ico border-neonPink/40 text-neonPink bg-neonPink/10"><svg fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M19 8v6M16 11h6"/></svg></span>
+        <span class="flex-1">Invite friends</span><span class="text-xs text-gray-500">Both get 100 coins</span><span class="text-gray-600">›</span></button>
+      <button onclick="vibe.go('29-help.html')"><span class="ico border-white/15 text-gray-300"><svg fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/></svg></span>
+        <span class="flex-1">Help &amp; support</span><span class="text-gray-600">›</span></button>
+    </div>
+  </section>
+  <div id="tabbar" data-active="me" data-unread="3"></div>
+</main>
+<script src="assets/tabbar.js"></script>
+<script>document.getElementById('bal').textContent = window.DEMO.balance.toLocaleString('en-IN');</script>
+</body>
+</html>

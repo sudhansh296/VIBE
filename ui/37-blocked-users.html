@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Blocked users</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<script src="assets/demo-data.js"></script>
+<script src="assets/safety.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-dangerRed/10 -top-24 -left-24"></div>
+
+  <header class="relative flex items-center gap-3 px-4 pt-5 pb-2">
+    <button onclick="history.length > 1 ? history.back() : vibe.go('28-settings.html')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Back">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 class="text-xl font-semibold">Blocked users</h1>
+  </header>
+
+  <section class="relative flex-1 overflow-y-auto px-5 pb-8">
+    <p class="text-xs text-gray-500 mt-1 leading-relaxed">People you block can't message or call you and can't see you online. They are not told that you blocked them.</p>
+    <div id="list" class="mt-3"></div>
+
+    <div id="empty" class="hidden flex-col items-center text-center pt-12">
+      <img src="assets/icons/ghost-empty.webp" class="w-40 h-40 object-contain float" alt="" onerror="this.src='assets/icons/home.webp'">
+      <h3 class="text-lg font-bold mt-3">No blocked users</h3>
+      <p class="text-sm text-gray-400 mt-1 max-w-[260px]">If someone bothers you, open their profile or chat and tap Block.</p>
+    </div>
+  </section>
+
+  <!-- unblock confirm -->
+  <div id="uw" class="sheet-wrap" onclick="if(event.target===this)closeU()">
+    <div class="sheet glass rounded-t-3xl p-6 border-t border-cyberLine">
+      <h3 id="ut" class="text-lg font-semibold text-center"></h3>
+      <p class="text-sm text-gray-400 text-center mt-2">They will be able to message and call you again.</p>
+      <div class="grid grid-cols-2 gap-3 mt-6"><button onclick="closeU()" class="h-12 rounded-2xl btn-ghost font-semibold">Cancel</button><button id="uy" class="h-12 rounded-2xl btn-neon font-bold">Unblock</button></div>
+    </div>
+  </div>
+</main>
+<script>
+  // DEMO. The block list lives on the SERVER; it is returned with the date each person was blocked.
+  const $ = i => document.getElementById(i);
+  const WHEN = { 4: 'Blocked 3 Oct', 8: 'Blocked 28 Sep' };
+  let target = null;
+  function paint() {
+    const ids = SAFETY.list(), hosts = ids.map(i => DEMO.hosts.find(h => h.id === i)).filter(Boolean);
+    $('list').innerHTML = hosts.map(h => `<div class="flex items-center gap-3 py-3.5 border-b border-white/5">
+      <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg opacity-70" style="background:linear-gradient(135deg,${h.grad[0]},${h.grad[1]})">${h.n[0]}</div>
+      <div class="flex-1 min-w-0"><div class="font-semibold">${h.n}, ${h.a}</div><div class="text-[11px] text-gray-500">${WHEN[h.id] || 'Blocked today'}</div></div>
+      <button data-u="${h.id}" class="h-9 px-4 rounded-full border border-white/20 text-xs font-semibold">Unblock</button></div>`).join('');
+    $('empty').classList.toggle('hidden', hosts.length > 0); $('empty').classList.toggle('flex', hosts.length === 0);
+  }
+  $('list').onclick = e => { const b = e.target.closest('[data-u]'); if (!b) return; target = DEMO.hosts.find(h => h.id === +b.dataset.u); $('ut').textContent = `Unblock ${target.n}?`; $('uw').classList.add('open'); };
+  function closeU() { $('uw').classList.remove('open'); }
+  $('uy').onclick = () => { SAFETY.remove(target.id); closeU(); vibe.toast(`${target.n} unblocked`); paint(); };
+  paint();
+</script>
+</body>
+</html>

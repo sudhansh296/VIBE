@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tab bar · 6 Bubble pop</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="../assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/theme.css">
+<style>
+  /* Option 6: the active ghost pops up into a floating neon bubble, and the bar has a round cut-out that slides under it */
+  .nav { position: absolute; left: 0; right: 0; bottom: 0; height: 80px; z-index: 30; --x: 16.66%; }
+  .bar { position: absolute; inset: 0; background: rgba(18,18,28,.95); border-top: 1px solid rgba(255,42,133,.25);
+    -webkit-mask-image: radial-gradient(circle 46px at var(--x) 0, transparent 45px, #000 46px);
+            mask-image: radial-gradient(circle 46px at var(--x) 0, transparent 45px, #000 46px);
+    transition: --x .45s; }
+  .bubble { position: absolute; top: -36px; left: var(--x); width: 72px; height: 72px; margin-left: -36px; border-radius: 99px;
+    background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.35), transparent 40%), linear-gradient(140deg, #ff2a85, #7a1fd1 55%, #00f2fe);
+    box-shadow: 0 0 0 4px #07070c, 0 10px 30px -4px rgba(255,42,133,.8); transition: left .45s cubic-bezier(.3,1.3,.4,1);
+    display: flex; align-items: center; justify-content: center; }
+  .bubble img { width: 62px; height: 62px; object-fit: contain; animation: pop .45s cubic-bezier(.2,1.6,.4,1); }
+  @keyframes pop { from { transform: scale(.4) rotate(-12deg); opacity: 0 } to { transform: none; opacity: 1 } }
+  .tabs { position: absolute; inset: 0; display: flex; }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 12px; position: relative; }
+  .tab img { width: 42px; height: 42px; object-fit: contain; opacity: .5; transition: all .3s; }
+  .tab span { font-size: 11px; color: #8a8a99; transition: all .3s; }
+  .tab.active img { opacity: 0; transform: translateY(-20px) scale(.5); }
+  .tab.active span { color: #fff; font-weight: 700; transform: translateY(-4px); }
+  .badge { position: absolute; top: 6px; left: calc(50% + 8px); min-width: 20px; height: 20px; padding: 0 5px; border-radius: 99px; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; background: #ff2a85; border: 2px solid #12121c; transition: all .3s; }
+  .tab.active .badge { top: -44px; left: calc(50% + 16px); z-index: 3; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <section id="content" class="flex-1 overflow-y-auto pb-32"></section>
+  <nav class="nav" id="nav">
+    <div class="bar"></div>
+    <div class="bubble" id="bubble"><img id="bubbleImg" src="../assets/icons/home.webp" alt=""></div>
+    <div class="tabs">
+      <button class="tab active" data-tab data-img="home"><img src="../assets/icons/home.webp" alt=""><span>Home</span></button>
+      <button class="tab" data-tab data-img="chat"><img src="../assets/icons/chat.webp" alt=""><span>Chats</span><b class="badge">3</b></button>
+      <button class="tab" data-tab data-img="profile"><img src="../assets/icons/profile.webp" alt=""><span>Me</span></button>
+    </div>
+  </nav>
+</main>
+<script src="shell.js"></script>
+<script>
+  const nav = document.getElementById('nav'), img = document.getElementById('bubbleImg');
+  window.onTab = (i, t) => {
+    const to = 16.66 + i * 33.33;
+    // animate the mask cut-out position frame by frame (CSS can't transition a custom property without @property)
+    const from = parseFloat(getComputedStyle(nav).getPropertyValue('--x')) || 16.66;
+    const start = performance.now();
+    (function step(now) {
+      const p = Math.min((now - start) / 450, 1), e = 1 - Math.pow(1 - p, 3);
+      nav.style.setProperty('--x', (from + (to - from) * e) + '%');
+      if (p < 1) requestAnimationFrame(step);
+    })(start);
+    img.src = `../assets/icons/${t.dataset.img}.webp`;
+    img.style.animation = 'none'; img.offsetHeight; img.style.animation = '';
+  };
+</script>
+</body>
+</html>

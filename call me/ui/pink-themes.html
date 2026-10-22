@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIBE · Pink theme colors</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/icons.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #fff; margin: 0; padding: 24px 16px 100px; }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  h2 { font-size: 22px; font-weight: 900; margin: 34px 0 4px; }
+  .sub { color: #8a8aa2; font-size: 13px; margin-bottom: 22px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(318px, 1fr)); gap: 28px; }
+  .opt { border-radius: 30px; padding: 14px; background: #14141c; border: 2px solid #24242f; cursor: pointer; position: relative; transition: all .18s; }
+  .opt:hover { border-color: #3d3d52; }
+  .opt.sel { border-color: var(--p1); box-shadow: 0 0 0 4px color-mix(in srgb, var(--p1) 25%, transparent), 0 24px 60px -24px var(--p1); }
+  .tag { position: absolute; top: -13px; left: 20px; padding: 3px 13px; border-radius: 99px; background: #23232f; border: 1px solid #34344a; font-size: 12px; font-weight: 800; letter-spacing: .05em; }
+  .opt.sel .tag { background: var(--p1); border-color: var(--p1); color: #fff; }
+  .tick { position: absolute; top: 14px; right: 16px; width: 26px; height: 26px; border-radius: 99px; background: var(--p1); color: #fff; display: none; align-items: center; justify-content: center; z-index: 9; }
+  .opt.sel .tick { display: flex; }
+  .nm0 { font-weight: 800; font-size: 15px; margin: 8px 0 2px; } .ds0 { font-size: 12px; color: #8a8aa2; margin-bottom: 10px; }
+  .sw { display: flex; gap: 6px; margin-bottom: 10px; } .sw i { width: 24px; height: 24px; border-radius: 8px; border: 1px solid rgba(255,255,255,.18); }
+
+  /* the app's current Home UI (cards C, Random Match pill, footer C) coloured by CSS variables */
+  .ph { position: relative; height: 560px; border-radius: 26px; overflow: hidden; background: var(--bg); color: var(--tx); border: 1px solid var(--line); }
+  .ph .glow { position: absolute; width: 260px; height: 260px; left: -70px; top: -90px; background: var(--p1); opacity: .16; filter: blur(70px); }
+  .ph .glow2 { position: absolute; width: 220px; height: 220px; right: -90px; top: 160px; background: var(--p2); opacity: .10; filter: blur(70px); }
+  .hd { position: relative; display: flex; align-items: center; padding: 14px 14px 8px; gap: 8px; }
+  .logo { font-size: 24px; font-weight: 900; flex: 1; background: linear-gradient(90deg, var(--p1), var(--p2), var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .coinchip { height: 32px; padding: 0 11px 0 4px; border-radius: 99px; display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 12px; color: var(--goldt); border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent); background: color-mix(in srgb, var(--gold) 16%, transparent); }
+  .coin { width: 22px; height: 22px; border-radius: 99px; background: radial-gradient(circle at 32% 28%, #fff7d6, var(--gold) 45%, color-mix(in srgb, var(--gold) 55%, #000)); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #3a2400; }
+  .bell { width: 32px; height: 32px; border-radius: 11px; display: flex; align-items: center; justify-content: center; background: var(--card); border: 1px solid var(--line); color: var(--sub); }
+  .tabs { position: relative; display: flex; gap: 16px; padding: 4px 14px 8px; font-weight: 700; font-size: 15px; color: var(--mute); }
+  .tabs b { color: var(--tx); position: relative; } .tabs b::after { content: ''; position: absolute; left: 0; right: 0; bottom: -6px; height: 3px; border-radius: 3px; background: linear-gradient(90deg, var(--p1), var(--p2)); }
+  .chips { position: relative; display: flex; gap: 6px; padding: 8px 14px; }
+  .chip { height: 28px; padding: 0 12px; border-radius: 99px; font-size: 11.5px; font-weight: 700; display: flex; align-items: center; color: var(--sub); background: var(--card); border: 1px solid var(--line); }
+  .chip.on { color: #fff; background: var(--p1); border-color: var(--p1); }
+  .story { position: relative; display: flex; gap: 12px; padding: 4px 14px 10px; }
+  .story div { width: 46px; height: 46px; border-radius: 99px; padding: 2px; background: conic-gradient(from 200deg, var(--p1), var(--p2), var(--p1)); } .story div span { display: flex; width: 100%; height: 100%; border-radius: 99px; align-items: center; justify-content: center; font-weight: 800; background: var(--bg); color: var(--tx); border: 2px solid var(--bg); }
+  .cards { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 4px 14px; }
+  .c { position: relative; aspect-ratio: .74; border-radius: 22px; overflow: hidden; color: #fff; }
+  .c .wm { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 96px; font-weight: 900; color: rgba(255,255,255,.22); padding-bottom: 14px; }
+  .c .sh { position: absolute; inset: 0; background: linear-gradient(transparent 45%, rgba(0,0,0,.62)); }
+  .c .st { position: absolute; top: 8px; left: 8px; display: flex; align-items: center; gap: 5px; font-size: 9.5px; font-weight: 800; padding: 3px 8px; border-radius: 99px; background: rgba(0,0,0,.42); }
+  .c .st i { width: 6px; height: 6px; border-radius: 99px; background: #3ee08f; }
+  .c .pr { position: absolute; top: 8px; right: 8px; display: flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 800; padding: 2px 7px 2px 3px; border-radius: 99px; background: rgba(0,0,0,.42); color: #ffd98a; }
+  .c .pr .coin { width: 15px; height: 15px; font-size: 8px; }
+  .c .nm { position: absolute; left: 10px; bottom: 9px; font-weight: 800; font-size: 13.5px; line-height: 1.15; } .c .nm small { display: block; font-weight: 500; opacity: .85; font-size: 10.5px; }
+  .c .bt { position: absolute; right: 8px; bottom: 8px; width: 36px; height: 36px; border-radius: 13px; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--p1), var(--p2)); color: #fff; }
+  .match { position: absolute; left: 50%; transform: translateX(-50%); bottom: 96px; display: flex; align-items: center; gap: 9px; padding: 6px 16px 6px 6px; border-radius: 99px; background: linear-gradient(90deg, var(--p1), var(--p2)); color: #fff; font-weight: 800; font-size: 12.5px; box-shadow: 0 10px 26px -8px var(--p1); white-space: nowrap; z-index: 3; }
+  .match .b { width: 30px; height: 30px; border-radius: 99px; background: #fff; color: var(--p1); display: flex; align-items: center; justify-content: center; }
+  .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 118px; background: linear-gradient(transparent, var(--bg) 35%); z-index: 2; }
+  .bar { position: absolute; left: 12px; right: 12px; bottom: 12px; height: 56px; border-radius: 24px; background: var(--bar); border: 1px solid var(--line); display: flex; align-items: center; z-index: 3; box-shadow: var(--bsh); }
+  .bar .it { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; font-size: 9.5px; font-weight: 700; color: var(--mute); } .bar .it svg { width: 22px; height: 22px; } .bar .it.on { color: var(--p1); }
+  .bar .mid { width: 76px; position: relative; height: 100%; } .bar .mid i { position: absolute; left: 50%; top: -22px; transform: translateX(-50%); width: 58px; height: 58px; border-radius: 99px; background: linear-gradient(135deg, var(--p1), var(--p2)); color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 5px var(--bg), 0 10px 24px -6px var(--p1); } .bar .mid svg { width: 26px; height: 26px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 style="font-size:30px;font-weight:900">VIBE · Pink theme colors</h1>
+  <p style="color:#9a9ab0;margin-top:6px">UI (layout, cards, footer) wahi hai jo app mein abhi hai. Sirf color aur theme badal rahe hain. <b style="color:#ff6a8a">Pink + Red</b> (5) aur <b style="color:#ffb3cf">Pink + White</b> (5). Jo pasand aaye click karo.</p>
+
+  <h2>A. Pink + Red <span style="font-weight:500;color:#8a8aa2;font-size:14px">(dark background)</span></h2>
+  <div class="sub">Gehra wine/black background, pink aur red accents.</div>
+  <div class="grid" id="gA"></div>
+
+  <h2 style="margin-top:50px">B. Pink + White <span style="font-weight:500;color:#8a8aa2;font-size:14px">(light background)</span></h2>
+  <div class="sub">Safed/blush background, pink accents.</div>
+  <div class="grid" id="gB"></div>
+</div>
+<div style="position:fixed;left:0;right:0;bottom:0;z-index:99;background:rgba(10,10,15,.96);border-top:1px solid #262636;padding:12px 16px;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap">
+  <span style="font-size:14px;color:#9a9ab0">Aap ka choice:</span><b id="sel" style="color:#ff4d8d">not selected</b><span style="font-size:12px;color:#6a6a80">Bas naam bata do, jaise "A3" ya "B2".</span></div>
+
+<script>
+  const dark = (o) => Object.assign({ tx: '#ffffff', onp: '#fff', sub: '#d8c3ca', bsh: 'none', goldt: '#ffd98a' }, o);
+  const light = (o) => Object.assign({ tx: '#2a1520', onp: '#fff', sub: '#a77a8e', bsh: '0 14px 30px -14px rgba(255,77,141,.5)', goldt: '#9a5a08' }, o);
+  const A = [
+    dark({ k: 'A1', n: 'Crimson Rose', d: 'Wine black background, bright pink + red.', bg: '#12040a', card: '#1e0a12', line: '#3a1220', bar: '#1b0810', p1: '#ff2d6f', p2: '#ff3b3b', gold: '#f6d27a', mute: '#a07a86', g: [['#ff2d6f', '#6a1040'], ['#ff3b3b', '#7a0f2a'], ['#e11d6a', '#5b0f3b'], ['#ff5a5a', '#8a1c2c']] }),
+    dark({ k: 'A2', n: 'Ruby Wine', d: 'Deep wine red feel, softer pink.', bg: '#160509', card: '#210b12', line: '#40121f', bar: '#1d0910', p1: '#ff4d6d', p2: '#c9184a', gold: '#f2c978', mute: '#a37b84', g: [['#ff4d6d', '#800f2f'], ['#c9184a', '#590d22'], ['#ff758f', '#a4133c'], ['#ff8fa3', '#7a1230']] }),
+    dark({ k: 'A3', n: 'Cherry Blossom Noir', d: 'Pink-forward with a cherry red second colour.', bg: '#14060c', card: '#1f0c14', line: '#391322', bar: '#1b0a12', p1: '#ff5c9e', p2: '#e11d48', gold: '#f6d27a', mute: '#a5808f', g: [['#ff5c9e', '#7a1346'], ['#e11d48', '#6b0f2a'], ['#f472b6', '#8a1b5a'], ['#fb7185', '#7f1d38']] }),
+    dark({ k: 'A4', n: 'Hot Pink Flame', d: 'Electric hot pink fading to flame red.', bg: '#1a0613', card: '#26091c', line: '#431535', bar: '#220819', p1: '#ff3d9a', p2: '#ff1744', gold: '#ffd37a', mute: '#a8809b', g: [['#ff3d9a', '#7a1050'], ['#ff1744', '#6b0f24'], ['#ff5fb0', '#9b1763'], ['#ff6b81', '#8a1b3a']] }),
+    dark({ k: 'A5', n: 'Scarlet Night', d: 'Near-black with sharp scarlet and rose.', bg: '#0d0406', card: '#170a0d', line: '#2e1217', bar: '#150709', p1: '#ff2e63', p2: '#ff0a54', gold: '#f0c27a', mute: '#8f6a72', g: [['#ff2e63', '#5a0a26'], ['#ff0a54', '#4a0820'], ['#ff6b9a', '#7a1036'], ['#e5384f', '#5e0f1f']] }),
+  ];
+  const B = [
+    light({ k: 'B1', n: 'Blush', d: 'Soft blush white with rose pink.', bg: '#fff5f8', card: '#ffffff', line: '#ffe0ea', bar: '#ffffff', p1: '#ff4d8d', p2: '#ff7ab0', gold: '#f2b84b', mute: '#b79aa7', g: [['#ff7ab0', '#ff4d8d'], ['#ff9ec3', '#f0508a'], ['#ffa3c4', '#e0407e'], ['#ff8fb8', '#d63a78']] }),
+    light({ k: 'B2', n: 'Pearl Pink', d: 'Pearl white with orchid pink.', bg: '#faf6f8', card: '#ffffff', line: '#f3dbe6', bar: '#ffffff', p1: '#ec4899', p2: '#f472b6', gold: '#f2b84b', mute: '#b497a6', g: [['#f472b6', '#ec4899'], ['#f9a8d4', '#db2777'], ['#fb7ab8', '#be185d'], ['#f48fc3', '#c8328a']] }),
+    light({ k: 'B3', n: 'Candy White', d: 'Pure white with vivid candy pink.', bg: '#ffffff', card: '#fff0f6', line: '#ffe3ef', bar: '#ffffff', p1: '#ff2d87', p2: '#ff6fb0', gold: '#f2b84b', mute: '#b99aab', g: [['#ff2d87', '#c4106a'], ['#ff6fb0', '#e0338a'], ['#ff4fa0', '#a20f62'], ['#ff8fc4', '#d63384']] }),
+    light({ k: 'B4', n: 'Rose Cream', d: 'Warm cream white with rose.', bg: '#fffafb', card: '#fff0f3', line: '#ffe1ea', bar: '#ffffff', p1: '#f43f7a', p2: '#fb7ba3', gold: '#f2b84b', mute: '#b99aa6', g: [['#fb7ba3', '#f43f7a'], ['#f9a8c9', '#e11d6a'], ['#ff8aae', '#cf2c68'], ['#f66b93', '#b91c5c']] }),
+    light({ k: 'B5', n: 'Cotton Rose', d: 'Cotton white with bubblegum pink.', bg: '#fdf8fa', card: '#ffffff', line: '#ffe1ee', bar: '#ffffff', p1: '#ff4d94', p2: '#ff8fbf', gold: '#f2b84b', mute: '#b99bab', g: [['#ff8fbf', '#ff4d94'], ['#ffa8cc', '#f0408a'], ['#ff9ac6', '#e03a85'], ['#ffb3d3', '#d6407f']] }),
+  ];
+  const H = [['Priya', 24, 'Mumbai', 60, 'Online'], ['Arjun', 26, 'Delhi', 50, 'Online']];
+  const phone = t => `<div class="ph"><div class="glow"></div><div class="glow2"></div>
+    <div class="hd"><span class="logo">VIBE</span><span class="coinchip"><span class="coin">V</span>2,850</span><span class="bell">${IC('bell', 'w-4 h-4')}</span></div>
+    <div class="tabs"><b>Discover</b><span>Following</span><span>New</span></div>
+    <div class="chips"><span class="chip on">All</span><span class="chip">Girls</span><span class="chip">Boys</span><span class="chip">Online now</span></div>
+    <div class="story">${['P', 'A', 'K', 'D'].map(l => `<div><span>${l}</span></div>`).join('')}</div>
+    <div class="cards">${H.map((h, k) => `<div class="c" style="background:linear-gradient(150deg,${t.g[k][0]},${t.g[k][1]})"><span class="wm">${h[0][0]}</span><span class="sh"></span>
+      <span class="st"><i></i>${h[4]}</span><span class="pr"><span class="coin">V</span>${h[3]}</span><span class="nm">${h[0]}, ${h[1]}<small>${h[2]}</small></span><span class="bt">${IC('video', 'w-5 h-5')}</span></div>`).join('')}</div>
+    <div class="match"><span class="b">${IC('bolt', 'w-4 h-4')}</span>Random match</div><div class="fade"></div>
+    <div class="bar"><div class="it on">${IC('home')}Home</div><div class="mid"><i>${IC('chat')}</i></div><div class="it">${IC('user')}Me</div></div></div>`;
+  const render = (arr, id) => document.getElementById(id).innerHTML = arr.map(t => {
+    const v = `--bg:${t.bg};--card:${t.card};--line:${t.line};--bar:${t.bar};--p1:${t.p1};--p2:${t.p2};--gold:${t.gold};--tx:${t.tx};--sub:${t.sub};--mute:${t.mute};--goldt:${t.goldt};--bsh:${t.bsh}`;
+    return `<div class="opt" data-n="${t.k} · ${t.n}" style="${v}"><span class="tag">${t.k}</span><span class="tick">${IC('check', 'w-4 h-4')}</span>
+      <div class="nm0">${t.n}</div><div class="ds0">${t.d}</div><div class="sw">${[t.bg, t.card, t.p1, t.p2, t.gold].map(c => `<i style="background:${c}"></i>`).join('')}</div>${phone(t)}</div>`; }).join('');
+  render(A, 'gA'); render(B, 'gB');
+  document.addEventListener('click', e => { const o = e.target.closest('.opt'); if (!o) return; document.querySelectorAll('.opt').forEach(x => x.classList.toggle('sel', x === o)); const s = document.getElementById('sel'); s.textContent = o.dataset.n; s.style.color = getComputedStyle(o).getPropertyValue('--p1'); });
+</script>
+</body>
+</html>

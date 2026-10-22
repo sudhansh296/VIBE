@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Messages</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<script src="assets/demo-data.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .tab { font-size: 14px; color: #6b6b7b; padding-bottom: 8px; border-bottom: 2px solid transparent; font-weight: 600; }
+  .tab.on { color: #fff; border-image: linear-gradient(90deg, #ff2a85, #00f2fe) 1; }
+  .row:active { background: #12121c; }
+  .typing i { display: inline-block; width: 4px; height: 4px; border-radius: 9px; background: #3ee08f; margin-right: 2px; animation: t 1.2s infinite; }
+  .typing i:nth-child(2) { animation-delay: .2s } .typing i:nth-child(3) { animation-delay: .4s }
+  @keyframes t { 0%,60%,100% { opacity: .3 } 30% { opacity: 1 } }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-64 h-64 bg-neonPink/10 -top-24 -right-20"></div>
+  <header class="relative flex items-center justify-between px-5 pt-5 pb-3">
+    <h1 class="text-2xl font-extrabold">Messages</h1>
+    <div class="flex gap-2">
+      <button onclick="toggleSearch()" class="w-9 h-9 rounded-xl btn-ghost flex items-center justify-center" aria-label="Search">
+        <img src="assets/icons/ic-search.webp" class="w-6 h-6 object-contain" alt=""></button>
+      <button onclick="vibe.go('16-notifications.html')" class="relative w-9 h-9 rounded-xl btn-ghost flex items-center justify-center" aria-label="Notifications">
+        <img src="assets/icons/ic-bell.webp" class="w-6 h-6 object-contain" alt="">
+        <span class="absolute -top-1 -right-1 w-3 h-3 bg-neonPink rounded-full border-2 border-cyberDark"></span></button>
+    </div>
+  </header>
+  <div id="searchBox" class="hidden relative px-5 pb-3">
+    <div class="neon-field h-11 rounded-2xl px-4 flex items-center"><input id="q" class="bg-transparent outline-none flex-1 text-sm" placeholder="Search chats"></div>
+  </div>
+  <div class="relative flex gap-6 px-5 border-b border-cyberLine" id="tabs">
+    <button class="tab on" data-t="chats">Chats</button><button class="tab" data-t="calls">Calls</button><button class="tab" data-t="following">Following</button>
+  </div>
+
+  <section id="list" class="relative flex-1 overflow-y-auto pb-36"></section>
+  <div id="tabbar" data-active="chats" data-unread="3"></div>
+
+  <!-- long-press actions -->
+  <div id="act" class="sheet-wrap" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="sheet rounded-t-3xl bg-cyberCard border-t border-cyberLine p-5 pb-8 space-y-2" id="actBody"></div>
+  </div>
+</main>
+
+<script src="assets/tabbar.js"></script>
+<script>
+  // DEMO data; real chats/calls come from the server (socket for live updates).
+  const D = window.DEMO, H = id => D.hosts.find(h => h.id === id);
+  const PH = c => `<svg class="${c}" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2Z"/></svg>`;
+  const VID = c => `<svg class="${c}" viewBox="0 0 24 24" fill="currentColor"><path d="M5 5.5h8.5a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3z"/><path d="M17.5 10.2l3.4-2.3c.5-.3 1.1 0 1.1.6v6.9c0 .6-.6.9-1.1.6l-3.4-2.3z"/></svg>`;
+  const TICK = seen => `<span class="${seen ? 'text-neonCyan' : 'text-gray-500'} font-bold">✓✓</span>`;
+
+  const chats = [
+    { team: true, text: 'Welcome! Here are 100 free coins 🎁', time: '9:02', unread: 1, pinned: true },
+    { id: 1, text: 'Same!! Call karte hain? ☕', time: '2m', unread: 2 },
+    { id: 2, typing: true, time: 'now' },
+    { id: 3, me: true, seen: true, text: 'Haha see you tomorrow 😄', time: '1h' },
+    { id: 6, kind: 'gift', text: '🎁 You sent a Rose', time: '3h' },
+    { id: 4, kind: 'missed', text: 'Missed voice call', time: 'Yesterday' },
+    { id: 5, me: true, seen: false, text: 'Kesariya on loop since morning', time: 'Mon' },
+    { id: 8, kind: 'video', text: 'Video call · 12:40', time: 'Sun' },
+  ];
+  const calls = [
+    { id: 1, type: 'video', dir: 'out', time: 'Today, 2:10 pm', dur: '06:24 · 420 coins' },
+    { id: 4, type: 'voice', dir: 'missed', time: 'Yesterday, 9:41 pm', dur: 'Missed' },
+    { id: 3, type: 'voice', dir: 'in', time: 'Yesterday, 6:05 pm', dur: '12:02 · 360 coins' },
+    { id: 6, type: 'video', dir: 'out', time: 'Mon, 11:20 pm', dur: 'No answer · 0 coins' },
+    { id: 2, type: 'video', dir: 'in', time: 'Sun, 8:15 pm', dur: '03:10 · 200 coins' },
+  ];
+  const following = [1, 3, 5, 6, 7];
+
+  function av(h, size = 'w-14 h-14', text = 'text-xl') {
+    const st = D.status[h.s];
+    return `<div class="relative shrink-0">${D.avatar(h, `${size} rounded-full ${text}`)}
+      ${h.s !== 'OFFLINE' ? `<span class="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 rounded-full border-2 border-cyberDark" style="background:${st.dot}"></span>` : ''}</div>`;
+  }
+  function chatRow(c) {
+    if (c.team) return `<a href="15-chat.html?id=team" class="row flex items-center gap-3 px-5 py-3">
+      <div class="w-14 h-14 rounded-full neon-border flex items-center justify-center shrink-0"><img src="assets/icons/home.webp" class="w-10 h-10 object-contain" alt=""></div>
+      <div class="flex-1 min-w-0"><div class="flex justify-between"><b class="flex items-center gap-1.5">VIBE Team <span class="w-4 h-4 bg-blue-500 rounded-full text-[9px] flex items-center justify-center">✓</span></b><span class="text-xs text-neonPink">${c.time}</span></div>
+      <div class="flex justify-between items-center mt-0.5"><span class="text-sm text-gray-300 truncate pr-2">${c.text}</span><span class="text-xs text-gray-500">📌</span></div></div></a>`;
+    const h = H(c.id);
+    let preview = c.text;
+    if (c.typing) preview = '<span class="text-onlineGreen flex items-center gap-1"><span class="typing"><i></i><i></i><i></i></span>typing…</span>';
+    else if (c.kind === 'missed') preview = `<span class="text-dangerRed flex items-center gap-1">${PH('w-3.5 h-3.5')} ${c.text}</span>`;
+    else if (c.kind === 'video') preview = `<span class="flex items-center gap-1">${VID('w-3.5 h-3.5 text-gray-400')} ${c.text}</span>`;
+    else if (c.me) preview = `${TICK(c.seen)} ${c.text}`;
+    return `<a href="15-chat.html?id=${h.id}" data-id="${h.id}" class="row flex items-center gap-3 px-5 py-3">
+      ${av(h)}
+      <div class="flex-1 min-w-0"><div class="flex justify-between"><b>${h.n}</b><span class="text-xs ${c.unread ? 'text-neonPink' : 'text-gray-500'}">${c.time}</span></div>
+      <div class="flex justify-between items-center mt-0.5"><span class="text-sm ${c.unread ? 'text-white' : 'text-gray-400'} truncate pr-2">${preview}</span>
+      ${c.unread ? `<span class="min-w-[20px] h-5 px-1.5 rounded-full btn-neon text-[11px] font-bold flex items-center justify-center">${c.unread}</span>` : ''}</div></div></a>`;
+  }
+  function callRow(c) {
+    const h = H(c.id), missed = c.dir === 'missed';
+    const arrow = c.dir === 'out' ? '<span class="text-onlineGreen">↗</span>' : `<span class="${missed ? 'text-dangerRed' : 'text-neonCyan'}">↙</span>`;
+    return `<div class="row flex items-center gap-3 px-5 py-3">
+      ${av(h, 'w-12 h-12', 'text-lg')}
+      <div class="flex-1 min-w-0" onclick="vibe.go('07-host-profile.html?id=${h.id}')"><b class="${missed ? 'text-dangerRed' : ''}">${h.n}</b>
+        <div class="text-xs text-gray-400 flex items-center gap-1.5 mt-0.5">${arrow} ${c.type === 'voice' ? PH('w-3 h-3') : VID('w-3 h-3')} ${c.time}</div>
+        <div class="text-[11px] text-gray-500 mt-0.5">${c.dur}</div></div>
+      ${h.voice ? `<button onclick="vibe.go('13-audio-call.html?id=${h.id}')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center text-onlineGreen" aria-label="Voice call">${PH('w-[18px] h-[18px]')}</button>` : ''}
+      ${h.video ? `<button onclick="vibe.go('09-outgoing-call.html?id=${h.id}')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center text-neonPink" aria-label="Video call">${VID('w-[18px] h-[18px]')}</button>` : ''}
+    </div>`;
+  }
+  function followRow(id) {
+    const h = H(id);
+    return `<div class="row flex items-center gap-3 px-5 py-3">
+      ${av(h)}
+      <div class="flex-1 min-w-0" onclick="vibe.go('07-host-profile.html?id=${h.id}')"><b>${h.n}, ${h.a}</b>
+        <div class="text-xs mt-0.5" style="color:${D.status[h.s].text}">${h.s === 'ONLINE' ? 'Online now' : h.s === 'BUSY' ? 'On a call' : 'Last seen 2h ago'}</div></div>
+      <a href="15-chat.html?id=${h.id}" class="px-4 h-9 rounded-full btn-ghost text-sm flex items-center">Chat</a>
+    </div>`;
+  }
+
+  let tab = 'chats', q = '';
+  function render() {
+    const L = document.getElementById('list');
+    const match = id => !q || (id === undefined ? 'vibe team' : H(id).n.toLowerCase()).includes(q);
+    if (tab === 'chats') L.innerHTML = chats.filter(c => match(c.id)).map(chatRow).join('') || empty('No chats found');
+    if (tab === 'calls') L.innerHTML = calls.filter(c => match(c.id)).map(callRow).join('');
+    if (tab === 'following') L.innerHTML = following.filter(match).map(followRow).join('');
+  }
+  const empty = t => `<p class="text-center text-sm text-gray-500 py-16">${t}</p>`;
+  document.querySelectorAll('.tab').forEach(b => b.onclick = () => { document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === b)); tab = b.dataset.t; render(); });
+  function toggleSearch() { const s = document.getElementById('searchBox'); s.classList.toggle('hidden'); if (!s.classList.contains('hidden')) document.getElementById('q').focus(); }
+  document.getElementById('q').oninput = e => { q = e.target.value.trim().toLowerCase(); render(); };
+
+  // long-press a chat for actions (real app: same on long-press)
+  let pressT;
+  document.getElementById('list').addEventListener('pointerdown', e => { const r = e.target.closest('[data-id]'); if (!r) return; pressT = setTimeout(() => openActions(H(+r.dataset.id)), 500); });
+  ['pointerup', 'pointerleave', 'scroll'].forEach(ev => document.getElementById('list').addEventListener(ev, () => clearTimeout(pressT), true));
+  function openActions(h) {
+    document.getElementById('actBody').innerHTML = `<div class="w-10 h-1 rounded-full bg-gray-600 mx-auto mb-3"></div><p class="text-center text-sm text-gray-400 mb-2">${h.n}</p>` +
+      [['📌', 'Pin chat'], ['🔕', 'Mute notifications'], ['🗑️', 'Delete chat'], ['⛔', 'Block'], ['🚩', 'Report']].map(([i, t]) =>
+        `<button onclick="document.getElementById('act').classList.remove('open');vibe.toast('${t} · ${h.n}')" class="w-full h-12 rounded-2xl bg-cyberDark border border-cyberLine flex items-center gap-3 px-4 ${i === '⛔' || i === '🚩' ? 'text-dangerRed' : ''}">${i} ${t}</button>`).join('');
+    document.getElementById('act').classList.add('open');
+  }
+  render();
+</script>
+</body>
+</html>

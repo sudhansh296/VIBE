@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Permissions</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .why { display: flex; gap: 12px; align-items: flex-start; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.06); } .why:last-child { border: 0; }
+  .seg { display: flex; padding: 3px; border-radius: 99px; background: #12121c; border: 1px solid #262636; }
+  .seg button { flex: 1; height: 32px; border-radius: 99px; font-size: 12px; color: #8b8b9a; } .seg .on { background: #26263a; color: #fff; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-80 h-80 bg-neonCyan/10 -top-28 -left-24"></div>
+  <div class="blob w-64 h-64 bg-neonPink/10 bottom-20 -right-24"></div>
+
+  <div class="relative px-5 pt-5"><div class="seg" id="seg"><button data-t="cam" class="on">Camera & mic</button><button data-t="notif">Notifications</button><button data-t="denied">If denied</button></div></div>
+
+  <section class="relative flex-1 overflow-y-auto px-6 pt-8 pb-6 flex flex-col items-center text-center" id="body"></section>
+
+  <footer class="relative p-5 pt-3">
+    <button id="go" class="btn-neon w-full h-14 rounded-2xl font-bold"></button>
+    <button id="skip" class="w-full h-11 mt-2 text-sm text-gray-400"></button>
+  </footer>
+</main>
+<script>
+  // DEMO. In the real app Android shows its own permission dialog after this explanation screen. If the user denies twice,
+  // Android won't ask again and the app sends them to the system Settings page (the "If denied" tab).
+  const $ = i => document.getElementById(i);
+  const svg = d => `<svg class="w-9 h-9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">${d}</svg>`;
+  const ICON = { cam: svg('<path d="M5.5 6h7.5a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H5.5a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3z"/><path d="m16 11 5-3v8l-5-3"/>'), notif: svg('<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>'), denied: svg('<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>') };
+  const S = {
+    cam: { tone: '#00f2fe', title: 'Allow camera and microphone', sub: 'VIBE needs them to make video and voice calls and to verify you.', go: 'Allow', skip: 'Not now',
+      why: [['Video calls', 'Show your face to the person you talk to'], ['Voice calls', 'Let them hear you'], ['Selfie check and photos', 'Verify you are real and add your photos and videos'], ['Your privacy', 'Calls are not recorded. The camera is used only when you start a call or tap the camera button']] },
+    notif: { tone: '#ff2a85', title: 'Never miss a call', sub: 'Turn on notifications so you know when someone calls or messages you.', go: 'Turn on notifications', skip: 'Not now',
+      why: [['Incoming calls', 'Ring even when the app is closed. Very important for hosts'], ['Messages and replies', 'Know when someone writes to you'], ['Money and safety', 'Payment, payout and account updates'], ['You are in control', 'Change this any time in Settings']] },
+    denied: { tone: '#ff4d5e', title: 'Permission is turned off', sub: 'Calls and photos will not work until you allow camera and microphone in your phone settings.', go: 'Open phone settings', skip: 'Maybe later',
+      why: [['1. Open phone settings', 'Tap the button below'], ['2. Open Permissions', 'Find Camera and Microphone'], ['3. Choose Allow', 'Come back to VIBE and try again']] },
+  };
+  let t = 'cam';
+  function paint() {
+    const s = S[t];
+    $('body').innerHTML = `<div class="w-24 h-24 rounded-3xl flex items-center justify-center float" style="border:1px solid ${s.tone}66;background:${s.tone}1a;color:${s.tone}">${ICON[t]}</div>
+      <h1 class="text-2xl font-light mt-6">${s.title}</h1><p class="text-sm text-gray-400 mt-2 leading-relaxed max-w-[300px]">${s.sub}</p>
+      <div class="w-full text-left mt-7 rounded-2xl bg-cyberCard border border-cyberLine px-4">${s.why.map(([a, b]) => `<div class="why"><span class="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style="background:${s.tone}"></span><div><b class="text-sm font-medium">${a}</b><div class="text-xs text-gray-500 mt-0.5 leading-relaxed">${b}</div></div></div>`).join('')}</div>`;
+    $('go').textContent = s.go; $('skip').textContent = s.skip;
+    document.querySelectorAll('#seg button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+  }
+  $('seg').onclick = e => { const b = e.target.closest('[data-t]'); if (b) { t = b.dataset.t; paint(); } };
+  $('go').onclick = () => { if (t === 'cam') { vibe.toast('Android permission dialog opens'); t = 'notif'; paint(); } else if (t === 'notif') { vibe.toast('Notifications turned on'); setTimeout(() => vibe.go('05-home.html'), 700); } else vibe.toast('Phone settings open'); };
+  $('skip').onclick = () => { if (t === 'cam') { t = 'notif'; paint(); } else vibe.go('05-home.html'); };
+  paint();
+</script>
+</body>
+</html>

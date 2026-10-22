@@ -1,0 +1,40 @@
+/* Layout shared by every call-design option; each option file only sets the look */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; min-height: 100vh; font-family: 'Inter', sans-serif; color: #fff; background: #050508; padding: 28px 16px; }
+h1 { font-size: 22px; margin: 0; } p.sub { color: #8b8b9a; font-size: 13px; margin: 6px 0 24px; }
+.row3 { display: flex; flex-wrap: wrap; gap: 28px; justify-content: center; }
+figure { margin: 0; } figcaption { font-size: 12px; color: #8b8b9a; margin-bottom: 10px; text-align: center; letter-spacing: .04em; text-transform: uppercase; }
+.ph { position: relative; width: 300px; height: 640px; border-radius: 38px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 0 0 8px #101016, 0 30px 60px -20px rgba(0,0,0,.9); }
+.ph > * { position: relative; z-index: 1; }
+.ph .bg, .ph .selfcam, .ph .remote, .ph .shade { position: absolute; inset: 0; z-index: 0; }
+.topline { display: flex; align-items: center; padding: 22px 18px 0; font-size: 11px; }
+.topline .min { width: 22px; height: 22px; opacity: .8 } .topline .sp { width: 22px; }
+.topline .enc { flex: 1; display: flex; gap: 5px; align-items: center; justify-content: center; opacity: .6; }
+.topline .enc svg { width: 11px; height: 11px; }
+.who { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 20px; }
+.av { display: flex; align-items: center; justify-content: center; font-weight: 600; border-radius: 99px; }
+.nm { font-weight: 600; } .st { display: flex; align-items: center; gap: 6px; } .meta { font-size: 11px; }
+.ctrls { margin-top: auto; }
+.row { display: flex; justify-content: space-between; align-items: flex-start; }
+.endrow { display: flex; justify-content: center; }
+.cb { background: none; border: 0; color: inherit; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 7px; cursor: pointer; font-family: inherit; }
+.cb .ic { display: flex; align-items: center; justify-content: center; transition: all .18s; }
+.cb .ic svg { width: 24px; height: 24px; }
+.cb .lb { font-size: 10.5px; }
+.cb:active .ic { transform: scale(.92); }
+/* stand-in camera feeds */
+.selfcam, .remote { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; overflow: hidden; }
+.selfcam .face, .remote .face { width: 150px; height: 190px; border-radius: 50% 50% 46% 46%; margin-bottom: -26px; filter: blur(1.5px); }
+.selfcam .body, .remote .body { width: 300px; height: 190px; border-radius: 50% 50% 0 0; }
+.pip { position: absolute !important; right: 14px; top: 74px; width: 84px; height: 120px; border-radius: 16px; display: flex; align-items: flex-end; justify-content: center; font-size: 9px; padding-bottom: 6px; z-index: 2 !important; }
+.topbar { display: flex; justify-content: space-between; align-items: center; padding: 22px 14px 0; }
+.topbar .chip { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.topbar .chip small { display: block; font-size: 10px; opacity: .75; font-variant-numeric: tabular-nums; }
+.av.mini { width: 30px; height: 30px; font-size: 12px; }
+.coins { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; }
+.coin { width: 13px; height: 13px; background: url('../assets/icons/coin.webp') center/contain no-repeat; display: inline-block; }
+.live { width: 6px; height: 6px; border-radius: 99px; background: #3ee08f; display: inline-block; }
+nav.opts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 18px; }
+nav.opts a { color: #c7c7d1; font-size: 12px; text-decoration: none; padding: 7px 12px; border-radius: 99px; border: 1px solid #262636; }
+nav.opts a.cur { background: #fff; color: #07070c; border-color: #fff; font-weight: 600; }
+header.top { text-align: center; }

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Login</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-neonPink/20 -top-20 -right-20"></div>
+  <div class="blob w-64 h-64 bg-neonCyan/15 top-60 -left-24"></div>
+
+  <!-- top bar -->
+  <header class="relative flex items-center justify-between px-6 pt-6">
+    <span class="text-xl font-black grad-text">VIBE</span>
+    <button id="langBtn" class="flex items-center gap-1.5 px-3 h-9 rounded-full btn-ghost text-sm text-gray-300">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+      <span id="langLabel">English</span>
+    </button>
+  </header>
+
+  <section class="relative flex-1 overflow-y-auto px-6 pt-6 flex flex-col">
+    <!-- hero -->
+    <div class="relative h-44 flex items-center justify-center">
+      <span class="absolute w-36 h-36 rounded-full border-2 border-neonPink/40 ring-wave"></span>
+      <span class="absolute w-36 h-36 rounded-full border-2 border-neonCyan/40 ring-wave" style="animation-delay:1s"></span>
+      <img src="assets/icons/chat.webp" alt="" class="relative w-40 h-40 object-contain heartbeat">
+    </div>
+
+    <h1 class="text-[28px] leading-tight font-extrabold mt-2" data-i18n="title">Welcome to <span class="grad-text">VIBE</span> 👋</h1>
+    <p class="text-gray-400 mt-2 text-sm" data-i18n="sub">Video chat with real people. Become a host and earn, open for everyone.</p>
+
+    <!-- phone input -->
+    <label class="text-xs font-medium text-gray-400 mt-8 mb-2" data-i18n="label">Mobile number</label>
+    <div id="field" class="neon-field flex items-center h-14 rounded-2xl px-4 gap-3">
+      <button class="flex items-center gap-1.5 font-semibold shrink-0">🇮🇳 +91
+        <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+      <span class="w-px h-6 bg-cyberLine"></span>
+      <input id="phone" class="bg-transparent outline-none flex-1 text-lg tracking-widest placeholder:text-gray-600 placeholder:tracking-normal" placeholder="Enter 10-digit number" inputmode="numeric" maxlength="11" autocomplete="tel-national">
+      <span id="ok" class="hidden w-6 h-6 rounded-full bg-onlineGreen/20 text-onlineGreen flex items-center justify-center text-sm">✓</span>
+    </div>
+    <p id="err" class="text-xs text-dangerRed mt-2 hidden">Please enter a valid 10-digit mobile number</p>
+
+    <button id="sendOtp" disabled class="btn-neon w-full h-14 rounded-2xl font-bold mt-5 text-[15px]" data-i18n="send">Send OTP</button>
+
+    <div class="flex items-center gap-3 my-6 text-xs text-gray-500"><span class="flex-1 h-px bg-cyberLine"></span><span data-i18n="or">or continue with</span><span class="flex-1 h-px bg-cyberLine"></span></div>
+
+    <button id="google" class="w-full h-14 rounded-2xl bg-white text-[#1f1f1f] font-semibold flex items-center justify-center gap-3 active:scale-[.97] transition">
+      <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+      <span data-i18n="google">Continue with Google</span>
+    </button>
+
+    <!-- consent -->
+    <label class="flex items-start gap-3 mt-auto pt-8 pb-8 cursor-pointer select-none">
+      <input id="agree" type="checkbox" class="peer sr-only" checked>
+      <span class="mt-0.5 w-5 h-5 shrink-0 rounded-md border-2 border-cyberLine flex items-center justify-center peer-checked:bg-neonPink peer-checked:border-neonPink text-[12px] font-black">✓</span>
+      <span class="text-[11px] leading-relaxed text-gray-500" data-i18n="terms">I confirm I am <b class="text-gray-300">18 or older</b> and agree to the <a href="#" class="text-neonCyan">Terms of Service</a>, <a href="#" class="text-neonCyan">Privacy Policy</a> and <a href="#" class="text-neonCyan">Community Rules</a>.</span>
+    </label>
+  </section>
+</main>
+
+<script>
+  const phone = document.getElementById('phone');
+  const btn = document.getElementById('sendOtp');
+  const agree = document.getElementById('agree');
+  const ok = document.getElementById('ok');
+  const err = document.getElementById('err');
+  const field = document.getElementById('field');
+
+  function digits() { return phone.value.replace(/\D/g, ''); }
+  function valid() { return /^[6-9]\d{9}$/.test(digits()); }
+  function refresh() {
+    btn.disabled = !(valid() && agree.checked);
+    ok.classList.toggle('hidden', !valid());
+    ok.classList.toggle('flex', valid());
+  }
+  // format as 98765 43210
+  phone.addEventListener('input', () => {
+    const d = digits().slice(0, 10);
+    phone.value = d.length > 5 ? d.slice(0, 5) + ' ' + d.slice(5) : d;
+    err.classList.add('hidden');
+    refresh();
+  });
+  agree.addEventListener('change', refresh);
+
+  btn.addEventListener('click', () => {
+    if (!valid()) { err.classList.remove('hidden'); field.classList.add('shake'); setTimeout(() => field.classList.remove('shake'), 400); return; }
+    sessionStorage.setItem('vibe-phone', digits());
+    btn.innerHTML = '<span class="inline-block w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin align-middle"></span>';
+    setTimeout(() => vibe.go('03-otp.html'), 700);
+  });
+  document.getElementById('google').addEventListener('click', () => {
+    if (!agree.checked) { vibe.toast('Please accept the terms first'); return; }
+    vibe.toast('Google account picker opens here');
+    setTimeout(() => vibe.go('04-profile-setup.html'), 900);
+  });
+
+  // English / Hindi toggle
+  const hi = {
+    title: 'VIBE में आपका स्वागत है 👋', sub: 'असली लोगों से वीडियो चैट करें। होस्ट बनें और कमाएँ, सबके लिए खुला।',
+    label: 'मोबाइल नंबर', send: 'OTP भेजें', or: 'या इससे जारी रखें', google: 'Google से जारी रखें',
+  };
+  const en = {};
+  document.querySelectorAll('[data-i18n]').forEach(el => (en[el.dataset.i18n] = el.innerHTML));
+  let lang = 'en';
+  document.getElementById('langBtn').addEventListener('click', () => {
+    lang = lang === 'en' ? 'hi' : 'en';
+    document.getElementById('langLabel').textContent = lang === 'en' ? 'English' : 'हिंदी';
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const k = el.dataset.i18n;
+      el.innerHTML = lang === 'hi' && hi[k] ? hi[k] : en[k];
+    });
+  });
+  refresh();
+</script>
+</body>
+</html>

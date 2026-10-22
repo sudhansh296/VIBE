@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Host application</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .slot { aspect-ratio: 3/4; border-radius: 18px; border: 1.5px dashed #3a3a4c; background: #12121c; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #6b6b7b; font-size: 11px; position: relative; overflow: hidden; }
+  .slot.full { border: 1.5px solid #ff2a85; color: #fff; background: linear-gradient(160deg, var(--a), var(--b)); }
+  .slot .main { position: absolute; left: 6px; top: 6px; font-size: 9px; font-weight: 700; letter-spacing: .08em; padding: 2px 7px; border-radius: 99px; background: rgba(0,0,0,.55); }
+  .lbl { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: #6b6b7b; margin: 20px 0 8px; display: block; }
+  .field { width: 100%; background: #12121c; border: 1.5px solid #262636; border-radius: 16px; padding: 14px 16px; outline: none; font-size: 14px; color: #fff; }
+  .field:focus { border-color: #ff2a85; box-shadow: 0 0 0 4px rgba(255,42,133,.15); }
+  .up { border: 1.5px solid #262636; background: #12121c; border-radius: 18px; padding: 14px; display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; }
+  .up.done { border-color: rgba(62,224,143,.5); background: rgba(62,224,143,.07); }
+  .pane { display: none; } .pane.show { display: block; }
+  .oval { width: 190px; height: 250px; border-radius: 50%; border: 3px dashed rgba(255,255,255,.75); position: relative; overflow: hidden; background: radial-gradient(circle at 50% 40%, #5b2a44, #1a0d16 75%); }
+  .oval.scan { border-style: solid; border-color: #ff2a85; box-shadow: 0 0 40px -6px #ff2a85; }
+  .oval.ok { border-style: solid; border-color: #3ee08f; box-shadow: 0 0 40px -6px #3ee08f; }
+  .scanline { position: absolute; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, #00f2fe, transparent); animation: scan 1.6s ease-in-out infinite; }
+  @keyframes scan { 0%,100% { top: 8% } 50% { top: 92% } }
+  .pose { height: 34px; padding: 0 14px; border-radius: 99px; border: 1.5px solid #262636; background: #12121c; font-size: 12px; color: #8b8b9a; display: flex; align-items: center; gap: 6px; }
+  .pose.on { border-color: #ff2a85; color: #fff; } .pose.done { border-color: rgba(62,224,143,.6); color: #3ee08f; }
+  .chk { display: flex; gap: 12px; align-items: center; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.06); } .chk:last-child { border: 0; }
+  .dotn { width: 28px; height: 28px; border-radius: 99px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-neonPink/10 -top-24 -left-24"></div>
+
+  <header class="relative flex items-center gap-3 px-4 pt-5 pb-2">
+    <button id="back" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Back">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="flex-1"><h1 id="title" class="text-xl font-semibold"></h1></div>
+    <div class="flex gap-1.5" id="dots"></div>
+  </header>
+
+  <section class="relative flex-1 overflow-y-auto px-5 pb-6">
+    <!-- 1 profile -->
+    <div class="pane show" data-p="0">
+      <span class="lbl">Photos (at least 3)</span>
+      <div id="slots" class="grid grid-cols-3 gap-3"></div>
+      <p class="text-[11px] text-gray-500 mt-2">Clear photos of yourself only. The first photo is your main picture.</p>
+
+      <span class="lbl">Intro video (15 seconds)</span>
+      <button id="vid" class="up"><span class="w-11 h-11 rounded-xl bg-neonCyan/10 border border-neonCyan/40 text-neonCyan flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5.5 6h7.5a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H5.5a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3z"/><path d="m16 11 5-3v8l-5-3"/></svg></span>
+        <span class="flex-1"><b class="block text-sm font-medium">Record a 15 sec intro</b><span id="vidSt" class="text-xs text-gray-500">Say hi and the languages you speak</span></span><span id="vidTick"></span></button>
+
+      <span class="lbl">Short bio</span>
+      <textarea id="bio" maxlength="150" rows="3" class="field resize-none" placeholder="Tell users what you love talking about"></textarea>
+      <div class="text-right text-[11px] text-gray-500 mt-1"><span id="cnt">0</span>/150</div>
+
+      <span class="lbl">Languages you speak</span>
+      <div id="langs" class="flex flex-wrap gap-2"></div>
+    </div>
+
+    <!-- 2 live selfie -->
+    <div class="pane" data-p="1">
+      <div class="flex flex-col items-center mt-3">
+        <div id="oval" class="oval"><video id="selfieVid" class="absolute inset-0 w-full h-full object-cover hidden" style="transform:scaleX(-1)" autoplay muted playsinline></video><div id="scan" class="scanline hidden"></div>
+          <svg id="ghostFace" class="absolute inset-0 m-auto w-24 h-24 text-white/25" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="12" cy="9" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
+        <p id="selfieMsg" class="text-sm font-medium mt-4 text-center">Keep your face inside the oval</p>
+        <div id="poses" class="flex gap-2 mt-4"></div>
+        <button id="selfieBtn" class="btn-neon h-12 px-8 rounded-full font-bold text-sm mt-6">Start selfie check</button>
+      </div>
+      <div class="rounded-2xl border border-white/10 bg-cyberCard p-4 text-xs text-gray-400 leading-relaxed mt-6 flex gap-3">
+        <svg class="w-5 h-5 text-neonCyan shrink-0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        <span>Only the VIBE team sees this selfie. It is compared with your photos to make sure they are really you.</span></div>
+    </div>
+
+    <!-- 3 identity -->
+    <div class="pane" data-p="2">
+      <div class="rounded-2xl border border-neonCyan/30 bg-neonCyan/5 p-4 flex gap-3 text-xs text-gray-300 leading-relaxed mt-2">
+        <svg class="w-5 h-5 text-neonCyan shrink-0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6Z"/><path d="m9 12 2 2 4-4"/></svg>
+        <span>Needed to confirm you are 18+ and for payouts and tax. Your documents are private.</span></div>
+
+      <span class="lbl">Date of birth</span>
+      <div class="field flex items-center justify-between"><span>14 Mar 2002 · from your profile</span><span class="text-[11px] font-semibold text-onlineGreen bg-onlineGreen/15 px-2 py-0.5 rounded-full">24 yrs ✓</span></div>
+
+      <span class="lbl">Full name (as on PAN)</span>
+      <input id="pname" class="field" placeholder="Your full name">
+      <span class="lbl">PAN number</span>
+      <input id="pan" class="field uppercase tracking-widest" maxlength="10" placeholder="ABCDE1234F">
+      <p id="panMsg" class="text-[11px] text-gray-500 mt-2 h-4"></p>
+
+      <span class="lbl">ID proof</span>
+      <div id="idtype" class="grid grid-cols-3 gap-2 text-xs"></div>
+      <button class="up mt-3" id="idup"><span class="w-11 h-11 rounded-xl bg-cyberGold/10 border border-cyberGold/40 text-cyberGold flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="11" r="2"/><path d="M6 16a3 3 0 0 1 6 0M14 10h4M14 13h3"/></svg></span>
+        <span class="flex-1"><b class="block text-sm font-medium">Upload ID photo</b><span id="idSt" class="text-xs text-gray-500">Front side, all details visible</span></span><span id="idTick"></span></button>
+    </div>
+
+    <!-- 4 settings -->
+    <div class="pane" data-p="3">
+      <span class="lbl">Accept</span>
+      <div class="grid grid-cols-2 gap-3" id="types"></div>
+
+      <span class="lbl">Starting rates (coins per minute)</span>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="rounded-2xl bg-cyberCard border border-cyberLine p-3 text-center"><div class="text-[10px] tracking-widest uppercase text-gray-500">Voice</div><div class="text-2xl font-light mt-1">30</div></div>
+        <div class="rounded-2xl bg-cyberCard border border-cyberLine p-3 text-center"><div class="text-[10px] tracking-widest uppercase text-gray-500">Video</div><div class="text-2xl font-light mt-1">60</div></div>
+      </div>
+      <p class="text-[11px] text-gray-500 mt-2">VIBE sets your first rates. Higher rates unlock as your host level grows.</p>
+
+      <span class="lbl">Agency code (optional)</span>
+      <div class="flex gap-2"><input id="agency" class="field uppercase tracking-widest" maxlength="10" placeholder="e.g. AG1045"><div id="agChip" class="hidden shrink-0 items-center px-3 rounded-2xl border border-onlineGreen/50 bg-onlineGreen/10 text-onlineGreen text-xs font-semibold whitespace-nowrap"></div></div>
+      <p id="agMsg" class="text-[11px] text-gray-500 mt-2">Invited by an agency? Enter its code. You can also join or leave one later.</p>
+
+      <label class="flex gap-3 items-start mt-6 text-xs text-gray-400 leading-relaxed" id="agree"><span class="w-5 h-5 rounded-md border-2 border-gray-600 shrink-0 flex items-center justify-center mt-0.5" id="box"></span>
+        <span>I am 18 or older, the photos are mine, and I agree to the VIBE host rules and terms. Nudity, sexual content and asking for money or numbers outside VIBE are not allowed and lead to a ban.</span></label>
+    </div>
+  </section>
+
+  <footer id="foot" class="relative p-5 pt-3 glass border-t border-cyberLine/60">
+    <button id="next" class="btn-neon w-full h-14 rounded-2xl font-bold"></button>
+  </footer>
+
+  <!-- intro video recorder -->
+  <div id="cam" class="hidden absolute inset-0 z-50 bg-black flex-col">
+    <video id="camVid" class="absolute inset-0 w-full h-full object-cover" style="transform:scaleX(-1)" autoplay muted playsinline></video>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/70"></div>
+    <button id="camClose" class="absolute top-5 left-4 w-10 h-10 rounded-full bg-black/50 border border-white/20 flex items-center justify-center" aria-label="Close"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div id="camMsg" class="absolute top-6 left-0 right-0 text-center text-sm font-medium px-16">Say hi and the languages you speak</div>
+    <div class="absolute bottom-10 left-0 right-0 flex flex-col items-center gap-3">
+      <div id="camTime" class="text-sm tabular-nums text-white/80">0:15</div>
+      <button id="camRec" class="relative w-20 h-20 rounded-full border-4 border-white flex items-center justify-center" aria-label="Record"><span id="camDot" class="w-14 h-14 rounded-full bg-dangerRed transition-all"></span>
+        <svg class="absolute inset-0 m-auto" style="width:92px;height:92px;transform:rotate(-90deg);pointer-events:none" viewBox="0 0 92 92"><circle id="camRing" cx="46" cy="46" r="43" fill="none" stroke="#ff2a85" stroke-width="4" stroke-linecap="round" stroke-dasharray="270" stroke-dashoffset="270"/></svg></button>
+      <div class="text-[11px] text-white/60">Tap to record · stops by itself after 15 seconds</div>
+    </div>
+  </div>
+
+  <!-- under review -->
+  <div id="review" class="hidden absolute inset-0 z-50 bg-cyberDark flex-col px-6 pt-10 overflow-y-auto">
+    <div class="blob w-72 h-72 bg-cyberGold/10 top-0 left-1/2 -translate-x-1/2"></div>
+    <div class="relative text-center">
+      <div class="w-28 h-28 mx-auto rounded-full border-2 border-cyberGold/50 bg-cyberCard flex items-center justify-center float"><svg class="w-12 h-12 text-cyberGold" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M6 3h12M6 21h12M7 3c0 5 5 6 5 9s-5 4-5 9M17 3c0 5-5 6-5 9s5 4 5 9"/></svg></div>
+      <h2 class="text-2xl font-light mt-5">Under review</h2>
+      <p class="text-sm text-gray-400 mt-2 leading-relaxed">Our team checks every host by hand so VIBE stays safe and real. We will notify you within 24 hours. You can keep using VIBE normally.</p>
+    </div>
+    <div class="relative rounded-2xl bg-cyberCard border border-cyberLine px-4 mt-6" id="checks"></div>
+    <button onclick="vibe.go('24-host-dashboard.html')" class="relative btn-neon mt-6 mb-6 h-14 rounded-2xl font-bold">Preview host dashboard</button>
+    <button onclick="showRejected()" class="relative text-[11px] text-gray-500 underline mb-8">Preview the "not approved" screen</button>
+  </div>
+
+  <!-- rejected -->
+  <div id="rejected" class="hidden absolute inset-0 z-50 bg-cyberDark flex-col px-6 pt-10 items-center text-center">
+    <div class="blob w-72 h-72 bg-dangerRed/10 top-0 left-1/2 -translate-x-1/2"></div>
+    <div class="relative w-28 h-28 rounded-full border-2 border-dangerRed/60 bg-cyberCard flex items-center justify-center"><svg class="w-12 h-12 text-dangerRed" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></svg></div>
+    <h2 class="relative text-2xl font-light mt-5">Not approved</h2>
+    <p class="relative text-sm text-gray-400 mt-2">Your application could not be approved this time.</p>
+    <div class="relative w-full mt-5 rounded-2xl border border-dangerRed/30 bg-dangerRed/5 p-4 text-left text-sm"><b class="text-dangerRed">Reason: </b><span class="text-gray-300">Photos are not clear. Please upload 3 clear photos of your own face.</span></div>
+    <button onclick="location.reload()" class="relative btn-neon w-full mt-6 h-14 rounded-2xl font-bold">Apply again</button>
+  </div>
+</main>
+<script>
+  // DEMO. Review result, the rejection reason, agency lookup and age check all come from the SERVER / admin panel.
+  const $ = id => document.getElementById(id);
+  const TITLES = ['Your profile', 'Live selfie', 'Verify identity', 'Call settings'];
+  const BTN = ['Continue', 'Continue', 'Continue', 'Submit for review'];
+  const GR = [['#ff2a85', '#7a1fd1'], ['#00f2fe', '#1e3a8a'], ['#f59e0b', '#9a3412']];
+  const LANGS = ['Hindi', 'English', 'Punjabi', 'Bengali', 'Tamil', 'Telugu', 'Marathi', 'Kannada', 'Gujarati'];
+  const POSES = ['Look straight', 'Turn left', 'Smile'];
+  const AGENCIES = { AG1045: 'Star Agency', AG4821: 'Moon Agency' };   // demo lookup
+  const OK = '<svg class="w-6 h-6 text-onlineGreen" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>';
+  const S = { step: 0, photos: [true, false, false, false, false, false], video: false, langs: new Set(['Hindi']), pose: -1, selfie: false, id: false, idType: 0, types: { voice: true, video: true }, agree: false, busy: false };
+
+  const panOk = () => /^[A-Z]{5}[0-9]{4}[A-Z]$/.test($('pan').value.toUpperCase());
+  function paint() {
+    $('title').textContent = TITLES[S.step];
+    $('dots').innerHTML = [0, 1, 2, 3].map(i => `<span class="h-1.5 rounded-full ${i <= S.step ? 'w-5 bg-neonPink' : 'w-2.5 bg-cyberLine'}"></span>`).join('');
+    document.querySelectorAll('.pane').forEach(p => p.classList.toggle('show', +p.dataset.p === S.step));
+    $('next').textContent = BTN[S.step];
+    $('slots').innerHTML = S.photos.map((f, i) => f
+      ? `<button data-s="${i}" class="slot full" style="--a:${GR[i % 3][0]};--b:${GR[i % 3][1]}">${i === 0 ? '<span class="main">MAIN</span>' : ''}<svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Tap to remove</button>`
+      : `<button data-s="${i}" class="slot"><svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add photo</button>`).join('');
+    $('vid').classList.toggle('done', S.video); $('vidTick').innerHTML = S.video ? OK : '<span class="text-gray-600 text-lg">›</span>';
+    $('vidSt').textContent = S.video ? 'Intro recorded · 0:15' : 'Say hi and the languages you speak';
+    $('langs').innerHTML = LANGS.map(l => `<button data-l="${l}" class="chip h-10 px-4 rounded-full text-sm ${S.langs.has(l) ? 'on' : ''}">${l}</button>`).join('');
+    $('poses').innerHTML = POSES.map((p, i) => `<span class="pose ${S.selfie || i < S.pose ? 'done' : i === S.pose ? 'on' : ''}">${S.selfie || i < S.pose ? '✓' : i + 1} ${p}</span>`).join('');
+    $('oval').className = 'oval ' + (S.selfie ? 'ok' : S.pose >= 0 ? 'scan' : '');
+    $('scan').classList.toggle('hidden', S.selfie || S.pose < 0);
+    $('selfieBtn').style.display = S.selfie || S.pose >= 0 ? 'none' : '';
+    $('selfieMsg').textContent = S.selfie ? 'Selfie verified' : S.pose >= 0 ? POSES[S.pose] + '…' : 'Keep your face inside the oval';
+    $('selfieMsg').style.color = S.selfie ? '#3ee08f' : '';
+    $('idtype').innerHTML = ['Aadhaar', 'PAN', 'Passport'].map((t, i) => `<button data-t="${i}" class="chip h-11 rounded-2xl ${i === S.idType ? 'on' : ''}">${t}</button>`).join('');
+    $('idup').classList.toggle('done', S.id); $('idTick').innerHTML = S.id ? OK : '<span class="text-gray-600 text-lg">›</span>'; if (S.id) $('idSt').textContent = 'ID uploaded';
+    $('types').innerHTML = [['voice', 'Voice calls'], ['video', 'Video calls']].map(([k, l]) => `<button data-ty="${k}" class="chip h-14 rounded-2xl ${S.types[k] ? 'on' : ''}">${l}</button>`).join('');
+    $('box').innerHTML = S.agree ? '<svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>' : '';
+    $('box').style.cssText = S.agree ? 'background:#ff2a85;border-color:#ff2a85' : '';
+    const can = [S.photos.filter(Boolean).length >= 3 && S.video && $('bio').value.trim().length >= 10 && S.langs.size > 0,
+      S.selfie, $('pname').value.trim().length > 3 && panOk() && S.id, S.agree && (S.types.voice || S.types.video)][S.step];
+    $('next').disabled = !can;
+  }
+  // Real front camera (works on localhost / https; asks the user for permission). Falls back to a simulation if it is denied or missing.
+  let stream = null;
+  async function openCam(el) {
+    try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 720, height: 960 }, audio: false }); el.srcObject = stream; await el.play().catch(() => {}); return true; }
+    catch (e) { stream = null; return false; }
+  }
+  function closeCam(el) { if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; if (el) el.srcObject = null; }
+
+  async function selfieFlow() {
+    const live = await openCam($('selfieVid'));
+    $('selfieVid').classList.toggle('hidden', !live); $('ghostFace').classList.toggle('hidden', live);
+    if (!live) vibe.toast('Camera not available · showing a demo');
+    selfieRun();
+  }
+  function selfieRun() {   // demo: 3 poses, about 1.2 s each
+    S.pose = 0; paint();
+    const t = setInterval(() => { S.pose++; if (S.pose >= 3) { clearInterval(t); S.selfie = true; const v = $('selfieVid'); if (stream) { v.pause(); stream.getTracks().forEach(x => x.stop()); stream = null; } } paint(); }, 1200);
+  }
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-s],[data-l],[data-t],[data-ty],#agree,#vid,#idup,#selfieBtn'); if (!t) return;
+    if (t.id === 'selfieBtn') return selfieFlow();
+    if (t.dataset.s) S.photos[+t.dataset.s] = !S.photos[+t.dataset.s];
+    else if (t.dataset.l) S.langs.has(t.dataset.l) ? S.langs.delete(t.dataset.l) : S.langs.add(t.dataset.l);
+    else if (t.dataset.t) S.idType = +t.dataset.t;
+    else if (t.id === 'vid') return openRecorder();
+    else if (t.id === 'idup') S.id = true;
+    else if (t.dataset.ty) { const k = t.dataset.ty, o = k === 'voice' ? 'video' : 'voice'; if (S.types[k] && !S.types[o]) vibe.toast('Keep at least one call type on'); else S.types[k] = !S.types[k]; }
+    else S.agree = !S.agree;
+    paint();
+  });
+  $('bio').oninput = () => { $('cnt').textContent = $('bio').value.length; paint(); };
+  $('pname').oninput = paint;
+  $('pan').oninput = () => { const v = $('pan').value.toUpperCase(); $('pan').value = v; $('panMsg').textContent = !v ? '' : panOk() ? 'PAN format looks right' : 'PAN is 5 letters, 4 digits, 1 letter'; $('panMsg').style.color = panOk() ? '#3ee08f' : '#6b6b7b'; paint(); };
+  $('agency').oninput = () => {
+    const c = $('agency').value.toUpperCase(); $('agency').value = c; const n = AGENCIES[c];
+    $('agChip').classList.toggle('hidden', !n); $('agChip').classList.toggle('flex', !!n); $('agChip').textContent = n ? '✓ ' + n : '';
+    $('agMsg').textContent = !c ? 'Invited by an agency? Enter its code. You can also join or leave one later.' : n ? 'Code verified' : 'Checking the code…';
+  };
+  $('back').onclick = () => S.step > 0 ? (S.step--, paint()) : (history.length > 1 ? history.back() : vibe.go('22-become-host.html'));
+  $('next').onclick = () => { if (S.step < 3) { S.step++; paint(); document.querySelector('section').scrollTop = 0; } else showReview(); };
+
+  let recTimer = null;
+  async function openRecorder() {
+    $('cam').classList.remove('hidden'); $('cam').classList.add('flex'); resetRec();
+    const live = await openCam($('camVid'));
+    if (!live) { $('camMsg').textContent = 'Camera not available · demo recording'; }
+  }
+  function resetRec() { clearInterval(recTimer); recTimer = null; $('camTime').textContent = '0:15'; $('camRing').style.strokeDashoffset = 270; $('camDot').style.cssText = ''; }
+  function closeRecorder() { resetRec(); closeCam($('camVid')); $('cam').classList.add('hidden'); $('cam').classList.remove('flex'); }
+  $('camClose').onclick = closeRecorder;
+  $('camRec').onclick = () => {
+    if (recTimer) return;
+    let t = 0; $('camDot').style.cssText = 'width:28px;height:28px;border-radius:8px';
+    recTimer = setInterval(() => {
+      t += 0.1; $('camRing').style.strokeDashoffset = 270 * (1 - t / 15); $('camTime').textContent = '0:' + String(Math.max(0, Math.ceil(15 - t))).padStart(2, '0');
+      if (t >= 15) { S.video = true; closeRecorder(); paint(); vibe.toast('Intro video saved'); }
+    }, 100);
+  };
+
+  function showReview() {
+    const ag = AGENCIES[$('agency').value];
+    const rows = [['Photos & intro video', '', 1], ['Live selfie', '', 1], ['PAN & ID', '', 1], ...(ag ? [['Agency', ag + ' · ' + $('agency').value, 1]] : []), ['Team review', 'In progress', 0]];
+    $('checks').innerHTML = rows.map(([t, s, d], i) => `<div class="chk"><span class="dotn ${d ? 'bg-neonPink' : 'bg-neonPink/15 text-neonPink border border-neonPink/40'}">${d ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>' : i + 1}</span>
+      <div class="flex-1"><div class="text-sm font-medium">${t}</div>${d && s ? `<div class="text-[11px] text-gray-500">${s}</div>` : ''}</div>${d ? '' : '<span class="text-xs font-semibold text-cyberGold">Pending</span>'}</div>`).join('');
+    $('foot').classList.add('hidden'); $('review').classList.remove('hidden'); $('review').classList.add('flex');
+  }
+  function showRejected() { $('review').classList.add('hidden'); $('review').classList.remove('flex'); $('rejected').classList.remove('hidden'); $('rejected').classList.add('flex'); }
+  paint();
+</script>
+</body>
+</html>

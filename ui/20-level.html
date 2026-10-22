@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · My level</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-neonCyan/10 -top-24 -left-24"></div>
+  <div class="blob w-64 h-64 bg-neonPink/10 top-40 -right-24"></div>
+
+  <header class="relative flex items-center gap-3 px-4 pt-5 pb-3">
+    <button onclick="history.length > 1 ? history.back() : vibe.go('17-me.html')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Back">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 class="text-xl font-semibold">My level</h1>
+  </header>
+
+  <section class="relative flex-1 overflow-y-auto px-5 pb-8">
+    <!-- progress ring -->
+    <div class="flex flex-col items-center mt-2">
+      <div class="relative w-40 h-40">
+        <svg viewBox="0 0 120 120" class="w-full h-full -rotate-90">
+          <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff2a85"/><stop offset="1" stop-color="#00f2fe"/></linearGradient></defs>
+          <circle cx="60" cy="60" r="52" fill="none" stroke="#1c1c28" stroke-width="8"/>
+          <circle id="ring" cx="60" cy="60" r="52" fill="none" stroke="url(#lg)" stroke-width="8" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7" style="transition:stroke-dashoffset 1.2s ease-out;filter:drop-shadow(0 0 8px rgba(255,42,133,.6))"/></svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center"><div class="text-[10px] tracking-[.18em] uppercase text-gray-500">Level</div><div class="text-5xl font-extralight">3</div></div>
+      </div>
+      <p class="text-sm text-gray-300 mt-3"><b class="text-white">620</b> / 1,000 XP to Level 4</p>
+      <p class="text-xs text-gray-500 mt-1">Level 4 unlocks: 5% off calls</p>
+    </div>
+
+    <h3 class="text-[10px] tracking-[.16em] uppercase text-gray-500 mt-7 mb-3">How to earn XP</h3>
+    <div class="grid grid-cols-2 gap-2 text-xs">
+      <div class="rounded-2xl bg-cyberCard border border-cyberLine p-3"><div class="text-neonPink font-semibold">Calls</div><div class="text-gray-400 mt-0.5">10 XP every minute</div></div>
+      <div class="rounded-2xl bg-cyberCard border border-cyberLine p-3"><div class="text-neonCyan font-semibold">Chats</div><div class="text-gray-400 mt-0.5">2 XP per message</div></div>
+      <div class="rounded-2xl bg-cyberCard border border-cyberLine p-3"><div class="text-cyberGold font-semibold">Gifts</div><div class="text-gray-400 mt-0.5">1 XP per 10 coins</div></div>
+      <div class="rounded-2xl bg-cyberCard border border-cyberLine p-3"><div class="text-onlineGreen font-semibold">Check-in</div><div class="text-gray-400 mt-0.5">20 XP daily</div></div>
+    </div>
+
+    <h3 class="text-[10px] tracking-[.16em] uppercase text-gray-500 mt-7 mb-3">Rewards</h3>
+    <div id="list" class="relative"></div>
+    <p class="text-[11px] text-gray-500 text-center mt-5">XP, levels and rewards are decided by VIBE. The app only shows them.</p>
+  </section>
+</main>
+<script>
+  // DEMO; real levels, XP and rewards come from the server (admin panel).
+  const R = [[1, 0, 'Profile frame'], [2, 300, 'Chat bubble style'], [3, 500, 'Free daily gift'], [4, 1000, '5% off calls'], [5, 2000, 'Animated entry'], [10, 8000, 'Custom badge'], [15, 20000, '10% off calls'], [20, 50000, 'Legend crown']];
+  const cur = 3;
+  // Rewards as a winding path: nodes zig-zag left/right, a curved road joins them, done part glows.
+  const W = 340, H = 78, N = R.length, pad = 28;
+  const px = i => (i % 2 ? W * 0.86 : W * 0.14), py = i => pad + i * H;
+  const seg = i => `C ${px(i - 1)} ${py(i - 1) + H * .55}, ${px(i)} ${py(i) - H * .55}, ${px(i)} ${py(i)}`;
+  let full = `M ${px(0)} ${py(0)}`; for (let i = 1; i < N; i++) full += ' ' + seg(i);
+  const idx = R.findIndex(r => r[0] > cur) - 1;   // last reached node
+  let doneP = `M ${px(0)} ${py(0)}`; for (let i = 1; i <= idx; i++) doneP += ' ' + seg(i);
+  const nodes = R.map(([l, xp, r], i) => {
+    const done = l <= cur, next = i === idx + 1, left = i % 2 === 0;
+    const circ = done ? 'background:linear-gradient(135deg,#ff2a85,#7a1fd1);border-color:#ff2a85;box-shadow:0 0 18px -2px rgba(255,42,133,.7)'
+      : next ? 'background:#12121c;border-color:#ff2a85;box-shadow:0 0 0 5px rgba(255,42,133,.12)' : 'background:#12121c;border-color:#2c2c3c';
+    const inner = done ? `<span class="text-[13px] font-bold">Lv${l}</span>` : next ? `<span class="text-[13px] font-bold text-neonPink">Lv${l}</span>`
+      : `<svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
+    const x = px(i) / W * 100, y = py(i);
+    const label = `<div class="absolute -translate-y-1/2 w-[62%] ${left ? 'text-left' : 'text-right'}" style="top:${y}px;${left ? `left:${x + 10}%` : `right:${100 - x + 10}%`}">
+      <div class="text-[13px] leading-tight ${done || next ? 'text-white' : 'text-gray-400'}">${r}</div>
+      <div class="text-[10px] mt-0.5 ${next ? 'text-neonPink font-semibold tracking-widest' : done ? 'text-onlineGreen' : 'text-gray-600'}">${next ? 'NEXT · ' : done ? '✓ ' : ''}${xp.toLocaleString('en-IN')} XP</div></div>`;
+    return `<div class="absolute -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full border-2 flex items-center justify-center ${next ? 'animate-pulse' : ''}" style="left:${x}%;top:${y}px;${circ}">${inner}</div>${label}`;
+  }).join('');
+  const total = pad * 2 + (N - 1) * H;
+  document.getElementById('list').innerHTML = `<div class="relative" style="height:${total}px">
+    <svg viewBox="0 0 ${W} ${total}" class="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+      <path d="${full}" fill="none" stroke="#2a2a3a" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 11" vector-effect="non-scaling-stroke"/>
+      <path d="${doneP}" fill="none" stroke="url(#lg)" stroke-width="5" stroke-linecap="round" vector-effect="non-scaling-stroke" style="filter:drop-shadow(0 0 6px rgba(255,42,133,.6))"/></svg>${nodes}</div>`;
+  setTimeout(() => (document.getElementById('ring').style.strokeDashoffset = 326.7 * (1 - 0.62)), 200);
+</script>
+</body>
+</html>

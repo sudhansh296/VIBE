@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Profile</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<script src="assets/demo-data.js"></script>
+<script src="assets/safety.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .slides { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; }
+  .slides > * { flex: 0 0 100%; scroll-snap-align: start; }
+  .gl { backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); background: rgba(0,0,0,.38); }
+  .gift.on { border-color: #ff2a85; background: linear-gradient(160deg, rgba(255,42,133,.2), #07070c); }
+</style>
+</head>
+<body>
+<main class="phone">
+  <section id="scroll" class="flex-1 overflow-y-auto pb-28">
+    <!-- media -->
+    <div class="relative h-[440px]">
+      <div id="slides" class="slides absolute inset-0"></div>
+      <div class="absolute inset-0 pointer-events-none bg-gradient-to-t from-cyberDark via-transparent to-black/40"></div>
+      <button onclick="history.length > 1 ? history.back() : vibe.go('05-home.html')" class="absolute top-5 left-4 w-10 h-10 gl rounded-xl flex items-center justify-center" aria-label="Back">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+      <div class="absolute top-5 right-4 flex gap-2">
+        <button onclick="vibe.toast('Profile link copied')" class="w-10 h-10 gl rounded-xl flex items-center justify-center" aria-label="Share">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg></button>
+        <button onclick="openSheet('safety')" class="w-10 h-10 gl rounded-xl flex items-center justify-center" aria-label="More">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
+      </div>
+      <button onclick="openVideo()" class="absolute top-20 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full gl text-xs font-medium">▶ Intro video · 0:18</button>
+      <button id="v2" onclick="unlocked.has('v2') ? openVideo(2) : askUnlock('video')" class="absolute top-32 left-4 flex items-center gap-1.5 px-3 py-1.5 rounded-full gl text-xs font-medium"></button>
+      <div id="status" class="absolute bottom-24 right-4 flex items-center gap-2 px-3 py-1.5 rounded-full gl"></div>
+      <div id="dots" class="absolute bottom-24 left-4 flex gap-1.5"></div>
+      <div id="thumbs" class="absolute bottom-4 left-4 right-4 flex gap-2"></div>
+    </div>
+
+    <div class="px-5 space-y-5">
+      <!-- name -->
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <div class="flex items-center gap-2"><h1 id="name" class="text-[26px] font-extrabold truncate"></h1><span id="verified"></span></div>
+          <button onclick="vibe.toast('ID copied')" class="text-sm text-gray-400 mt-0.5 flex items-center gap-1.5">ID: <span id="uid"></span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+        </div>
+        <button id="follow" onclick="toggleFollow()" class="shrink-0 flex items-center gap-1.5 px-4 h-10 rounded-full btn-neon text-sm font-bold">＋ Follow</button>
+      </div>
+
+      <!-- tags -->
+      <div id="tags" class="flex flex-wrap gap-2 text-sm"></div>
+
+      <!-- stats -->
+      <div class="grid grid-cols-3 gap-2 text-center">
+        <div class="rounded-2xl bg-cyberCard border border-cyberLine py-3"><div id="followers" class="font-bold text-lg"></div><div class="text-[11px] text-gray-500">Followers</div></div>
+        <div class="rounded-2xl bg-cyberCard border border-cyberLine py-3"><div id="calls" class="font-bold text-lg"></div><div class="text-[11px] text-gray-500">Calls</div></div>
+        <div class="rounded-2xl bg-cyberCard border border-cyberLine py-3"><div id="ans" class="font-bold text-lg"></div><div class="text-[11px] text-gray-500">Answer rate</div></div>
+      </div>
+
+      <!-- bio -->
+      <div class="flex gap-3 p-4 rounded-2xl bg-cyberCard border border-cyberLine">
+        <span class="text-cyberGold text-2xl leading-none">“</span><p id="bio" class="text-sm text-gray-300 leading-relaxed"></p>
+      </div>
+
+      <div><h3 class="text-sm font-semibold text-gray-300 mb-2">Speaks</h3><div id="langs" class="flex flex-wrap gap-2"></div></div>
+
+      <div><h3 class="text-sm font-semibold text-gray-300 mb-2">What people say</h3>
+        <div class="flex flex-wrap gap-2 text-xs">
+          <span class="px-3 py-1.5 rounded-full bg-cyberCard border border-cyberLine">😊 Friendly · 842</span>
+          <span class="px-3 py-1.5 rounded-full bg-cyberCard border border-cyberLine">🎵 Great vibe · 610</span>
+          <span class="px-3 py-1.5 rounded-full bg-cyberCard border border-cyberLine">😂 Funny · 355</span>
+          <span class="px-3 py-1.5 rounded-full bg-cyberCard border border-cyberLine">🧠 Smart · 201</span>
+        </div></div>
+
+      <div><div class="flex justify-between mb-2"><h3 class="text-sm font-semibold text-gray-300">Gifts received</h3><span class="text-xs text-gray-500">128 total</span></div>
+        <div class="flex gap-2 overflow-x-auto">
+          <div class="shrink-0 w-16 rounded-2xl bg-cyberCard border border-cyberLine py-2 text-center"><div class="text-2xl">🌹</div><div class="text-[11px] text-gray-400">×64</div></div>
+          <div class="shrink-0 w-16 rounded-2xl bg-cyberCard border border-cyberLine py-2 text-center"><div class="text-2xl">☕</div><div class="text-[11px] text-gray-400">×31</div></div>
+          <div class="shrink-0 w-16 rounded-2xl bg-cyberCard border border-cyberLine py-2 text-center"><div class="text-2xl">🧸</div><div class="text-[11px] text-gray-400">×18</div></div>
+          <div class="shrink-0 w-16 rounded-2xl bg-cyberCard border border-cyberLine py-2 text-center"><div class="text-2xl">💍</div><div class="text-[11px] text-gray-400">×9</div></div>
+          <div class="shrink-0 w-16 rounded-2xl bg-cyberCard border border-cyberLine py-2 text-center"><div class="text-2xl">🏎️</div><div class="text-[11px] text-gray-400">×6</div></div>
+        </div></div>
+    </div>
+  </section>
+
+  <!-- action bar -->
+  <div class="absolute bottom-0 left-0 right-0 p-4 pb-6 bg-gradient-to-t from-cyberDark via-cyberDark/95 to-transparent flex gap-3">
+    <button onclick="vibe.go('15-chat.html?id=' + h.id)" class="w-14 h-14 rounded-2xl btn-ghost flex items-center justify-center" aria-label="Chat"><img src="assets/icons/chat.webp" class="w-11 h-11 object-contain" alt=""></button>
+    <button onclick="openSheet('gifts')" class="w-14 h-14 rounded-2xl btn-ghost flex items-center justify-center text-2xl" aria-label="Gift">🎁</button>
+    <button onclick="audioCall()" class="w-14 h-14 rounded-2xl btn-ghost flex flex-col items-center justify-center text-onlineGreen" aria-label="Voice call">
+      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2Z"/></svg>
+      <span id="audioRate" class="text-[9px] text-cyberGold font-semibold mt-0.5"></span></button>
+    <button id="callBtn" onclick="call()" class="flex-1 h-14 rounded-2xl spin-border flex items-center justify-center gap-3">
+      <span id="callIc" class="w-9 h-9 rounded-full btn-neon flex items-center justify-center">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M5 5.5h8.5a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3z"/><path fill="currentColor" stroke="none" d="M17.5 10.2l3.4-2.3c.5-.3 1.1 0 1.1.6v6.9c0 .6-.6.9-1.1.6l-3.4-2.3z"/></svg></span>
+      <span class="text-left leading-tight"><span id="callLbl" class="block font-bold">Video Call</span><span id="rate" class="block text-xs text-cyberGold"></span></span>
+    </button>
+  </div>
+
+  <!-- gift sheet -->
+  <div id="gifts" class="sheet-wrap" onclick="closeSheet(event)">
+    <div class="sheet rounded-t-3xl bg-cyberCard border-t border-cyberLine p-5 pb-8">
+      <div class="w-10 h-1 rounded-full bg-gray-600 mx-auto mb-4"></div>
+      <div class="flex items-center justify-between mb-4"><h3 class="text-lg font-bold">Send a gift</h3>
+        <div class="flex items-center gap-2 text-cyberGold text-sm font-semibold"><span class="coin w-5 h-5"></span><span id="gbal"></span></div></div>
+      <div id="giftGrid" class="grid grid-cols-4 gap-2"></div>
+      <button onclick="sendGift()" class="btn-neon w-full h-12 rounded-2xl font-bold mt-5" id="sendBtn">Send</button>
+    </div>
+  </div>
+
+  <!-- safety sheet -->
+
+  <div id="unlock" class="sheet-wrap" onclick="closeSheet(event)">
+    <div class="sheet glass rounded-t-3xl p-6 border-t border-cyberLine">
+      <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-4"></div>
+      <h3 id="ulTitle" class="text-lg font-semibold text-center"></h3>
+      <div class="flex items-center justify-center gap-2 mt-4"><span class="coin w-8 h-8"></span><span id="ulPrice" class="text-4xl font-black text-cyberGold"></span></div>
+      <p class="text-xs text-gray-400 text-center mt-3">Your balance: <b id="ulBal" class="text-white"></b> coins</p>
+      <p id="ulNote" class="text-xs text-gray-500 text-center mt-1"></p>
+      <button id="ulBtn" onclick="confirmUnlock()" class="btn-neon w-full h-14 rounded-2xl font-bold mt-5"></button>
+    </div>
+  </div>
+  <div id="safety" class="sheet-wrap" onclick="closeSheet(event)">
+    <div class="sheet rounded-t-3xl bg-cyberCard border-t border-cyberLine p-5 pb-8 space-y-2">
+      <div class="w-10 h-1 rounded-full bg-gray-600 mx-auto mb-3"></div>
+      <button onclick="closeSheet();vibe.go('36-report-user.html?id='+id)" class="w-full h-12 rounded-2xl bg-cyberDark border border-cyberLine flex items-center gap-3 px-4">🚩 <span>Report</span></button>
+      <button onclick="closeSheet();SAFETY.confirmBlock(id, h.n, () => setTimeout(() => history.length > 1 ? history.back() : vibe.go('05-home.html'), 700))" class="w-full h-12 rounded-2xl bg-cyberDark border border-cyberLine flex items-center gap-3 px-4 text-dangerRed">⛔ <span>Block</span></button>
+      <button onclick="closeSheet()" class="w-full h-12 rounded-2xl bg-cyberDark border border-cyberLine">Cancel</button>
+    </div>
+  </div>
+
+  <!-- intro video player + photo viewer (demo: gradient stand-ins; the real app streams the host's video and photos) -->
+  <div id="media" class="hidden absolute inset-0 z-[70] bg-black flex-col">
+    <div id="mBg" class="absolute inset-0"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/55 via-transparent to-black/70"></div>
+    <div class="relative z-10 flex items-center gap-3 px-4 pt-5"><span id="mTitle" class="flex-1 text-sm font-semibold"></span>
+      <button onclick="closeMedia()" class="w-10 h-10 rounded-full bg-black/40 border border-white/25 flex items-center justify-center" aria-label="Close"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div id="mBody" class="relative z-10 flex-1 flex items-center justify-center text-[150px] font-black text-white/80" onclick="toggleVideo()"></div>
+    <div id="mBar" class="relative z-10 px-5 pb-6">
+      <div class="h-1 rounded-full bg-white/25 overflow-hidden"><i id="mProg" class="block h-full bg-white" style="width:0"></i></div>
+      <div class="flex items-center justify-between mt-3 text-xs text-white/80"><button id="mPlay" class="w-11 h-11 rounded-full bg-white/15 border border-white/25 flex items-center justify-center" onclick="toggleVideo()" aria-label="Play or pause"></button><span id="mTime">0:00 / 0:18</span></div>
+    </div>
+    <div id="mNav" class="hidden relative z-10 px-5 pb-6 flex items-center justify-between text-sm text-white/80"><button onclick="stepViewer(-1)" class="w-11 h-11 rounded-full bg-white/15 border border-white/25">‹</button><span id="mCount"></span><button onclick="stepViewer(1)" class="w-11 h-11 rounded-full bg-white/15 border border-white/25">›</button></div>
+  </div>
+</main>
+
+<script>
+  const D = window.DEMO;
+  const id = +(new URLSearchParams(location.search).get('id') || 1);
+  const h = D.hosts.find(x => x.id === id) || D.hosts[0];
+  const st = D.status[h.s];
+  const pink = h.g === 'F';
+
+  // photos (demo: 6 gradient slides, the maximum). The first 3 photos and the intro video are free; the host can lock the rest and
+  // users unlock each one with coins. Prices, the free count and the host's share are set by VIBE; the SERVER charges, credits the host
+  // and only then sends the real file, so a locked photo is never in the app until it is paid for.
+  const LOCK = { photo: 200, video: 500 }, FREE_PHOTOS = 3;
+  const unlocked = new Set((() => { try { return JSON.parse(sessionStorage.getItem('vibeUnlocked' + id) || '[]'); } catch (e) { return []; } })());
+  const saveU = () => { try { sessionStorage.setItem('vibeUnlocked' + id, JSON.stringify([...unlocked])); } catch (e) {} };
+  const shades = [h.grad, [h.grad[1], h.grad[0]], ['#1e0f17', h.grad[0]], [h.grad[0], '#07070c'], [h.grad[1], '#07070c'], ['#2a1038', h.grad[1]]];
+  const isLocked = i => i >= FREE_PHOTOS && !unlocked.has('p' + i);
+  const lockIco = '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+  function paintSlides() {
+    document.getElementById('slides').innerHTML = shades.map((g, i) => isLocked(i)
+      ? `<div class="h-full relative flex items-center justify-center" style="background:linear-gradient(160deg,${g[0]},${g[1]})"><div class="absolute inset-0 backdrop-blur-2xl bg-black/35"></div>
+           <button onclick="askUnlock('photo',${i})" class="relative flex flex-col items-center gap-2"><span class="w-16 h-16 rounded-full bg-black/50 border border-white/30 flex items-center justify-center">${lockIco.replace('w-4 h-4', 'w-7 h-7')}</span>
+           <span class="px-4 h-10 rounded-full btn-neon text-sm font-bold flex items-center gap-1.5">Unlock · <span class="coin w-4 h-4"></span>${LOCK.photo}</span></button></div>`
+      : `<div class="h-full flex items-center justify-center text-[160px] font-black text-white/80" style="background:linear-gradient(160deg,${g[0]},${g[1]})">${i === 0 ? h.n[0] : '📷'}</div>`).join('');
+    document.getElementById('thumbs').innerHTML = shades.map((g, i) =>
+      `<button data-i="${i}" class="th relative w-14 h-14 rounded-xl border-2 ${i === 0 ? 'border-neonPink' : 'border-transparent'} overflow-hidden" style="background:linear-gradient(160deg,${g[0]},${g[1]})">${isLocked(i) ? `<span class="absolute inset-0 bg-black/55 flex items-center justify-center">${lockIco}</span>` : ''}</button>`).join('')
+;
+    document.querySelectorAll('.th').forEach(t => t.onclick = () => document.getElementById('slides').scrollTo({ left: t.dataset.i * document.getElementById('slides').clientWidth, behavior: 'smooth' }));
+    document.getElementById('v2').innerHTML = unlocked.has('v2') ? '▶ Video 2 · 0:24' : `${lockIco} Video 2 · <span class="coin w-3.5 h-3.5"></span>${LOCK.video}`;
+  }
+  document.getElementById('dots').innerHTML = shades.map((_, i) => `<span class="dot h-1.5 rounded-full ${i === 0 ? 'w-5 bg-white' : 'w-1.5 bg-white/40'}"></span>`).join('');
+  paintSlides();
+  let pendingUnlock = null;
+  function askUnlock(kind, i) {
+    pendingUnlock = { kind, i }; const price = LOCK[kind];
+    document.getElementById('ulTitle').textContent = kind === 'photo' ? 'Unlock this photo' : 'Unlock this video';
+    document.getElementById('ulPrice').textContent = price; document.getElementById('ulBal').textContent = D.balance.toLocaleString('en-IN');
+    const ok = D.balance >= price; document.getElementById('ulBtn').textContent = ok ? `Unlock for ${price} coins` : 'Not enough coins · Top up';
+    document.getElementById('ulNote').textContent = ok ? `Once unlocked, you can see it any time. ${h.n} earns from every unlock.` : `You need ${price - D.balance} more coins.`;
+    closeSheet(); openSheet('unlock');
+  }
+  function confirmUnlock() {
+    const { kind, i } = pendingUnlock; const price = LOCK[kind];
+    if (D.balance < price) return vibe.go('18-wallet.html');
+    D.balance -= price; unlocked.add(kind === 'photo' ? 'p' + i : 'v2'); saveU(); closeSheet(); paintSlides();
+    vibe.toast(`Unlocked · ${price} coins used`); if (kind === 'video') openVideo(2);
+  }
+  const slides = document.getElementById('slides');
+  function mark(i) {
+    document.querySelectorAll('.th').forEach((t, j) => { t.classList.toggle('border-neonPink', j === i); t.classList.toggle('border-transparent', j !== i); });
+    document.querySelectorAll('.dot').forEach((d, j) => { d.className = `dot h-1.5 rounded-full transition-all ${j === i ? 'w-5 bg-white' : 'w-1.5 bg-white/40'}`; });
+  }
+  slides.addEventListener('scroll', () => mark(Math.round(slides.scrollLeft / slides.clientWidth)));
+
+  document.getElementById('status').innerHTML = `<span class="w-2 h-2 rounded-full ${st.pulse ? 'pulse-dot' : ''}" style="background:${st.dot};color:${st.dot}"></span><span class="text-xs font-semibold" style="color:${st.text}">${h.s}</span>`;
+  document.getElementById('name').textContent = h.n;
+  document.getElementById('verified').innerHTML = h.v ? '<span class="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-[11px] font-black">✓</span>'
+    : h.vip ? '<span class="px-2 py-0.5 rounded-full bg-gradient-to-r from-cyberGold to-yellow-500 text-black text-[10px] font-extrabold">VIP</span>' : '';
+  document.getElementById('uid').textContent = 40362380 + h.id;
+  document.getElementById('tags').innerHTML = `
+    <span class="px-3 py-1 rounded-full border" style="color:${pink ? '#ff2a85' : '#00f2fe'};border-color:${pink ? '#ff2a8566' : '#00f2fe66'};background:${pink ? '#ff2a8522' : '#00f2fe18'}">${pink ? '♀' : '♂'} ${h.a}</span>
+    <span class="px-3 py-1 rounded-full bg-cyberCard border border-cyberLine text-gray-300">📍 ${h.c}</span>
+    <span class="px-3 py-1 rounded-full bg-cyberGold/15 border border-cyberGold/40 text-cyberGold">★ Lv.${h.lv}</span>
+    <span class="px-3 py-1 rounded-full bg-neonCyan/10 border border-neonCyan/40 text-neonCyan">⭐ ${h.rt} (${h.rc.toLocaleString('en-IN')})</span>`;
+  document.getElementById('followers').textContent = h.f;
+  document.getElementById('calls').textContent = h.calls.toLocaleString('en-IN');
+  document.getElementById('ans').textContent = h.ans + '%';
+  document.getElementById('bio').textContent = h.bio;
+  document.getElementById('langs').innerHTML = h.langs.map(l => `<span class="px-3 py-1.5 rounded-xl bg-cyberCard border border-cyberLine text-sm">${l}</span>`).join('');
+  document.getElementById('rate').innerHTML = `<span class="coin w-3 h-3 align-[-1px]"></span> ${h.r} coins/min`;
+  // main call button: right icon + short one-line text for each state
+  function setCallState(icon, iconCls, title, sub) {
+    const ic = document.getElementById('callIc');
+    ic.className = `w-9 h-9 rounded-full flex items-center justify-center ${iconCls}`;
+    ic.innerHTML = icon;
+    document.getElementById('callLbl').textContent = title;
+    document.getElementById('rate').textContent = sub;
+    document.getElementById('rate').className = 'block text-xs text-gray-400 whitespace-nowrap';
+    document.getElementById('callBtn').classList.remove('spin-border');
+    document.getElementById('callBtn').classList.add('btn-ghost');
+  }
+  const BELL = '<svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
+  const PHONE = '<svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2Z"/></svg>';
+  if (h.s === 'OFFLINE') setCallState(BELL, 'bg-cyberLine text-gray-300', 'Notify me', 'Offline now');
+  else if (h.s === 'BUSY') setCallState(PHONE, 'bg-orange-400/20 text-orange-300', 'On a call', 'Try again soon');
+
+  document.getElementById('audioRate').textContent = `${h.ar}/min`;
+  if (!h.voice) { document.getElementById('audioRate').textContent = 'off'; document.getElementById('audioRate').parentElement.classList.add('opacity-40'); }
+  // small voice button only when the host takes both; a voice-only host gets the big button as "Voice Call"
+  const smallVoice = document.querySelector('[aria-label="Voice call"]');
+  if (!(h.voice && h.video)) smallVoice.remove();
+  if (!h.video && (h.s === 'LIVE' || h.s === 'ONLINE')) {
+    const ic = document.getElementById('callIc');
+    ic.className = 'w-9 h-9 rounded-full flex items-center justify-center bg-onlineGreen text-black'; ic.innerHTML = PHONE;
+    document.getElementById('callLbl').textContent = 'Voice Call';
+    document.getElementById('rate').innerHTML = `<span class="coin w-3 h-3 align-[-1px]"></span> ${h.ar} coins/min`;
+    document.getElementById('callBtn').onclick = audioCall;
+  }
+  function audioCall() {
+    if (!h.voice) return vibe.toast(`${h.n} takes video calls only`);
+    if (h.s === 'BUSY') return vibe.toast(`${h.n} is on another call`);
+    if (h.s === 'OFFLINE') return vibe.toast(`We'll notify you when ${h.n} is online`);
+    vibe.go(`13-audio-call.html?id=${h.id}`);
+  }
+  let following = false;
+  function toggleFollow() {
+    following = !following;
+    const b = document.getElementById('follow');
+    b.textContent = following ? '✓ Following' : '＋ Follow';
+    b.className = `shrink-0 flex items-center gap-1.5 px-4 h-10 rounded-full text-sm font-bold ${following ? 'btn-ghost text-gray-300' : 'btn-neon'}`;
+  }
+  function call() {
+    if (!h.video) return vibe.toast(`${h.n} takes voice calls only`);
+    if (h.s === 'BUSY') return vibe.toast(`${h.n} is on another call`);
+    if (h.s === 'OFFLINE') return vibe.toast(`We'll notify you when ${h.n} is online`);
+    vibe.go(`09-outgoing-call.html?id=${h.id}`);
+  }
+
+  // gifts (prices shown here come from the server in the real app)
+  const gifts = [['🌹', 'Rose', 20], ['☕', 'Chai', 50], ['🍫', 'Choco', 99], ['🧸', 'Teddy', 199], ['💐', 'Bouquet', 299], ['💍', 'Ring', 999], ['🏎️', 'Car', 2999], ['🏰', 'Castle', 9999]];
+  let pick = 0;
+  document.getElementById('gbal').textContent = D.balance.toLocaleString('en-IN');
+  function drawGifts() {
+    document.getElementById('giftGrid').innerHTML = gifts.map(([e, n, c], i) =>
+      `<button onclick="pick=${i};drawGifts()" class="gift ${i === pick ? 'on' : ''} rounded-2xl border-[1.5px] border-cyberLine bg-cyberDark py-3"><div class="text-3xl">${e}</div><div class="text-[11px] mt-1 text-gray-300">${n}</div><div class="text-[11px] text-cyberGold font-semibold">${c}</div></button>`).join('');
+    document.getElementById('sendBtn').textContent = `Send ${gifts[pick][1]} · ${gifts[pick][2]} coins`;
+  }
+  drawGifts();
+  function sendGift() {
+    const [e, n, c] = gifts[pick];
+    closeSheet();
+    vibe.toast(c > D.balance ? 'Not enough coins · recharge in Wallet' : `${e} ${n} sent to ${h.n}!`);
+  }
+  function openSheet(id) { document.getElementById(id).classList.add('open'); }
+  function closeSheet(e) { if (e && e.target !== e.currentTarget) return; document.querySelectorAll('.sheet-wrap.open').forEach(s => s.classList.remove('open')); }
+
+  // ---- intro video + photo viewer (demo) ----
+  let vTimer = null, vT = 0, vPlaying = false, vIdx = 0;
+  const VLEN = 18, PLAY = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>', PAUSE = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
+  const fmt = t => `0:${String(Math.floor(t)).padStart(2, '0')}`;
+  function showMedia(mode) { const m = document.getElementById('media'); m.classList.remove('hidden'); m.classList.add('flex'); document.getElementById('mBar').style.display = mode === 'video' ? '' : 'none'; document.getElementById('mNav').classList.toggle('hidden', mode === 'video'); document.getElementById('mNav').classList.toggle('flex', mode !== 'video'); }
+  function openVideo(n) {
+    showMedia('video'); const g = shades[1]; document.getElementById('mBg').style.background = `linear-gradient(160deg,${g[0]},${g[1]})`;
+    document.getElementById('mTitle').textContent = n === 2 ? `${h.n} · Video 2` : `${h.n} · Intro video`; document.getElementById('mBody').textContent = '▶'; vT = 0; playVideo();
+  }
+  function playVideo() { vPlaying = true; document.getElementById('mPlay').innerHTML = PAUSE; document.getElementById('mBody').style.opacity = .0; clearInterval(vTimer);
+    vTimer = setInterval(() => { vT += .1; document.getElementById('mProg').style.width = (vT / VLEN * 100) + '%'; document.getElementById('mTime').textContent = `${fmt(vT)} / ${fmt(VLEN)}`; if (vT >= VLEN) { pauseVideo(); vT = 0; } }, 100); }
+  function pauseVideo() { vPlaying = false; clearInterval(vTimer); document.getElementById('mPlay').innerHTML = PLAY; document.getElementById('mBody').style.opacity = 1; }
+  function toggleVideo() { if (document.getElementById('mBar').style.display === 'none') return; vPlaying ? pauseVideo() : playVideo(); }
+  function openViewer(i) { vIdx = i; showMedia('photo'); paintViewer(); }
+  function paintViewer() { if (isLocked(vIdx)) { closeMedia(); return askUnlock('photo', vIdx); } const g = shades[vIdx]; document.getElementById('mBg').style.background = `linear-gradient(160deg,${g[0]},${g[1]})`; document.getElementById('mBody').style.opacity = 1; document.getElementById('mBody').textContent = vIdx === 0 ? h.n[0] : '📷'; document.getElementById('mTitle').textContent = `${h.n} · Photos`; document.getElementById('mCount').textContent = `${vIdx + 1} / ${shades.length}`; }
+  function stepViewer(d) { vIdx = (vIdx + d + shades.length) % shades.length; paintViewer(); }
+  function closeMedia() { clearInterval(vTimer); const m = document.getElementById('media'); m.classList.add('hidden'); m.classList.remove('flex'); }
+</script>
+</body>
+</html>

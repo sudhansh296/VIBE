@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Filter</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  /* dual-thumb age slider */
+  .range2 { position: relative; height: 28px; }
+  .range2 input { position: absolute; left: 0; right: 0; top: 6px; pointer-events: none; appearance: none; -webkit-appearance: none; background: none; }
+  .range2 input::-webkit-slider-thumb { pointer-events: auto; appearance: none; -webkit-appearance: none; width: 22px; height: 22px; border-radius: 99px; background: #fff; border: 4px solid #ff2a85; box-shadow: 0 0 12px rgba(255,42,133,.7); }
+  .range2 input::-moz-range-thumb { pointer-events: auto; width: 16px; height: 16px; border-radius: 99px; background: #fff; border: 4px solid #ff2a85; }
+  .track { position: absolute; left: 0; right: 0; top: 15px; height: 4px; border-radius: 4px; background: #262636; }
+  .track span { position: absolute; top: 0; bottom: 0; border-radius: 4px; background: linear-gradient(90deg, #ff2a85, #00f2fe); }
+  .single { appearance: none; -webkit-appearance: none; height: 4px; border-radius: 4px; background: #262636; }
+  .single::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 22px; height: 22px; border-radius: 99px; background: #fff; border: 4px solid #00f2fe; box-shadow: 0 0 12px rgba(0,242,254,.7); }
+  .seg { border: 1.5px solid #262636; background: #12121c; color: #c7c7d1; transition: all .18s; }
+  .seg.on { border-color: #ff2a85; color: #fff; background: linear-gradient(135deg, rgba(255,42,133,.22), rgba(0,242,254,.12)); }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-neonCyan/10 -top-24 -right-24"></div>
+
+  <header class="relative flex items-center justify-between px-5 pt-5 pb-3">
+    <button onclick="vibe.go('05-home.html')" class="w-10 h-10 rounded-xl btn-ghost flex items-center justify-center" aria-label="Close">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <h1 class="text-lg font-bold">Filter</h1>
+    <button onclick="reset()" class="text-sm text-neonCyan font-semibold w-10">Reset</button>
+  </header>
+
+  <section class="relative flex-1 overflow-y-auto px-5 pb-6 space-y-7">
+    <!-- show -->
+    <div>
+      <h3 class="text-xs font-medium text-gray-400 mb-3">Show me</h3>
+      <div class="grid grid-cols-3 gap-2" id="show">
+        <button class="seg h-12 rounded-2xl text-sm font-semibold" data-v="all">✨ Everyone</button>
+        <button class="seg h-12 rounded-2xl text-sm font-semibold" data-v="F">♀ Girls</button>
+        <button class="seg h-12 rounded-2xl text-sm font-semibold" data-v="M">♂ Boys</button>
+      </div>
+    </div>
+
+    <!-- call type -->
+    <div>
+      <h3 class="text-xs font-medium text-gray-400 mb-3">Call type</h3>
+      <div class="grid grid-cols-3 gap-2" id="callType">
+        <button class="seg h-12 rounded-2xl text-sm font-semibold" data-v="any">Any</button>
+        <button class="seg h-12 rounded-2xl text-sm font-semibold flex items-center justify-center gap-1.5" data-v="voice"><svg class="w-4 h-4 text-onlineGreen" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2Z"/></svg>Voice</button>
+        <button class="seg h-12 rounded-2xl text-sm font-semibold flex items-center justify-center gap-1.5" data-v="video"><svg class="w-4 h-4 text-neonPink" viewBox="0 0 24 24" fill="currentColor"><path d="M5 5.5h8.5a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3z"/><path d="M17.5 10.2l3.4-2.3c.5-.3 1.1 0 1.1.6v6.9c0 .6-.6.9-1.1.6l-3.4-2.3z"/></svg>Video</button>
+      </div>
+    </div>
+
+    <!-- age -->
+    <div>
+      <div class="flex justify-between mb-2"><h3 class="text-xs font-medium text-gray-400">Age</h3><span id="ageLbl" class="text-sm font-semibold"></span></div>
+      <div class="range2">
+        <div class="track"><span id="ageFill"></span></div>
+        <input id="minAge" type="range" min="18" max="60" step="1">
+        <input id="maxAge" type="range" min="18" max="60" step="1">
+      </div>
+    </div>
+
+    <!-- price -->
+    <div>
+      <div class="flex justify-between mb-3"><h3 class="text-xs font-medium text-gray-400">Max call price</h3>
+        <span class="text-sm font-semibold text-cyberGold flex items-center gap-1.5"><span class="coin w-3.5 h-3.5"></span><span id="rateLbl"></span>/min</span></div>
+      <input id="maxRate" type="range" min="30" max="200" step="10" class="single">
+      <div class="flex justify-between text-[11px] text-gray-600 mt-1"><span>30</span><span>200</span></div>
+    </div>
+
+    <!-- languages -->
+    <div>
+      <div class="flex justify-between mb-3"><h3 class="text-xs font-medium text-gray-400">Speaks</h3><span class="text-[11px] text-gray-600">any of these</span></div>
+      <div class="flex flex-wrap gap-2" id="langs"></div>
+    </div>
+
+    <!-- toggles -->
+    <div class="rounded-2xl bg-cyberCard border border-cyberLine divide-y divide-cyberLine">
+      <label class="flex items-center gap-3 p-4 cursor-pointer"><span class="text-lg">🟢</span><span class="flex-1"><b class="text-sm">Online now only</b><span class="block text-xs text-gray-500">Hide people who are offline</span></span><span id="onlineOnly" class="toggle"></span></label>
+      <label class="flex items-center gap-3 p-4 cursor-pointer"><span class="text-lg">✅</span><span class="flex-1"><b class="text-sm">Verified only</b><span class="block text-xs text-gray-500">Face-verified profiles</span></span><span id="verifiedOnly" class="toggle"></span></label>
+    </div>
+
+    <!-- sort -->
+    <div>
+      <h3 class="text-xs font-medium text-gray-400 mb-3">Sort by</h3>
+      <div class="grid grid-cols-2 gap-2" id="sort">
+        <button class="seg h-11 rounded-xl text-sm" data-v="online">🟢 Online first</button>
+        <button class="seg h-11 rounded-xl text-sm" data-v="rating">⭐ Top rated</button>
+        <button class="seg h-11 rounded-xl text-sm" data-v="price">🪙 Lowest price</button>
+        <button class="seg h-11 rounded-xl text-sm" data-v="new">✨ Newest</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="relative p-5 pt-3 glass border-t border-cyberLine/60">
+    <button onclick="apply()" class="btn-neon w-full h-14 rounded-2xl font-bold">Show results</button>
+  </footer>
+</main>
+
+<script>
+  const DEFAULTS = { show: 'all', callType: 'any', minAge: 18, maxAge: 40, maxRate: 200, langs: [], onlineOnly: false, verifiedOnly: false, sort: 'online' };
+  let f = Object.assign({}, DEFAULTS, JSON.parse(sessionStorage.getItem('vibe-filter') || '{}'));
+  const ALL_LANGS = ['Hindi', 'English', 'Bengali', 'Marathi', 'Telugu', 'Tamil', 'Gujarati', 'Kannada', 'Malayalam', 'Punjabi'];
+
+  function seg(id, key) {
+    document.querySelectorAll(`#${id} .seg`).forEach(b => {
+      b.classList.toggle('on', b.dataset.v === f[key]);
+      b.onclick = () => { f[key] = b.dataset.v; seg(id, key); };
+    });
+  }
+  const minA = document.getElementById('minAge'), maxA = document.getElementById('maxAge');
+  function ages() {
+    if (+minA.value > +maxA.value - 1) minA.value = +maxA.value - 1;
+    f.minAge = +minA.value; f.maxAge = +maxA.value;
+    document.getElementById('ageLbl').textContent = `${f.minAge} – ${f.maxAge}${f.maxAge === 60 ? '+' : ''}`;
+    const pct = v => ((v - 18) / 42) * 100;
+    const fill = document.getElementById('ageFill');
+    fill.style.left = pct(f.minAge) + '%'; fill.style.right = (100 - pct(f.maxAge)) + '%';
+  }
+  const rate = document.getElementById('maxRate');
+  function rateLbl() { f.maxRate = +rate.value; document.getElementById('rateLbl').textContent = f.maxRate === 200 ? 'Any' : f.maxRate; }
+  function langs() {
+    const box = document.getElementById('langs'); box.innerHTML = '';
+    ALL_LANGS.forEach(l => {
+      const b = document.createElement('button');
+      b.className = 'chip px-4 h-10 rounded-full text-sm' + (f.langs.includes(l) ? ' on' : '');
+      b.textContent = l;
+      b.onclick = () => { f.langs = f.langs.includes(l) ? f.langs.filter(x => x !== l) : [...f.langs, l]; b.classList.toggle('on'); };
+      box.appendChild(b);
+    });
+  }
+  function toggles() {
+    ['onlineOnly', 'verifiedOnly'].forEach(k => {
+      const t = document.getElementById(k);
+      t.classList.toggle('on', f[k]);
+      t.parentElement.onclick = e => { e.preventDefault(); f[k] = !f[k]; t.classList.toggle('on', f[k]); };
+    });
+  }
+  function load() {
+    seg('show', 'show'); seg('sort', 'sort'); seg('callType', 'callType');
+    minA.value = f.minAge; maxA.value = f.maxAge; ages();
+    rate.value = f.maxRate; rateLbl();
+    langs(); toggles();
+  }
+  minA.oninput = maxA.oninput = ages; rate.oninput = rateLbl;
+
+  function reset() { f = Object.assign({}, DEFAULTS); load(); vibe.toast('Filters reset'); }
+  function apply() {
+    const isDefault = JSON.stringify(f) === JSON.stringify(DEFAULTS);
+    if (isDefault) sessionStorage.removeItem('vibe-filter');
+    else sessionStorage.setItem('vibe-filter', JSON.stringify(f));
+    vibe.go('05-home.html');
+  }
+  load();
+</script>
+</body>
+</html>

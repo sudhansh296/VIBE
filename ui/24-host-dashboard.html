@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Host dashboard</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .card { border: 1px solid #262636; background: #12121c; border-radius: 20px; }
+  .sw { width: 54px; height: 32px; border-radius: 99px; background: #2a2a3a; position: relative; flex-shrink: 0; transition: background .2s; }
+  .sw::after { content: ''; position: absolute; left: 3px; top: 3px; width: 26px; height: 26px; border-radius: 99px; background: #fff; transition: transform .2s; }
+  .sw.on { background: linear-gradient(135deg, #3ee08f, #0ea5a0); } .sw.on::after { transform: translateX(22px); }
+  .bar { width: 100%; border-radius: 8px 8px 3px 3px; background: linear-gradient(#ff2a85, #7a1fd1); min-height: 6px; transition: height .8s cubic-bezier(.2,.9,.3,1); }
+  .bar.today { background: linear-gradient(#f6dc9b, #eab308); box-shadow: 0 0 16px -2px rgba(246,220,155,.7); }
+  .seg { display: flex; padding: 3px; border-radius: 99px; background: #12121c; border: 1px solid #262636; }
+  .seg button { flex: 1; height: 32px; border-radius: 99px; font-size: 12px; color: #8b8b9a; } .seg .on { background: #26263a; color: #fff; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-onlineGreen/10 -top-24 -right-24"></div>
+  <div class="blob w-60 h-60 bg-neonPink/10 top-72 -left-24"></div>
+
+  <header class="relative flex items-center gap-3 px-4 pt-5 pb-3">
+    <button onclick="history.length > 1 ? history.back() : vibe.go('17-me.html')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Back">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 class="text-xl font-semibold flex-1">Host dashboard</h1>
+    <button onclick="vibe.go('25-host-rates.html')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Call settings">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+  </header>
+
+  <section class="relative flex-1 overflow-y-auto px-5 pb-8 space-y-4">
+    <!-- online switch -->
+    <div id="status" class="card p-4 flex items-center gap-4">
+      <div class="relative w-12 h-12 shrink-0"><span id="pulse" class="absolute inset-0 rounded-full bg-onlineGreen/40 ring-wave"></span><span class="relative w-12 h-12 rounded-full border-2 border-onlineGreen flex items-center justify-center bg-cyberDark"><svg class="w-6 h-6 text-onlineGreen" id="ico" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" viewBox="0 0 24 24"><path d="M14.5 12a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"/><path d="M7.5 7.5a6.4 6.4 0 0 0 0 9M16.5 7.5a6.4 6.4 0 0 1 0 9"/></svg></span></div>
+      <div class="flex-1"><b id="stTxt" class="text-lg"></b><div id="stSub" class="text-xs text-gray-400"></div></div>
+      <button id="sw" class="sw on" aria-label="Go online"></button>
+    </div>
+
+    <div id="hint" class="rounded-2xl border border-dashed border-white/15 px-4 py-3 text-center text-xs text-gray-400 flex items-center justify-center gap-2"></div>
+
+    <!-- earnings -->
+    <div class="rounded-3xl p-5 border border-cyberGold/40 relative overflow-hidden" style="background:linear-gradient(135deg,rgba(120,80,10,.4),#12121c 65%)">
+      <div class="absolute -right-8 -top-10 w-36 h-36 rounded-full bg-cyberGold/20 blur-2xl"></div>
+      <div class="relative text-[10px] tracking-[.16em] uppercase text-gray-300">Available to withdraw</div>
+      <div class="relative flex items-center gap-2 mt-1"><span class="coin w-9 h-9"></span><span class="text-4xl font-black text-cyberGold" id="avail"></span></div>
+      <div class="relative text-xs text-gray-400 mt-1" id="inr"></div>
+      <button onclick="vibe.go('26-withdraw.html')" class="relative mt-4 w-full h-12 rounded-2xl bg-cyberGold text-black font-bold text-sm">Withdraw</button>
+    </div>
+
+    <div class="grid grid-cols-3 gap-2 text-center">
+      <div class="card py-3"><div class="font-bold" id="sToday"></div><div class="text-[10px] tracking-[.12em] uppercase text-gray-500 mt-0.5">Today</div></div>
+      <div class="card py-3"><div class="font-bold" id="sMin"></div><div class="text-[10px] tracking-[.12em] uppercase text-gray-500 mt-0.5">Minutes</div></div>
+      <div class="card py-3"><div class="font-bold flex items-center justify-center gap-1"><svg class="w-3.5 h-3.5 text-cyberGold" viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3Z"/></svg>4.8</div><div class="text-[10px] tracking-[.12em] uppercase text-gray-500 mt-0.5">Rating</div></div>
+    </div>
+
+    <!-- chart -->
+    <div class="card p-4">
+      <div class="flex items-center justify-between mb-4"><b class="text-sm font-medium">Earnings</b>
+        <div class="seg w-44"><button class="on" data-r="week">This week</button><button data-r="month">Month</button></div></div>
+      <div id="chart" class="flex items-end gap-2 h-32"></div>
+      <div id="days" class="flex gap-2 mt-2 text-[10px] text-gray-500 text-center"></div>
+    </div>
+
+    <!-- my rates -->
+    <button onclick="vibe.go('25-host-rates.html')" class="card w-full p-4 text-left">
+      <div class="flex items-center justify-between"><b class="text-sm font-medium">My rates</b><span class="text-xs text-neonPink">Edit ›</span></div>
+      <div class="grid grid-cols-3 gap-2 mt-3 text-center text-xs">
+        <div class="rounded-xl bg-cyberDark py-2.5"><div class="text-gray-500 text-[10px] uppercase tracking-widest">Voice</div><div class="font-semibold mt-0.5 flex justify-center items-center gap-1"><span class="coin w-3.5 h-3.5"></span>30/min</div></div>
+        <div class="rounded-xl bg-cyberDark py-2.5"><div class="text-gray-500 text-[10px] uppercase tracking-widest">Video</div><div class="font-semibold mt-0.5 flex justify-center items-center gap-1"><span class="coin w-3.5 h-3.5"></span>60/min</div></div>
+        <div class="rounded-xl bg-cyberDark py-2.5"><div class="text-gray-500 text-[10px] uppercase tracking-widest">Message</div><div class="font-semibold mt-0.5 flex justify-center items-center gap-1"><span class="coin w-3.5 h-3.5"></span>200</div></div>
+      </div>
+      <div class="text-[11px] text-gray-500 mt-3">Higher rates unlock as your host level grows.</div>
+    </button>
+
+    <!-- recent -->
+    <div class="card p-4">
+      <b class="text-sm font-medium">Recent earnings</b>
+      <div class="seg mt-3" id="ftabs"><button class="on" data-f="all">All</button><button data-f="call">Calls</button><button data-f="gift">Gifts</button><button data-f="msg">Messages</button></div>
+      <div id="recent" class="mt-1"></div>
+      <p class="text-[11px] text-gray-500 mt-2">Calls shorter than the minimum set by VIBE do not earn.</p>
+    </div>
+
+    <button onclick="vibe.go('51-gifts-history.html')" class="card w-full p-4 flex items-center gap-3 text-left"><span class="w-11 h-11 rounded-xl border border-cyberGold/40 bg-cyberGold/10 text-cyberGold flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg></span><span class="flex-1"><b class="text-sm font-medium block">Gifts</b><span class="text-xs text-gray-500">Received and sent</span></span><span class="text-gray-600">›</span></button>
+
+    <!-- agency -->
+    <div class="card p-4 flex items-center gap-3">
+      <span class="w-11 h-11 rounded-xl border border-cyberGold/40 bg-cyberGold/10 text-cyberGold flex items-center justify-center"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 11a3 3 0 1 0 0-6M22 21a6 6 0 0 0-4-5.6"/></svg></span>
+      <div class="flex-1"><b class="text-sm font-medium">Agency</b><div class="text-xs text-gray-500" id="ag">Not in an agency</div></div>
+      <button id="agBtn" class="h-9 px-4 rounded-full border border-white/15 text-xs">Join with code</button>
+    </div>
+    <p class="text-[11px] text-gray-500 text-center">Earnings, share and payouts are calculated by the VIBE server.</p>
+  </section>
+</main>
+<script>
+  // DEMO. Every amount below is computed by the SERVER; coin-to-rupee value and share % are admin settings.
+  const COIN_INR = 0.1;   // demo only
+  const $ = id => document.getElementById(id);
+  const WEEK = [['Mon', 420], ['Tue', 680], ['Wed', 310], ['Thu', 920], ['Fri', 760], ['Sat', 1180], ['Sun', 540]];
+  const MONTH = [['W1', 3200], ['W2', 4100], ['W3', 3650], ['W4', 4810]];
+  const RECENT = [['Video call · Rahul', '12 min', '+432', 'Today, 2:10 pm', 'call'], ['Voice call · Sam', '8 min', '+144', 'Today, 12:40 pm', 'call'], ['Messages · Karan', '14 msgs', '+168', 'Today, 11:05 am', 'msg'], ['Gift · Rose x5', '', '+90', 'Yesterday', 'gift'], ['Video call · Arjun', 'under 1 min', '0', 'Yesterday', 'call']];
+  let filter = 'all';
+  let online = true;
+
+  function paintStatus() {
+    $('sw').classList.toggle('on', online);
+    $('stTxt').textContent = online ? 'You are online' : 'You are offline'; $('stTxt').style.color = online ? '#3ee08f' : '#9ca3af';
+    $('stSub').textContent = online ? 'Users can call and message you' : 'Switch on to receive calls';
+    $('pulse').style.display = online ? '' : 'none'; $('ico').style.color = online ? '#3ee08f' : '#6b7280';
+    $('hint').innerHTML = online ? '<span class="w-2 h-2 rounded-full bg-onlineGreen animate-pulse"></span>Waiting for calls… keep VIBE open' : 'Turn on Online to start receiving calls';
+  }
+  function chart(data) {
+    const max = Math.max(...data.map(d => d[1]));
+    $('chart').innerHTML = data.map((d, i) => `<div class="flex-1 h-full flex items-end"><div class="bar ${i === data.length - 1 && data === WEEK ? 'today' : ''}" style="height:0" data-h="${Math.round(d[1] / max * 100)}"></div></div>`).join('');
+    $('days').innerHTML = data.map(d => `<div class="flex-1">${d[0]}</div>`).join('');
+    requestAnimationFrame(() => setTimeout(() => document.querySelectorAll('.bar').forEach(b => b.style.height = b.dataset.h + '%'), 30));
+  }
+  $('sw').onclick = () => { online = !online; paintStatus(); };
+  document.querySelector('.seg').onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; document.querySelectorAll('.seg button').forEach(x => x.classList.toggle('on', x === b)); chart(b.dataset.r === 'week' ? WEEK : MONTH); };
+  $('agBtn').onclick = () => { const c = prompt('Enter agency code'); if (c) { $('ag').textContent = 'Agency ' + c.toUpperCase().slice(0, 10); $('agBtn').textContent = 'Leave'; } };
+
+  const avail = 12480; $('avail').textContent = avail.toLocaleString('en-IN'); $('inr').textContent = `About ₹${(avail * COIN_INR).toLocaleString('en-IN')}`;
+  $('sToday').textContent = '674'; $('sMin').textContent = '34';
+  function paintRecent() {
+    const list = RECENT.filter(r => filter === 'all' || r[4] === filter);
+    $('recent').innerHTML = list.length ? list.map(([t, m, a, d]) => `<div class="flex items-center gap-3 py-3 border-b border-white/5 last:border-0"><div class="flex-1"><div class="text-sm">${t}</div><div class="text-[11px] text-gray-500">${d}${m ? ' · ' + m : ''}</div></div><b class="${a === '0' ? 'text-gray-500' : 'text-onlineGreen'}">${a}</b></div>`).join('') : '<div class="text-center text-xs text-gray-500 py-6">Nothing here yet</div>';
+  }
+  $('ftabs').onclick = e => { const b = e.target.closest('[data-f]'); if (!b) return; filter = b.dataset.f; document.querySelectorAll('#ftabs button').forEach(x => x.classList.toggle('on', x === b)); paintRecent(); };
+  paintRecent(); paintStatus(); chart(WEEK);
+</script>
+</body>
+</html>

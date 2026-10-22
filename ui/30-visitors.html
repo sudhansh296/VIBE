@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Visitors</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .av { width: 52px; height: 52px; border-radius: 99px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; position: relative; flex-shrink: 0; }
+  .av .on { position: absolute; right: 0; bottom: 0; width: 13px; height: 13px; border-radius: 99px; background: #3ee08f; border: 2px solid #07070c; }
+  .act { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  .grpH { font-size: 12px; font-weight: 600; color: #9ca3af; margin: 18px 0 4px; }
+  .blur { filter: blur(7px); pointer-events: none; user-select: none; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-neonPink/10 -top-24 -left-24"></div>
+
+  <header class="relative flex items-center gap-3 px-4 pt-5 pb-2">
+    <button onclick="history.length > 1 ? history.back() : vibe.go('17-me.html')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Back">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 class="text-xl font-semibold">Visitors</h1>
+  </header>
+
+  <section class="relative flex-1 overflow-y-auto px-5 pb-28">
+    <p class="text-sm text-gray-400 mt-1"><b id="total" class="text-white"></b> people viewed your profile</p>
+    <div id="list"></div>
+    <div id="lock" class="hidden mt-5 rounded-2xl border border-cyberGold/40 p-5 text-center" style="background:linear-gradient(135deg,rgba(120,80,10,.35),#12121c 65%)">
+      <img src="assets/icons/ic-vip.webp" class="w-14 h-14 object-contain mx-auto" alt="">
+      <b class="block mt-2">See everyone who visited you</b>
+      <p class="text-xs text-gray-400 mt-1">Get the full list with names and time, and message or call them in one tap.</p>
+      <button onclick="vibe.go('19-vip.html')" class="mt-4 h-11 px-7 rounded-full font-bold text-black text-sm" style="background:linear-gradient(90deg,#f6dc9b,#eab308)">Unlock with VIP</button>
+    </div>
+    <button id="demo" class="block mx-auto mt-6 text-[11px] text-gray-500 underline">Preview as VIP</button>
+  </section>
+</main>
+<script>
+  // DEMO. The server returns visitors (and hides names for non-VIP users); the app only displays what it receives.
+  const V = [
+    ['Today', 'Ram', 26, 'Viewed 5 min ago · 3 times', true, ['#38bdf8', '#1e40af'], true],
+    ['Today', 'Arjun', 30, 'Viewed 1 h ago', true, ['#10b981', '#065f46'], false],
+    ['Today', 'Rohan', 26, 'Viewed 3 h ago', false, ['#a855f7', '#581c87'], false],
+    ['Yesterday', 'Kabir', 24, 'Viewed yesterday, 21:10', false, ['#f59e0b', '#9a3412'], false],
+    ['Yesterday', 'Vihaan', 25, 'Viewed yesterday, 18:42', false, ['#f43f5e', '#86198f'], false],
+  ];
+  const FREE_VISIBLE = 2;   // how many non-VIP users still see; set by VIBE
+  let vip = false;
+  const $ = id => document.getElementById(id);
+  const row = (v, i, hidden) => `<div class="flex items-center gap-3 py-3 border-b border-white/5 ${hidden ? 'blur' : ''}">
+    <div class="av" style="background:linear-gradient(135deg,${v[5][0]},${v[5][1]})">${hidden ? '?' : v[1][0]}${v[4] ? '<span class="on"></span>' : ''}</div>
+    <div class="flex-1 min-w-0"><div class="font-semibold">${hidden ? 'Someone' : v[1] + ', ' + v[2]}${v[6] && !hidden ? ' <span class="inline-block w-2 h-2 rounded-full bg-neonPink align-middle"></span>' : ''}</div><div class="text-[11px] text-gray-500">${v[3]}</div></div>
+    <button class="act bg-cyberCard border border-cyberLine" data-a="chat" data-i="${i}" aria-label="Chat"><svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z"/></svg></button>
+    <button class="act btn-neon" data-a="call" data-i="${i}" aria-label="Call"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5.5 6h7.5a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H5.5a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3z"/><path d="m16 11 5-3v8l-5-3"/></svg></button></div>`;
+  function paint() {
+    $('total').textContent = '136';
+    let html = '', last = '';
+    V.forEach((v, i) => { if (v[0] !== last) { html += `<div class="grpH">${v[0]}</div>`; last = v[0]; } html += row(v, i, !vip && i >= FREE_VISIBLE); });
+    $('list').innerHTML = html; $('lock').classList.toggle('hidden', vip); $('demo').textContent = vip ? 'Preview as a normal user' : 'Preview as VIP';
+  }
+  $('list').onclick = e => { const b = e.target.closest('[data-a]'); if (b) vibe.go(b.dataset.a === 'chat' ? '15-chat.html' : '10-video-call.html'); };
+  $('demo').onclick = () => { vip = !vip; paint(); };
+  paint();
+</script>
+</body>
+</html>

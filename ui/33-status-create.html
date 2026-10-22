@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · New status</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<script src="assets/status-data.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .glassbtn { width: 42px; height: 42px; border-radius: 99px; background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.25); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+  .sw { width: 34px; height: 34px; border-radius: 99px; border: 2px solid rgba(255,255,255,.35); flex-shrink: 0; }
+  .sw.on { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.25); }
+  .aud { flex: 1; height: 46px; border-radius: 16px; border: 1.5px solid rgba(255,255,255,.25); background: rgba(0,0,0,.3); font-size: 13px; backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; gap: 8px; color: rgba(255,255,255,.8); }
+  .aud.on { border-color: #ff2a85; color: #fff; background: rgba(255,42,133,.25); }
+  #cap { background: transparent; border: 0; outline: 0; resize: none; text-align: center; font-size: 26px; font-weight: 600; line-height: 1.3; width: 100%; color: #fff; }
+  #cap::placeholder { color: rgba(255,255,255,.5); }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div id="bg" class="absolute inset-0"></div>
+  <div class="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-black/75"></div>
+
+  <header class="relative z-10 flex items-center gap-3 px-4 pt-5">
+    <button onclick="history.length > 1 ? history.back() : vibe.go('05-home.html')" class="glassbtn" aria-label="Close"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="flex-1"></div>
+    <button id="photo" class="glassbtn" aria-label="Photo from gallery"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M6 3h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3Z"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></button>
+    <button id="cam" class="glassbtn" aria-label="Camera"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20 8h-3l-2-3H9L7 8H4a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1Z"/><circle cx="12" cy="13.5" r="3"/></svg></button>
+  </header>
+
+  <div class="relative z-10 flex-1 flex items-center justify-center px-8">
+    <textarea id="cap" rows="4" maxlength="120" placeholder="Type a status"></textarea>
+  </div>
+
+  <div class="relative z-10 px-4 pb-5">
+    <div id="sw" class="flex gap-3 justify-center mb-4"></div>
+    <div class="flex gap-3">
+      <button class="aud on" data-a="all"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>Everyone</button>
+      <button class="aud" data-a="fol"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 11a3 3 0 1 0 0-6M22 21a6 6 0 0 0-4-5.6"/></svg>Followers only</button>
+    </div>
+    <button id="share" class="btn-neon w-full h-14 rounded-2xl font-bold mt-3 flex items-center justify-center gap-2" disabled><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>Share status</button>
+    <p class="text-[11px] text-white/60 text-center mt-3">Disappears after 24 hours · Follow the community guidelines</p>
+  </div>
+</main>
+<script>
+  // DEMO. A real status uploads a photo / short video; the server moderates it and removes it after 24 hours.
+  const BGS = [['#ff9a8b', '#ff2a85', '#3b0a2e'], ['#a18cd1', '#7a1fd1', '#1a0b2e'], ['#84fab0', '#0ea5a0', '#06242a'], ['#f6d365', '#fda085', '#4a1d12'], ['#4facfe', '#1e3a8a', '#0a1230'], ['#434343', '#1c1c28', '#000']];
+  let bg = 0, aud = 'all';
+  const $ = id => document.getElementById(id);
+  function paint() {
+    const c = BGS[bg]; $('bg').style.background = `linear-gradient(160deg, ${c[0]}, ${c[1]} 55%, ${c[2]})`;
+    $('sw').innerHTML = BGS.map((c, i) => `<button data-b="${i}" class="sw ${i === bg ? 'on' : ''}" style="background:linear-gradient(135deg,${c[0]},${c[1]})" aria-label="Background ${i + 1}"></button>`).join('');
+    $('share').disabled = $('cap').value.trim().length < 1;
+    document.querySelectorAll('.aud').forEach(b => b.classList.toggle('on', b.dataset.a === aud));
+  }
+  $('sw').onclick = e => { const b = e.target.closest('[data-b]'); if (b) { bg = +b.dataset.b; paint(); } };
+  document.querySelectorAll('.aud').forEach(b => b.onclick = () => { aud = b.dataset.a; paint(); });
+  $('cap').oninput = paint;
+  $('photo').onclick = () => vibe.toast('Choose a photo or video from your gallery');
+  $('cam').onclick = () => vibe.toast('Camera opens here');
+  $('share').onclick = () => {
+    window.STATUS.setMine({ text: $('cap').value.trim(), bg: BGS[bg], aud, views: 24 });
+    vibe.toast('Status shared'); setTimeout(() => vibe.go('05-home.html'), 800);
+  };
+  paint();
+</script>
+</body>
+</html>

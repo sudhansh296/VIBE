@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Withdraw</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .card { border: 1px solid #262636; background: #12121c; border-radius: 20px; }
+  .lbl { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: #6b6b7b; margin: 22px 0 10px; display: block; }
+  .field { width: 100%; background: #12121c; border: 1.5px solid #262636; border-radius: 16px; padding: 14px 16px; outline: none; font-size: 14px; color: #fff; }
+  .field:focus { border-color: #ff2a85; box-shadow: 0 0 0 4px rgba(255,42,133,.15); }
+  .tabn { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #6b6b7b; padding-bottom: 12px; position: relative; line-height: 1; }
+  .tabn.on { color: #fff; } .tabn.on::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 2px; background: linear-gradient(90deg, #ff2a85, #00f2fe); }
+  .pill { font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 3px 9px; border-radius: 99px; }
+  .ok-pop { animation: pop .5s cubic-bezier(.2,1.5,.4,1) both; } @keyframes pop { from { transform: scale(.5); opacity: 0 } to { transform: none; opacity: 1 } }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-72 h-72 bg-cyberGold/10 -top-24 -right-24"></div>
+
+  <header class="relative flex items-center gap-3 px-4 pt-5 pb-3">
+    <button onclick="history.length > 1 ? history.back() : vibe.go('24-host-dashboard.html')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Back">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 class="text-xl font-semibold">Withdraw</h1>
+  </header>
+
+  <div class="relative flex gap-6 px-5 border-b border-white/10" id="tabs"><button class="tabn on" data-t="new">Withdraw</button><button class="tabn" data-t="hist">History</button></div>
+
+  <section id="v-new" class="relative flex-1 overflow-y-auto px-5 pt-4 pb-6">
+    <div class="rounded-3xl p-5 border border-cyberGold/40 relative overflow-hidden" style="background:linear-gradient(135deg,rgba(120,80,10,.4),#12121c 65%)">
+      <div class="relative text-[10px] tracking-[.16em] uppercase text-gray-300">Available</div>
+      <div class="relative flex items-center gap-2 mt-1"><span class="coin w-9 h-9"></span><span class="text-4xl font-black text-cyberGold" id="avail"></span></div>
+      <div class="relative text-xs text-gray-400 mt-1" id="inrAvail"></div>
+    </div>
+
+    <span class="lbl">Amount (coins)</span>
+    <div class="neon-field rounded-2xl flex items-center px-4 h-16 gap-2"><span class="coin w-6 h-6"></span><input id="amt" inputmode="numeric" class="flex-1 bg-transparent outline-none text-2xl font-light" placeholder="0"></div>
+    <div class="flex gap-2 mt-3" id="quick"></div>
+    <div id="calc" class="card p-4 mt-4 text-sm space-y-2"></div>
+    <p id="err" class="text-xs text-dangerRed mt-2 min-h-4"></p>
+
+    <span class="lbl" style="margin-top:14px">Pay to</span>
+    <div id="payto"></div>
+
+    <div class="mt-5 rounded-2xl border border-onlineGreen/30 bg-onlineGreen/5 px-4 py-3 text-xs text-gray-300 flex items-center gap-3">
+      <svg class="w-5 h-5 text-onlineGreen shrink-0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6Z"/><path d="m9 12 2 2 4-4"/></svg>
+      <span>Identity verified. Money is sent only to an account in your own name. If a payout fails, your coins come back automatically.</span></div>
+    <p class="text-[11px] text-gray-500 text-center mt-4 leading-relaxed">Coin value, minimum amount, fees and tax deduction are set by VIBE. The final payout is shown before you confirm.</p>
+  </section>
+
+  <section id="v-hist" class="hidden relative flex-1 overflow-y-auto px-5 pt-3 pb-6"></section>
+
+  <footer id="bar" class="relative p-5 pt-3 glass border-t border-cyberLine/60"><button id="go" class="btn-neon w-full h-14 rounded-2xl font-bold">Request withdrawal</button></footer>
+
+  <div id="ok" class="hidden absolute inset-0 z-50 bg-black/80 backdrop-blur items-center justify-center flex-col text-center px-8">
+    <div class="ok-pop w-24 h-24 rounded-full flex items-center justify-center border-2 border-onlineGreen text-onlineGreen"><svg class="w-12 h-12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></div>
+    <h2 class="text-2xl font-light mt-5">Request sent</h2>
+    <p id="okTxt" class="text-cyberGold text-lg font-semibold mt-1"></p>
+    <div class="w-full rounded-2xl bg-cyberCard border border-cyberLine px-4 mt-5 text-left text-sm">
+      <div class="flex items-center gap-3 py-3 border-b border-white/5"><span class="w-6 h-6 rounded-full bg-onlineGreen text-black flex items-center justify-center text-xs">✓</span><span class="flex-1">Requested</span><span class="text-xs text-gray-500">Just now</span></div>
+      <div class="flex items-center gap-3 py-3 border-b border-white/5"><span class="w-6 h-6 rounded-full bg-cyberGold text-black flex items-center justify-center text-xs font-bold">2</span><span class="flex-1">Processing</span><span class="text-xs text-gray-500">within 48 h</span></div>
+      <div class="flex items-center gap-3 py-3"><span class="w-6 h-6 rounded-full bg-cyberLine text-gray-400 flex items-center justify-center text-xs font-bold">3</span><span class="flex-1 text-gray-400">Paid to your account</span><span class="text-xs text-gray-600">—</span></div>
+    </div>
+    <button onclick="closeOk()" class="mt-8 h-12 px-10 rounded-full bg-white text-cyberDark font-bold text-sm">Done</button>
+  </div>
+</main>
+<script>
+  // DEMO. Coin value, minimum, fee % and TDS % are admin settings; the SERVER computes the payout and validates the request.
+  const CFG = { coinInr: 0.1, min: 5000, feePct: 2, tdsPct: 1 };
+  const $ = id => document.getElementById(id);
+  let avail = 12480, amt = 0, tab = 'new', pay = { upi: 'priya@okaxis', name: 'Priya Sharma', pan: 'ABCDE1234F' }, editing = false;
+  const HIST = [[8000, 'Paid', '12 Oct · UTR 4245…891'], [6000, 'Rejected', '28 Sep · Wrong UPI · coins returned'], [10000, 'Paid', '14 Sep · UTR 3811…207']];
+  const PILL = { Paid: 'bg-onlineGreen/15 text-onlineGreen', Pending: 'bg-cyberGold/15 text-cyberGold', Rejected: 'bg-dangerRed/15 text-dangerRed' };
+  const inr = n => '₹' + n.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+
+  function calc() {
+    const gross = amt * CFG.coinInr, fee = gross * CFG.feePct / 100, tds = gross * CFG.tdsPct / 100, net = gross - fee - tds;
+    $('calc').innerHTML = amt ? `<div class="flex justify-between text-gray-400"><span>Value of coins</span><span>${inr(gross)}</span></div>
+      <div class="flex justify-between text-gray-400"><span>Service fee (${CFG.feePct}%)</span><span>− ${inr(fee)}</span></div>
+      <div class="flex justify-between text-gray-400"><span>Tax deducted (${CFG.tdsPct}%)</span><span>− ${inr(tds)}</span></div>
+      <div class="flex justify-between pt-2 border-t border-white/10 font-semibold"><span>You receive</span><span class="text-onlineGreen text-lg">${inr(net)}</span></div>`
+      : `<div class="text-gray-500 text-center text-xs">Enter an amount to see what you will receive</div>`;
+    const bad = pending() ? 'You already have a request in progress. Only one at a time.' : amt && amt < CFG.min ? `Minimum withdrawal is ${CFG.min.toLocaleString('en-IN')} coins` : amt > avail ? 'More than your available balance' : '';
+    $('err').textContent = bad; $('go').disabled = !amt || !!bad || !valid();
+  }
+  const pending = () => HIST.some(h => h[1] === 'Pending');
+  const valid = () => !!pay && !editing && !pending();
+  function paintPay() {
+    if (pay && !editing) {
+      $('payto').innerHTML = `<div class="card p-4 flex items-center gap-3"><span class="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 10 12 4l9 6M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18"/></svg></span>
+        <div class="flex-1 min-w-0"><b class="block text-sm truncate">${pay.upi}</b><span class="text-[11px] text-gray-500">UPI · ${pay.name} · PAN ✓</span></div>
+        <button id="chg" class="text-xs font-semibold text-neonPink">Change</button></div>`;
+      $('chg').onclick = () => { editing = true; paintPay(); calc(); };
+    } else {
+      $('payto').innerHTML = `<div class="rounded-2xl border border-white/10 bg-cyberCard p-3 text-[11px] text-gray-400 leading-relaxed mb-3">Add these once. Money is sent only to a UPI ID in <b class="text-white">your own name</b>. PAN is needed by law for payouts (tax).</div>
+        <div class="space-y-3"><div class="relative"><input id="upi" class="field pr-16" placeholder="UPI ID (name@bank)" autocapitalize="off"><span id="upiOk" class="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-onlineGreen hidden">✓ Valid</span></div>
+        <input id="hname" class="field" placeholder="Name as in bank / UPI"><input id="pan" class="field uppercase tracking-widest" maxlength="10" placeholder="PAN number"><input id="pname" class="field" placeholder="Name on PAN"></div>
+        <button id="savePay" class="btn-neon w-full h-12 rounded-2xl font-bold text-sm mt-4" disabled>Save and continue</button>
+        <p class="text-[11px] text-gray-500 text-center mt-2">Only the VIBE payouts team can see these details</p>`;
+      const chk = () => { const u = /^[\w.\-]{2,}@[\w]{2,}$/.test($('upi').value); $('upiOk').classList.toggle('hidden', !u);
+        $('savePay').disabled = !(u && $('hname').value.trim().length > 2 && /^[A-Za-z]{5}[0-9]{4}[A-Za-z]$/.test($('pan').value) && $('pname').value.trim().length > 2); };
+      ['upi', 'hname', 'pan', 'pname'].forEach(id => $(id).oninput = chk);
+      $('savePay').onclick = () => { pay = { upi: $('upi').value, name: $('hname').value, pan: $('pan').value.toUpperCase() }; editing = false; paintPay(); calc(); };
+    }
+  }
+  function paintHist() {
+    $('v-hist').innerHTML = HIST.map(([c, s, d]) => `<div class="flex items-center gap-3 py-3.5 border-b border-white/5">
+      <span class="w-10 h-10 rounded-full border border-white/15 text-gray-300 flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg></span>
+      <div class="flex-1 min-w-0"><div class="flex items-center gap-2"><b class="flex items-center gap-1"><span class="coin w-3.5 h-3.5"></span>${c.toLocaleString('en-IN')}</b><span class="pill ${PILL[s]}">${s.toUpperCase()}</span></div><div class="text-[11px] text-gray-500 mt-0.5 truncate">${d}</div></div>
+      <div class="text-sm text-gray-300">${inr(c * CFG.coinInr * (100 - CFG.feePct - CFG.tdsPct) / 100)}</div></div>`).join('');
+  }
+  $('avail').textContent = avail.toLocaleString('en-IN'); $('inrAvail').textContent = `About ${inr(avail * CFG.coinInr)}`;
+  $('quick').innerHTML = [5000, 10000, 'All'].map(q => `<button data-q="${q}" class="chip flex-1 h-10 rounded-full text-sm">${q === 'All' ? 'All' : q.toLocaleString('en-IN')}</button>`).join('');
+  $('quick').onclick = e => { const b = e.target.closest('[data-q]'); if (!b) return; amt = b.dataset.q === 'All' ? avail : Math.min(+b.dataset.q, avail); $('amt').value = amt; calc(); };
+  $('amt').oninput = e => { amt = +e.target.value.replace(/\D/g, '') || 0; e.target.value = amt || ''; calc(); };
+  $('tabs').onclick = e => { const b = e.target.closest('[data-t]'); if (!b) return; tab = b.dataset.t;
+    document.querySelectorAll('.tabn').forEach(x => x.classList.toggle('on', x === b));
+    $('v-new').classList.toggle('hidden', tab !== 'new'); $('v-hist').classList.toggle('hidden', tab !== 'hist'); $('bar').classList.toggle('hidden', tab !== 'new'); };
+  $('go').onclick = () => { HIST.unshift([amt, 'Pending', 'Today · ' + pay.upi]); avail -= amt; $('avail').textContent = avail.toLocaleString('en-IN'); $('inrAvail').textContent = `About ${inr(avail * CFG.coinInr)}`;
+    $('okTxt').textContent = `${amt.toLocaleString('en-IN')} coins`; $('ok').classList.remove('hidden'); $('ok').classList.add('flex'); amt = 0; $('amt').value = ''; paintHist(); calc(); };
+  function closeOk() { $('ok').classList.add('hidden'); $('ok').classList.remove('flex'); }
+  paintPay(); paintHist(); calc();
+</script>
+</body>
+</html>

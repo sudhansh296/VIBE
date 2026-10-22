@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Tab bar · 2 Center notch</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="../assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/theme.css">
+<style>
+  /* Option 2: bar with a curved notch; Chats is a big raised button inside a spinning neon ring */
+  .nav { position: absolute; left: 0; right: 0; bottom: 0; height: 96px; z-index: 30; }
+  .nav svg.bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .side { position: absolute; bottom: 14px; width: 90px; display: flex; flex-direction: column; align-items: center; }
+  .side img { width: 44px; height: 44px; object-fit: contain; opacity: .5; transition: all .3s; }
+  .side span { font-size: 11px; color: #8a8a99; }
+  .side.active img { opacity: 1; transform: translateY(-3px); filter: drop-shadow(0 0 10px rgba(0,242,254,.8)); }
+  .side.active span { color: #fff; font-weight: 600; }
+  .side.active::after { content: ''; position: absolute; bottom: -8px; width: 18px; height: 3px; border-radius: 3px; background: linear-gradient(90deg, #ff2a85, #00f2fe); }
+  .center { position: absolute; left: 50%; bottom: 38px; transform: translateX(-50%); width: 82px; height: 82px; border-radius: 99px; }
+  .center .ring { position: absolute; inset: 0; border-radius: 99px; background: conic-gradient(#ff2a85, #00f2fe, #f6dc9b, #ff2a85); animation: spin360 4s linear infinite; }
+  .center .core { position: absolute; inset: 4px; border-radius: 99px; background: radial-gradient(circle at 35% 30%, #2a1630, #0d0d16); display: flex; align-items: center; justify-content: center; }
+  .center img { width: 70px; height: 70px; object-fit: contain; transition: transform .3s; }
+  .center.active img { transform: scale(1.08); }
+  .center.active .core { box-shadow: 0 0 30px rgba(255,42,133,.7); }
+  .center-label { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); font-size: 11px; color: #8a8a99; }
+  .center.active ~ .center-label { color: #ff2a85; font-weight: 700; }
+  .badge { position: absolute; top: -2px; right: -2px; min-width: 22px; height: 22px; border-radius: 99px; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; background: #ff2a85; border: 2px solid #07070c; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <section id="content" class="flex-1 overflow-y-auto pb-32"></section>
+  <nav class="nav">
+    <svg class="bg" viewBox="0 0 420 96" preserveAspectRatio="none">
+      <defs><linearGradient id="edge" x1="0" x2="1"><stop offset="0" stop-color="#ff2a85" stop-opacity=".1"/><stop offset=".5" stop-color="#ff2a85"/><stop offset="1" stop-color="#00f2fe" stop-opacity=".1"/></linearGradient></defs>
+      <path d="M0,22 H150 C168,22 170,58 210,58 C250,58 252,22 270,22 H420 V96 H0 Z" fill="rgba(18,18,28,.92)"/>
+      <path d="M0,22 H150 C168,22 170,58 210,58 C250,58 252,22 270,22 H420" fill="none" stroke="url(#edge)" stroke-width="1.5"/>
+    </svg>
+    <button class="side active" data-tab style="left:22px"><img src="../assets/icons/home.webp" alt=""><span>Home</span></button>
+    <button class="center" data-tab><span class="ring"></span><span class="core"><img src="../assets/icons/chat.webp" alt=""></span><b class="badge">3</b></button>
+    <span class="center-label">Chats</span>
+    <button class="side" data-tab style="right:22px"><img src="../assets/icons/profile.webp" alt=""><span>Me</span></button>
+  </nav>
+</main>
+<script src="shell.js"></script>
+</body>
+</html>

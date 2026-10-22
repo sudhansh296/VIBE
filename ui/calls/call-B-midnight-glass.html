@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calls · B Midnight Glass</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+  /* B · Midnight Glass: soft color wash from the person, frosted floating capsule, white icons */
+  .ph { background: #07070c; }
+  .voice .bg { background: radial-gradient(120% 70% at 50% 0%, rgba(168,85,247,.32), rgba(255,42,133,.10) 45%, transparent 70%), #07070c; }
+  .who { margin-top: 74px; }
+  .avwrap { padding: 6px; border-radius: 99px; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 0 80px rgba(168,85,247,.35); }
+  .who .av { width: 120px; height: 120px; font-size: 44px; background: linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,.04)); color: #fff; backdrop-filter: blur(10px); }
+  .who .nm { font-size: 27px; font-weight: 600; margin-top: 22px; letter-spacing: -.01em; }
+  .who .st { font-size: 14px; color: rgba(255,255,255,.7); margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .who .meta { color: rgba(255,255,255,.45); margin-top: 10px; }
+  .ctrls { margin: auto 16px 26px; }
+  .row { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    border-radius: 32px; padding: 12px 14px; align-items: center; }
+  .cb .lb { display: none; }
+  .cb .ic { width: 50px; height: 50px; border-radius: 99px; color: #fff; }
+  .cb.on .ic { background: rgba(255,255,255,.9); color: #0b0b12; }
+  .endrow { margin-top: 14px; }
+  .endb .ic { width: 132px; height: 52px; border-radius: 99px; background: #ff3b4e; box-shadow: 0 10px 30px -8px rgba(255,59,78,.7); }
+  .ring .selfcam { background: radial-gradient(ellipse at 50% 35%, #363d55, #0d0f18 75%); }
+  .ring .face, .incall .face { background: radial-gradient(circle at 50% 40%, #59607a, #2a2f45 70%); opacity: .6; }
+  .ring .body, .incall .body { background: radial-gradient(circle at 50% 0, #39405a, #12141e 70%); opacity: .7; }
+  .shade { background: linear-gradient(180deg, rgba(7,7,12,.75), transparent 38%, transparent 62%, rgba(7,7,12,.7)); }
+  .who.small { margin-top: 40px; }
+  .who.small .av { width: 72px; height: 72px; font-size: 26px; }
+  .who.small .avwrap { box-shadow: none; }
+  .who.small .nm { font-size: 22px; margin-top: 12px; }
+  .incall .remote { background: radial-gradient(ellipse at 50% 35%, #5a3d63, #160f1a 75%); }
+  .incall .ctrls { margin-bottom: 22px; }
+  .incall .cb .ic { width: 44px; height: 44px; } .incall .cb .ic svg { width: 21px; height: 21px; }
+  .incall .endb .ic { width: 52px; height: 44px; }
+  .topbar .chip, .coins { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1); backdrop-filter: blur(16px); padding: 6px 10px 6px 6px; border-radius: 99px; }
+  .coins { padding: 6px 10px; color: #f6dc9b; }
+  .topbar .av.mini { background: rgba(255,255,255,.14); }
+  .pip { background: radial-gradient(ellipse at 50% 30%, #464d66, #171a26); border: 1px solid rgba(255,255,255,.2); color: rgba(255,255,255,.7); }
+</style>
+</head>
+<body>
+<header class="top"><h1>Call design · B · Midnight Glass</h1><p class="sub">Soft colour wash, frosted floating capsule, white icons, wide red end pill.</p></header>
+<nav class="opts"><a href="call-A-whatsapp-clean.html">A · WhatsApp Clean</a><a class="cur" href="call-B-midnight-glass.html">B · Midnight Glass</a><a href="call-C-luxe-gold.html">C · Luxe Gold</a><a href="call-D-vibe-minimal.html">D · VIBE Minimal</a><a href="index.html">Compare all</a></nav>
+<div class="row3" id="r"></div>
+<script src="calls.js"></script><script>renderCalls(document.getElementById('r'));</script>
+</body>
+</html>

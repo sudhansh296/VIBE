@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>VIBE · Help & support</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script src="assets/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .topic { position: relative; overflow: hidden; border-radius: 20px; padding: 14px; text-align: left; border: 1px solid #262636; background: linear-gradient(160deg, var(--c1), #12121c 70%); transition: transform .12s; }
+  .topic:active { transform: scale(.97); }
+  .topic .ic { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--c2); background: rgba(0,0,0,.25); color: var(--c2); margin-bottom: 10px; }
+  .topic .ic svg { width: 19px; height: 19px; }
+  .faq { border: 1px solid #262636; background: #12121c; border-radius: 18px; overflow: hidden; transition: border-color .2s; }
+  .faq + .faq { margin-top: 10px; }
+  .faq.open { border-color: rgba(255,42,133,.45); }
+  .faq > button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 15px 16px; text-align: left; font-size: 14px; }
+  .faq .a { max-height: 0; overflow: hidden; transition: max-height .3s ease; padding: 0 16px; font-size: 13px; color: #9ca3af; line-height: 1.6; }
+  .faq.open .a { max-height: 320px; padding-bottom: 14px; }
+  .faq .ch { transition: transform .25s; color: #6b6b7b; } .faq.open .ch { transform: rotate(90deg); color: #ff2a85; }
+  .vote { height: 32px; padding: 0 12px; border-radius: 99px; border: 1px solid #2c2c3c; font-size: 12px; color: #9ca3af; display: inline-flex; align-items: center; gap: 6px; }
+  .vote.on { border-color: #3ee08f; color: #3ee08f; background: rgba(62,224,143,.1); }
+  .field { width: 100%; background: #12121c; border: 1.5px solid #262636; border-radius: 16px; padding: 14px 16px; outline: none; font-size: 14px; color: #fff; }
+  .field:focus { border-color: #ff2a85; box-shadow: 0 0 0 4px rgba(255,42,133,.15); }
+  .h { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: #6b6b7b; margin: 26px 0 12px; }
+  .tk { border: 1px solid #262636; background: #12121c; border-radius: 18px; padding: 14px; display: flex; align-items: center; gap: 12px; }
+  .pill { font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 3px 9px; border-radius: 99px; }
+</style>
+</head>
+<body>
+<main class="phone">
+  <div class="blob w-80 h-80 bg-onlineGreen/10 -top-28 -left-24"></div>
+  <div class="blob w-64 h-64 bg-neonPink/10 top-72 -right-28"></div>
+
+  <header class="relative flex items-center gap-3 px-4 pt-5 pb-2">
+    <button onclick="history.length > 1 ? history.back() : vibe.go('17-me.html')" class="w-10 h-10 rounded-full btn-ghost flex items-center justify-center" aria-label="Back">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h1 class="text-xl font-semibold flex-1">Help & support</h1>
+    <button onclick="document.getElementById('tickets').scrollIntoView({behavior:'smooth'})" class="h-9 px-3 rounded-full btn-ghost text-xs flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>My requests</button>
+  </header>
+
+  <section class="relative flex-1 overflow-y-auto px-5 pb-8">
+    <!-- hero -->
+    <div class="flex items-center gap-4 mt-3">
+      <img src="assets/icons/chat.webp" class="w-24 h-24 object-contain float shrink-0" alt="">
+      <div>
+        <h2 class="text-2xl font-light leading-tight">Hi, how can we <span class="grad-text font-semibold">help</span>?</h2>
+        <div class="mt-2 inline-flex items-center gap-2 text-[11px] text-onlineGreen"><span class="w-2 h-2 rounded-full bg-onlineGreen animate-pulse"></span>Support is online · replies in about an hour</div>
+      </div>
+    </div>
+
+    <div class="neon-field rounded-2xl flex items-center gap-3 px-4 h-13 mt-5" style="height:52px">
+      <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" class="flex-1 bg-transparent outline-none text-sm" placeholder="Search: payment, refund, withdraw…">
+      <button id="clr" class="hidden text-gray-500 text-lg leading-none">×</button>
+    </div>
+
+    <!-- topics -->
+    <div id="topics" class="grid grid-cols-2 gap-3 mt-5"></div>
+
+    <!-- faq -->
+    <div class="h" id="faqH">Popular questions</div>
+    <div id="faqs"></div>
+
+    <!-- tickets -->
+    <div class="h" id="tickets">Your requests</div>
+    <div id="tkList" class="space-y-3"></div>
+
+    <!-- contact -->
+    <div class="h">Talk to us</div>
+    <div class="grid grid-cols-2 gap-3">
+      <button onclick="vibe.toast('Support chat opens here')" class="rounded-2xl border border-neonCyan/30 p-4 text-left" style="background:linear-gradient(160deg,rgba(0,242,254,.12),#12121c 70%)"><span class="w-10 h-10 rounded-xl border border-neonCyan/40 bg-black/25 text-neonCyan flex items-center justify-center mb-3"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z"/></svg></span><b class="text-sm font-medium block">Chat with us</b><span class="text-[11px] text-gray-400">Fastest way to get help</span></button>
+      <button onclick="openReport()" class="rounded-2xl border border-dangerRed/30 p-4 text-left" style="background:linear-gradient(160deg,rgba(255,77,94,.12),#12121c 70%)"><span class="w-10 h-10 rounded-xl border border-dangerRed/40 bg-black/25 text-dangerRed flex items-center justify-center mb-3"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg></span><b class="text-sm font-medium block">Report a problem</b><span class="text-[11px] text-gray-400">Payment, call, user or bug</span></button>
+    </div>
+
+    <div class="mt-4 rounded-2xl border border-white/10 bg-cyberCard p-4 flex items-center gap-3 text-xs text-gray-400">
+      <svg class="w-5 h-5 text-cyberGold shrink-0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6Z"/><path d="m9 12 2 2 4-4"/></svg>
+      <span>VIBE support will never ask for your OTP, password or UPI PIN. Do not share them with anyone.</span></div>
+    <p class="text-[11px] text-gray-600 text-center mt-5">Support hours, answers and contact details are managed by VIBE.</p>
+  </section>
+
+  <!-- report sheet -->
+  <div id="rw" class="sheet-wrap" onclick="if(event.target===this)closeReport()">
+    <div class="sheet glass rounded-t-3xl p-6 border-t border-cyberLine max-h-[88%] overflow-y-auto">
+      <div class="w-10 h-1 rounded-full bg-white/20 mx-auto mb-4"></div>
+      <h3 class="text-lg font-semibold">Report a problem</h3>
+      <p class="text-xs text-gray-400 mt-1">Pick what it is about so the right team sees it.</p>
+      <div id="rt" class="grid grid-cols-3 gap-2 mt-4"></div>
+      <div id="extra" class="mt-3 space-y-3"></div>
+      <textarea id="rtxt" rows="3" maxlength="300" class="field resize-none mt-3" placeholder="Tell us what happened"></textarea>
+      <button id="shot" class="mt-3 w-full h-12 rounded-2xl border border-dashed border-white/20 text-sm text-gray-400 flex items-center justify-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M6 3h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3Z"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg><span id="shotT">Add a screenshot (optional)</span></button>
+      <button id="rsend" class="btn-neon w-full h-14 rounded-2xl font-bold mt-4" disabled>Send report</button>
+    </div>
+  </div>
+</main>
+<script>
+  // DEMO content. FAQ, topics, support hours and your requests (tickets) come from the SERVER (admin panel > Content / Support).
+  const $ = id => document.getElementById(id);
+  const IC = {
+    pay: '<svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4"/></svg>',
+    call: '<svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5.5 6h7.5a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H5.5a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3z"/><path d="m16 11 5-3v8l-5-3"/></svg>',
+    host: '<svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3"/></svg>',
+    acc: '<svg fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+    up: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M7 11v9H4v-9h3Zm0 0 4-8a2 2 0 0 1 2 2v4h6a2 2 0 0 1 2 2l-1 6a2 2 0 0 1-2 2H7"/></svg>',
+    down: '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 13V4h3v9h-3Zm0 0-4 8a2 2 0 0 1-2-2v-4H5a2 2 0 0 1-2-2l1-6a2 2 0 0 1 2-2h11"/></svg>',
+  };
+  const TOPICS = [['Payments & coins', 'Coins', 'pay', '#f6dc9b', 'rgba(246,220,155,.14)'], ['Calls & chat', 'Calls', 'call', '#00f2fe', 'rgba(0,242,254,.14)'], ['Hosting & payouts', 'Hosting', 'host', '#ff2a85', 'rgba(255,42,133,.16)'], ['Account & safety', 'Account', 'acc', '#3ee08f', 'rgba(62,224,143,.14)']];
+  const FAQ = [
+    ['Calls', 'How am I charged for calls?', 'Calls are charged per minute at the start of each minute, using the host rate shown before you call. Voice calls usually cost less than video calls. Each host sets their rate within limits decided by VIBE.', 1],
+    ['Calls', 'What happens if the host ends the call?', 'If the host ends the call early you are refunded for the minute you were billed but did not use. The server decides this, so the balance shown after the call is always the correct one.', 1],
+    ['Coins', 'My payment went through but coins are missing', 'Coins are added only after the server confirms your payment. This can take a minute. If they do not appear, use Report a problem and pick Payment, then add the time and amount.', 1],
+    ['Coins', 'How does paid chat work?', 'Each host gives you a few free messages. After that, every message costs the price shown inside the chat. VIP members chat free.'],
+    ['Coins', 'Can I get a refund?', 'Coins you already bought are not refundable. If a call or payment failed because of an error on our side, report it and we will return the coins.'],
+    ['Hosting', 'Who can become a host?', 'Anyone 18 or older. You apply with photos, a 15 second intro video, a live selfie, PAN and an ID. The VIBE team reviews it, usually within 24 hours.', 1],
+    ['Hosting', 'How do I withdraw my earnings?', 'Open Host dashboard and tap Withdraw. Add your UPI ID and PAN once. Requests above the minimum are reviewed and paid to your own account. If a payout fails, your coins come back automatically.'],
+    ['Hosting', 'Why was my application not approved?', 'The rejection screen shows the reason, for example unclear photos. Fix it and tap Apply again.'],
+    ['Account', 'How do I delete my account?', 'Go to Settings > Delete account. Hosts should withdraw any earnings first because unpaid earnings are lost.'],
+    ['Account', 'Someone is bothering me', 'Open their profile or chat, tap the menu and choose Block or Report. Our team reviews every report.', 1],
+  ];
+  const TICKETS = [['Payment · coins not added', 'Open', 'Today, 10:20 am', 'Replied'], ['Call · host ended early', 'Resolved', '12 Oct', '']];
+  const REASONS = [['Payment', 'pay'], ['A call', 'call'], ['A user', 'acc'], ['App bug', 'host'], ['Hosting', 'host'], ['Other', 'acc']];
+  const EXTRA = { Payment: ['Amount (₹)', 'Payment time or ID'], 'A call': ['Host name', 'When did it happen?'], 'A user': ['User name or ID'], Hosting: ['Application or withdrawal ID'] };
+  let cat = 'All', open = -1, reason = '', shot = false; const voted = {};
+
+  function paintTopics() {
+    $('topics').innerHTML = TOPICS.map(([t, c, i, c2, c1]) => `<button data-c="${c}" class="topic ${cat === c ? 'ring-1 ring-white/30' : ''}" style="--c1:${c1};--c2:${c2}"><span class="ic">${IC[i]}</span><b class="text-sm font-medium block">${t}</b><span class="text-[11px] text-gray-400">${FAQ.filter(f => f[0] === c).length} answers</span></button>`).join('');
+  }
+  function paintFaq() {
+    const q = $('q').value.trim().toLowerCase(); $('clr').classList.toggle('hidden', !q);
+    const list = FAQ.map((f, i) => [f, i]).filter(([f]) => q ? (f[1] + f[2]).toLowerCase().includes(q) : cat === 'All' ? f[3] : f[0] === cat);
+    $('faqH').innerHTML = q ? `Results (${list.length})` : cat === 'All' ? 'Popular questions' : `${cat} <button id="all" class="ml-2 normal-case tracking-normal text-neonPink">Show popular</button>`;
+    $('faqs').innerHTML = list.length ? list.map(([f, i]) => `<div class="faq ${i === open ? 'open' : ''}"><button data-f="${i}"><span class="flex-1">${f[1]}</span><span class="ch">›</span></button>
+      <div class="a">${f[2]}<div class="flex items-center gap-2 mt-3"><span class="text-[11px] text-gray-500 mr-1">Was this helpful?</span>
+        <button class="vote ${voted[i] === 1 ? 'on' : ''}" data-v="1" data-i="${i}">${IC.up}Yes</button><button class="vote ${voted[i] === 0 ? 'on' : ''}" data-v="0" data-i="${i}">${IC.down}No</button></div></div></div>`).join('')
+      : '<div class="text-center py-10"><div class="text-sm text-gray-400">No answers found</div><button onclick="openReport()" class="mt-3 text-neonPink text-sm">Report a problem instead</button></div>';
+  }
+  function paintTickets() {
+    $('tkList').innerHTML = TICKETS.map(([t, s, d, n]) => `<button class="tk w-full text-left" onclick="vibe.toast('Ticket conversation opens here')"><span class="w-10 h-10 rounded-xl flex items-center justify-center ${s === 'Open' ? 'bg-cyberGold/10 text-cyberGold border border-cyberGold/40' : 'bg-onlineGreen/10 text-onlineGreen border border-onlineGreen/40'}"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">${s === 'Open' ? '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>' : '<path d="m5 12 5 5 9-10"/>'}</svg></span>
+      <span class="flex-1 min-w-0"><b class="block text-sm font-medium truncate">${t}</b><span class="text-[11px] text-gray-500">${d}${n ? ' · <span class="text-neonCyan">New reply</span>' : ''}</span></span>
+      <span class="pill ${s === 'Open' ? 'bg-cyberGold/15 text-cyberGold' : 'bg-onlineGreen/15 text-onlineGreen'}">${s.toUpperCase()}</span></button>`).join('');
+  }
+  $('topics').onclick = e => { const b = e.target.closest('[data-c]'); if (b) { cat = cat === b.dataset.c ? 'All' : b.dataset.c; open = -1; $('q').value = ''; paintTopics(); paintFaq(); } };
+  $('faqs').onclick = e => {
+    const v = e.target.closest('[data-v]'); if (v) { voted[v.dataset.i] = +v.dataset.v; vibe.toast(+v.dataset.v ? 'Thanks for the feedback' : 'Sorry. Try Chat with us'); return paintFaq(); }
+    const b = e.target.closest('[data-f]'); if (b) { open = open === +b.dataset.f ? -1 : +b.dataset.f; paintFaq(); }
+  };
+  $('faqH').onclick = e => { if (e.target.id === 'all') { cat = 'All'; paintTopics(); paintFaq(); } };
+  $('q').oninput = () => { open = -1; paintFaq(); };
+  $('clr').onclick = () => { $('q').value = ''; paintFaq(); };
+
+  // report sheet
+  function paintReport() {
+    $('rt').innerHTML = REASONS.map(([r, i]) => `<button data-r="${r}" class="chip rounded-2xl py-3 px-1 flex flex-col items-center gap-1.5 text-xs ${r === reason ? 'on' : ''}"><span class="w-6 h-6">${IC[i]}</span>${r}</button>`).join('');
+    $('extra').innerHTML = (EXTRA[reason] || []).map((p, i) => `<input class="field" placeholder="${p}" data-x>`).join('');
+    $('shotT').textContent = shot ? 'Screenshot added ✓' : 'Add a screenshot (optional)';
+    $('shot').style.borderColor = shot ? 'rgba(62,224,143,.6)' : ''; $('shot').style.color = shot ? '#3ee08f' : '';
+    chk();
+  }
+  const chk = () => $('rsend').disabled = !reason || $('rtxt').value.trim().length < 5;
+  function openReport() { $('rw').classList.add('open'); paintReport(); }
+  function closeReport() { $('rw').classList.remove('open'); }
+  $('rt').onclick = e => { const b = e.target.closest('[data-r]'); if (b) { reason = b.dataset.r; paintReport(); } };
+  $('rtxt').oninput = chk; $('shot').onclick = () => { shot = !shot; paintReport(); };
+  $('rsend').onclick = () => {
+    TICKETS.unshift([`${reason} · ${$('rtxt').value.trim().slice(0, 28)}`, 'Open', 'Just now', '']); paintTickets();
+    closeReport(); vibe.toast('Report sent · we will reply in your notifications'); $('rtxt').value = ''; reason = ''; shot = false;
+  };
+  paintTopics(); paintFaq(); paintTickets();
+</script>
+</body>
+</html>

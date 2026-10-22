@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Call designs · compare</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #050508; color: #fff; font-family: 'Inter', sans-serif; padding: 20px 12px; }
+  h1 { margin: 0; font-size: 20px; } p { color: #8b8b9a; font-size: 12px; margin: 6px 0 0; }
+  .opt { margin: 26px auto 8px; display: flex; justify-content: space-between; align-items: baseline; max-width: 1060px; }
+  .opt b { font-size: 15px; } .opt a { color: #00f2fe; font-size: 12px; }
+  /* each option page is rendered at desktop width and scaled down to fit any pane */
+  .frame { position: relative; width: 100%; max-width: 1060px; margin: 0 auto; overflow: hidden; border: 1px solid #1f1f2b; border-radius: 18px; }
+  .frame iframe { position: absolute; top: 0; left: 0; width: 1060px; height: 860px; border: 0; transform-origin: 0 0; background: #050508; }
+</style>
+</head>
+<body>
+  <h1>Call screens · 4 design options</h1>
+  <p>Each option: Voice call · Video calling (ringing) · Video call. Tap "open" to see one full size. Tell me A, B, C or D.</p>
+  <div id="list"></div>
+<script>
+  const opts = [['A', 'WhatsApp Clean', 'call-A-whatsapp-clean.html'], ['B', 'Midnight Glass', 'call-B-midnight-glass.html'],
+    ['C', 'Luxe Gold', 'call-C-luxe-gold.html'], ['D', 'VIBE Minimal', 'call-D-vibe-minimal.html']];
+  document.getElementById('list').innerHTML = opts.map(([k, n, f]) =>
+    `<div class="opt"><b>${k} · ${n}</b><a href="${f}" target="_blank">open ↗</a></div><div class="frame"><iframe src="${f}" scrolling="no"></iframe></div>`).join('');
+  function fit() {
+    document.querySelectorAll('.frame').forEach(fr => {
+      const s = Math.min(1, fr.clientWidth / 1060);
+      fr.querySelector('iframe').style.transform = `scale(${s})`;
+      fr.style.height = 860 * s + 'px';
+    });
+  }
+  addEventListener('resize', fit); fit();
+</script>
+</body>
+</html>

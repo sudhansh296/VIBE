@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calls · D VIBE Minimal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+  /* D · VIBE Minimal: brand pink/cyan used only as one thin ring and one dock line; everything else monochrome */
+  .ph { background: #07070c; }
+  .voice .bg { background: linear-gradient(180deg, rgba(255,42,133,.08), transparent 40%), #07070c; }
+  .who { margin-top: 74px; }
+  .avwrap { position: relative; padding: 6px; border-radius: 99px; }
+  .avwrap::before { content: ''; position: absolute; inset: 0; border-radius: 99px; background: conic-gradient(#ff2a85, #00f2fe, #ff2a85);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px)); mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+    animation: spin 6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg) } }
+  .who .av { width: 120px; height: 120px; font-size: 44px; background: linear-gradient(160deg, #1d1a28, #121019); color: #fff; }
+  .who .nm { font-size: 27px; font-weight: 600; margin-top: 22px; }
+  .who .st { font-size: 14px; color: #c7c7d1; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .who .meta { color: #6b6b7b; margin-top: 10px; }
+  .ctrls { position: relative; background: #0f0f17; border-radius: 28px 28px 0 0; padding: 20px 22px 30px; }
+  .ctrls::before { content: ''; position: absolute; left: 22%; right: 22%; top: 0; height: 1px; background: linear-gradient(90deg, transparent, #ff2a85, #00f2fe, transparent); }
+  .cb .ic { width: 54px; height: 54px; border-radius: 99px; background: #1a1a25; border: 1px solid #262636; color: #fff; }
+  .cb.on .ic { background: #fff; color: #07070c; border-color: #fff; }
+  .cb[data-k="gift"] .ic { color: #ff2a85; }
+  .cb .lb { color: #8b8b9a; }
+  .endrow { margin-top: 20px; }
+  .endb .ic { width: 62px; height: 62px; background: #ff3b4e; border: 0; box-shadow: 0 8px 24px -6px rgba(255,59,78,.6); }
+  .endb .lb { display: none; }
+  .ring .selfcam { background: radial-gradient(ellipse at 50% 35%, #34324a, #0b0b12 75%); }
+  .ring .face, .incall .face { background: radial-gradient(circle at 50% 40%, #59577a, #2a2940 70%); opacity: .6; }
+  .ring .body, .incall .body { background: radial-gradient(circle at 50% 0, #393853, #121219 70%); opacity: .7; }
+  .shade { background: linear-gradient(180deg, rgba(7,7,12,.75), transparent 38%, transparent 58%, rgba(7,7,12,.7)); }
+  .who.small { margin-top: 40px; }
+  .who.small .av { width: 72px; height: 72px; font-size: 26px; }
+  .who.small .nm { font-size: 22px; margin-top: 12px; }
+  .ring .ctrls { background: rgba(15,15,23,.92); }
+  .incall .remote { background: radial-gradient(ellipse at 50% 35%, #4b3a5e, #120e18 75%); }
+  .incall .ctrls { margin: auto 12px 22px; border-radius: 28px; padding: 12px 14px; background: rgba(15,15,23,.9); }
+  .incall .cb .lb { display: none; }
+  .incall .cb .ic { width: 44px; height: 44px; } .incall .cb .ic svg { width: 21px; height: 21px; }
+  .incall .endb .ic { width: 44px; height: 44px; }
+  .topbar .chip, .coins { background: rgba(7,7,12,.6); border: 1px solid #262636; padding: 6px 10px 6px 6px; border-radius: 99px; }
+  .coins { padding: 6px 10px; color: #f6dc9b; }
+  .topbar .av.mini { background: #1d1a28; }
+  .pip { background: radial-gradient(ellipse at 50% 30%, #45435f, #15141f); border: 1px solid rgba(255,255,255,.2); color: #c7c7d1; }
+</style>
+</head>
+<body>
+<header class="top"><h1>Call design · D · VIBE Minimal</h1><p class="sub">Monochrome UI; brand pink/cyan only as one thin ring and one dock line.</p></header>
+<nav class="opts"><a href="call-A-whatsapp-clean.html">A · WhatsApp Clean</a><a href="call-B-midnight-glass.html">B · Midnight Glass</a><a href="call-C-luxe-gold.html">C · Luxe Gold</a><a class="cur" href="call-D-vibe-minimal.html">D · VIBE Minimal</a><a href="index.html">Compare all</a></nav>
+<div class="row3" id="r"></div>
+<script src="calls.js"></script><script>renderCalls(document.getElementById('r'));</script>
+</body>
+</html>
